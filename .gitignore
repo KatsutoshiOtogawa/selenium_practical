@@ -5,3 +5,9 @@ DynamoDBLocal_lib
 third_party_licenses
 LICENSE.txt
 README.txt
+
+# your local DB
+shared-local-instance.db
+
+# log4j
+apache-log4j-2.13.3-bin
