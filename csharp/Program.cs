@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Net.Sockets;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
@@ -76,7 +75,6 @@ namespace csharp
                 connection = new AmazonDynamoDBClient();
             }else{
                 AmazonDynamoDBConfig ddbConfig = new AmazonDynamoDBConfig();
-                // ddbConfig.ServiceURL = "http://localhost:8000";
                 ddbConfig.ServiceURL = String.Format(
                     "http://{0}:{1}"
                     ,Environment.GetEnvironmentVariable("HOST")
@@ -88,8 +86,6 @@ namespace csharp
         }
         static void Main(string[] args)
         {
-            // Console.WriteLine("Hello World!");
-
             // read
             DotEnv.AutoConfig();
             AmazonDynamoDBClient DynamoDB = null;
