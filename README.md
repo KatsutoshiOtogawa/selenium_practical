@@ -50,27 +50,6 @@ tar zxvf dynamodb_local_latest.tar.gz
 rm dynamodb_local_latest.tar.gz* 
 ```
 
-```
-wget https://ftp.jaist.ac.jp/pub/apache/logging/log4j/2.13.3/apache-log4j-2.13.3-bin.tar.gz
-wget https://www.apache.org/dist/logging/log4j/2.13.3/apache-log4j-2.13.3-bin.tar.gz.sha512
-
-shasum -a 512 -c apache-log4j-2.13.3-bin.tar.gz.sha512
-
-wget https://www.apache.org/dist/logging/log4j/2.13.3/apache-log4j-2.13.3-bin.tar.gz.asc
-wget https://downloads.apache.org/logging/KEYS
-gpg --import KEYS
-
-# generate your secretkey, if first time use gpg.
-# if you gpgconf --kill gpg-agent
-
-gpg --generate-key
-
-# 秘密鍵で署名する。
-gpg --sign-key 739A04DE604E6AD81CCE457F1E4B1D05B095DD52
-gpg --verify apache-log4j-2.13.3-bin.tar.gz.asc 
-
-```
-
 you launch DynamoDBLocal
 ```
 java -Djava.library.path=./DynamoDBLocal_lib -jar DynamoDBLocal.jar -sharedDb &
@@ -80,6 +59,11 @@ set aws credential.
 ```
 aws configure set aws_access_key_id fakeMyKeyId
 aws configure set aws_secret_access_key fakeSecretAccessKey
+
+set -o allexport;
+source .env
+set +o allexport
+
 
 # this setting is optional. you dont have to use.
 aws configure set region 'ap-northeast-1'
@@ -93,7 +77,7 @@ aws dynamodb list-tables --endpoint-url http://localhost:8000
 
 ## use 
 ```
-docker run -p 8000:8000 amazon/dynamodb-local:latest -jar DynamoDBLocal.jar -inMemory -sharedDb
+docker run -p 8000:8000 amazon/dynamodb-local:latest -jar DynamoDBLocal.jar -inMemory -sharedDb &
 ```
 
 

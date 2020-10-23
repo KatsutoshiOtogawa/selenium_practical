@@ -20,12 +20,16 @@ import boto3
 import datetime
 
 
-class TestDlsitescraping():
-  def setup_method(self, method):
+class ScrapingDLSite():
+  def __init__(self,connection):
     self.driver = webdriver.Chrome()
-    self.vars = {}
-  
-  def teardown_method(self, method):
+    self.created_at = datetime.datetime.now().strftime('%Y-%m-%d')
+    self.transition_interval = 5
+    self.table_name = "ArtCollection"
+    self.shop_name = "DLSite"
+    self.dynamodb = connection
+
+  def __del__(self):
     self.driver.quit()
   
   def wait_for_window(self, timeout = 2):
@@ -35,23 +39,8 @@ class TestDlsitescraping():
     if len(wh_now) > len(wh_then):
       return set(wh_now).difference(set(wh_then)).pop()
   
-  def test_dlsitescraping(self):
+  def start_scraping(self):
 
-    # store start scraping 
-    CreatedAt = datetime.datetime.now().strftime('%Y-%m-%d')
-
-    # load environment variable
-    load_dotenv(verbose=True)
-
-    dotenv_path = join(dirname(__file__), '.env')
-    load_dotenv(dotenv_path)
-    dynamodb = boto3.client(
-      'dynamodb',
-      endpoint_url="http://localhost:8000"
-    )
-
-    table_name = "ArtCollection"
-    
     self.driver.get("https://www.dlsite.com/index.html")
     self.driver.set_window_size(1440, 797)
 
@@ -67,7 +56,7 @@ class TestDlsitescraping():
     except:
       pass
     
-    time.sleep(5)
+    time.sleep(self.transition_interval)
 
     # login user.
     WebDriverWait(self.driver, 60).until(expected_conditions.element_to_be_clickable((By.LINK_TEXT, "ログイン")))
@@ -94,34 +83,41 @@ class TestDlsitescraping():
     except:
       pass
     
-    time.sleep(5)
+    time.sleep(self.transition_interval)
     # read ArtName list file
     with open(join(dirname(__file__),'ArtName.txt')) as f:
       for line in f.readlines():
+        print('read line {}'.format(line))
         # Begining of line [#], this line is ignore.
-        if re.match('^#', line) or line == '' or line == None:
+        if line.startswith('#') or line in ['',None]:
+
+          print('enter continue sentense')
           continue
 
+        print('scraping {}'.format(line))
         ArtName = line
 
         # search for keyword using exact match. and go to page search result.
         WebDriverWait(self.driver, 60).until(expected_conditions.element_to_be_clickable((By.ID, "search_text")))
-
         # clear the input box for 
         self.driver.find_element(By.ID, "search_text").clear()
         self.driver.find_element(By.ID, "search_text").click()
-        self.driver.find_element(By.ID, "search_text").send_keys("\"{}\"".format(ArtName))
+        # self.driver.find_element(By.ID, "search_text").send_keys("\"{}\"".format(ArtName))
+        self.driver.find_element(By.ID, "search_text").send_keys("{}".format(ArtName))
         self.driver.find_element(By.ID, "search_text").send_keys(Keys.ENTER)
 
         # search result you
         # this operation is failuer is doesent looking for Art.
+
         try:
-          WebDriverWait(self.driver, 60).until(expected_conditions.element_to_be_clickable((By.LINK_TEXT, ArtName))) 
-          self.driver.find_element(By.LINK_TEXT, "{}".format(ArtName)).click()
+          WebDriverWait(self.driver, 60).until(expected_conditions.element_to_be_clickable((By.CSS_SELECTOR, ".search_result_img_box_inner a[title='{}']".format(ArtName))))
+          # WebDriverWait(self.driver, 60).until(expected_conditions.element_to_be_clickable((By.LINK_TEXT, ArtName)))
+          # self.driver.find_element(By.LINK_TEXT, "{}".format(ArtName)).click()
+          self.driver.find_element(By.CSS_SELECTOR, ".search_result_img_box_inner a[title='{}']".format(ArtName)).click()
         except:
           continue
         
-        time.sleep(5)
+        time.sleep(self.transition_interval)
 
         # url からArtIdを取得。
         # ex) https://www.dlsite.com/pro/work/=/product_id/VJ009935.html -> VJ000935
@@ -177,6 +173,9 @@ class TestDlsitescraping():
             'ShopArtId': {
                 'S': ShopArtId,
             },
+            'ShopName': {
+                'S': self.shop_name
+            },
             'ArtName': {
                 'S': ArtName,
             },
@@ -203,102 +202,40 @@ class TestDlsitescraping():
                 ],
             },
             'CreatedAt': {
-                'S': CreatedAt,
+                'S': self.created_at,
             },
         }
 
-        dynamodb.put_item(TableName=table_name, Item=item)
+        self.dynamodb.put_item(TableName=self.table_name, Item=item)
 
+def create_dynamodb_connection():
+  # dynamoDBLocal is used, if Environment Variable HOST or PORT isnt setten.
+  connection = None
+  if os.environ.get("HOST") in [None,'']:
+      connection = boto3.client('dynamodb')
 
-    # # search for keyword using exact match. and go to page search result.
-    # WebDriverWait(self.driver, 60).until(expected_conditions.element_to_be_clickable((By.ID, "search_text")))
-    # self.driver.find_element(By.ID, "search_text").click()
-    # self.driver.find_element(By.ID, "search_text").send_keys("\"{}\"".format(ArtName))
-    # self.driver.find_element(By.ID, "search_text").send_keys(Keys.ENTER)
+  else:
+    connection = boto3.client(
+      'dynamodb',
+      endpoint_url="http://{}:{}".format(os.environ.get("HOST"),os.environ.get("PORT"))
+    )
 
-    # # search result you
-    # WebDriverWait(self.driver, 60).until(expected_conditions.element_to_be_clickable((By.LINK_TEXT, ArtName))) 
-    # self.driver.find_element(By.LINK_TEXT, "{}".format(ArtName)).click()
+  return connection
 
-    # time.sleep(5)
+def set_environment_variable():
 
-    # # go to create affiliate link page
-    # WebDriverWait(self.driver, 60).until(expected_conditions.element_to_be_clickable((By.LINK_TEXT, "アフィリエイトリンク作成"))) 
-    # self.driver.find_element(By.LINK_TEXT, "アフィリエイトリンク作成").click()
+  # load environment variable
+  load_dotenv(verbose=True)
 
-    
-    # WebDriverWait(self.driver, 60).until(expected_conditions.element_to_be_clickable((By.ID, "afid"))) 
-    # self.driver.find_element(By.ID, "afid").click()
-    # dropdown = self.driver.find_element(By.ID, "afid")
+  dotenv_path = join(dirname(__file__), '.env')
+  load_dotenv(dotenv_path)
 
-    # select = Select(dropdown)
-    # select.select_by_visible_text("{} ({})".format(os.environ.get("DLSITE_AFFILIATE_ID"),os.environ.get("DLSITE_AFFILIATE_SITE")))
+if __name__ == '__main__':
 
-    # # copy affliate link url.
-    # WebDriverWait(self.driver, 60).until(expected_conditions.element_to_be_clickable((By.CSS_SELECTOR, "#affiliate_link_box button.copy_btn._link_only")))
-    # self.driver.find_element(By.CSS_SELECTOR, "#affiliate_link_box button.copy_btn._link_only").click()
+  set_environment_variable()
 
-    # AffiliateUrl = pyperclip.paste()
+  dynamodb = create_dynamodb_connection
 
-    # # copy SmallImg link url
-    # WebDriverWait(self.driver, 60).until(expected_conditions.element_to_be_clickable((By.CSS_SELECTOR, "#preview_mini img.target_type"))) 
-    # AffiliateBigImageUrl = self.driver.find_element(By.CSS_SELECTOR, "#preview_mini img.target_type").get_attribute("src")
+  instance = ScrapingDLSite(dynamodb)
 
-    # # copy MiddleImg link url
-    # WebDriverWait(self.driver, 60).until(expected_conditions.element_to_be_clickable((By.CSS_SELECTOR, "#preview_thum img.target_type"))) 
-    # AffiliateMiddleImageUrl = self.driver.find_element(By.CSS_SELECTOR, "#preview_thum img.target_type").get_attribute("src")
-
-    # # copy SmallImg link url
-    # WebDriverWait(self.driver, 60).until(expected_conditions.element_to_be_clickable((By.CSS_SELECTOR, "#preview_main img.target_type"))) 
-    # AffiliateSmallImageUrl = self.driver.find_element(By.CSS_SELECTOR, "#preview_main img.target_type").get_attribute("src")
-
-    # # copy MusicPlayer embed tag
-
-    # # copy MoviePlayer embed Tag
-    # # this Movie is sometimes 
-    # PlayerEmbed = []
-    # try:
-    #   WebDriverWait(self.driver, 60).until(expected_conditions.element_to_be_clickable((By.CSS_SELECTOR, ".main_modify_box button.copy_btn[data-content-selector='#chobit_player_embed_url']"))) 
-    #   self.driver.find_element(By.CSS_SELECTOR, ".main_modify_box button.copy_btn[data-content-selector='#chobit_player_embed_url']").click()
-    #   PlayerEmbed.append(
-    #     {
-    #       'S': pyperclip.paste()
-    #     }
-    #   )
-    # except:
-    #   pass
-    
-
-    # # player
-    # item = {
-    #     'ShopArtId': {
-    #         'S': ArtName,
-    #     },
-    #     'ArtName': {
-    #         'S': ArtName,
-    #     },
-    #     'AffiliateUrl': {
-    #         'S': AffiliateUrl,
-    #     },
-    #     'AffiliateBigImageUrl': {
-    #         'S': AffiliateBigImageUrl,
-    #     },
-    #     'AffiliateMiddleImageUrl': {
-    #         'S': AffiliateMiddleImageUrl,
-    #     },
-    #     'AffiliateSmallImageUrl': {
-    #         'S': AffiliateSmallImageUrl,
-    #     },
-    #     'PlayerEmbed': {
-    #         'L': PlayerEmbed
-    #     },
-    #     'Gallery': {
-    #         'L': [
-    #           {
-    #             'S': ''
-    #           }
-    #         ],
-    #     }
-    # }
-
-    # dynamodb.put_item(TableName=table_name, Item=item)
+  instance.start_scraping()
