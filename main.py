@@ -30,6 +30,7 @@ class ScrapingDLSite():
     self.dynamodb = connection
 
   def __del__(self):
+    self.driver.close()
     self.driver.quit()
   
   def wait_for_window(self, timeout = 2):
@@ -87,14 +88,10 @@ class ScrapingDLSite():
     # read ArtName list file
     with open(join(dirname(__file__),'ArtName.txt')) as f:
       for line in f.readlines():
-        print('read line {}'.format(line))
         # Begining of line [#], this line is ignore.
         if line.startswith('#') or line in ['',None]:
-
-          print('enter continue sentense')
           continue
-
-        print('scraping {}'.format(line))
+        
         ArtName = line
 
         # search for keyword using exact match. and go to page search result.
@@ -152,10 +149,6 @@ class ScrapingDLSite():
         WebDriverWait(self.driver, 60).until(expected_conditions.element_to_be_clickable((By.CSS_SELECTOR, "#preview_main img.target_type"))) 
         AffiliateBigImageUrl = self.driver.find_element(By.CSS_SELECTOR, "#preview_main img.target_type").get_attribute("src")
 
-        # copy MusicPlayer embed tag
-
-        # copy MoviePlayer embed Tag
-        # this Movie is sometimes 
         PlayerEmbed = []
         try:
           WebDriverWait(self.driver, 60).until(expected_conditions.element_to_be_clickable((By.CSS_SELECTOR, ".main_modify_box button.copy_btn[data-content-selector='#chobit_player_embed_url']"))) 
