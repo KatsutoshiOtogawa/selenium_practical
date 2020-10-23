@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
@@ -10,9 +11,7 @@ namespace csharp
     public class ScrapingDLSite
     {
         private IWebDriver Driver;
-
         private TimeSpan TransitionInterval;
-
         private WebDriverWait Wait;
         private String CreatedAt;
         private String TableName;
@@ -28,7 +27,8 @@ namespace csharp
             this.DynamoDB = connection;
             this.Wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(60));
         }
-        ~ScrapingDLSite(){
+        ~ScrapingDLSite()
+        {
             destructor();
         }
         public void destructor()
@@ -45,6 +45,8 @@ namespace csharp
             Wait.Until(driver =>driver.FindElement(By.XPath("(//a[contains(text(),\'同人\')])[2]")).Enabled);
             Driver.FindElement(By.XPath("(//a[contains(text(),\'同人\')])[2]")).Click();
 
+            // age validation
+            // this popup is shown when you visit first time.
             try
             {
                 Wait.Until(driver =>driver.FindElement(By.CssSelector("li.btn_yes.btn-approval > a")).Enabled);
@@ -55,11 +57,61 @@ namespace csharp
                 Console.WriteLine(ex.Message);
             }
 
-            // WebDriverWait(self.driver, 60).until(expected_conditions.element_to_be_clickable((By.LINK_TEXT, "ログイン")))
-            // self.driver.find_element(By.LINK_TEXT, "ログイン").click()
+            Thread.Sleep(TransitionInterval);
 
+            // login user
+            Wait.Until(driver =>driver.FindElement(By.LinkText("ログイン")).Enabled);
+            Driver.FindElement(By.LinkText("ログイン")).Click();
+
+            Wait.Until(driver =>driver.FindElement(By.Id("form_id")).Enabled);
+            Driver.FindElement(By.Id("form_id")).Click();
+            Driver.FindElement(By.Id("form_id")).SendKeys(Environment.GetEnvironmentVariable("DLSITE_ID"));
+
+            Wait.Until(driver =>driver.FindElement(By.Id("form_password")).Enabled);
+            Driver.FindElement(By.Id("form_password")).Click();
+            Driver.FindElement(By.Id("form_password")).SendKeys(Environment.GetEnvironmentVariable("DLSITE_PASSWORD"));
+
+            Wait.Until(driver =>driver.FindElement(By.CssSelector(".type-clrDefault")).Enabled);
+            Driver.FindElement(By.CssSelector(".type-clrDefault")).Click();
+
+            // close modal window for qupon. qupon is shown when user is just login.
+            // this popup dont know to show
+            // you dont know this popup show or not.
+            // このポップアップが表示されるかどうか分からない。
+            try
+            {
+                Wait.Until(driver =>driver.FindElement(By.CssSelector("div > div.modal_close")).Enabled);
+                Driver.FindElement(By.CssSelector("div > div.modal_close")).Click();
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+            Thread.Sleep(TransitionInterval);
+            // read ArtName list file
+            string[] lines = System.IO.File.ReadAllLines("ArtName.txt");
+
+            foreach (string line in lines)
+            {
+                // Begining of line [#], this line is ignore.
+                if(line.StartsWith("#") || String.IsNullOrEmpty(line))
+                {
+                    continue;
+                }
+
+                var ArtName = line;
+
+                // search for keyword using exact match. and go to page search result.
+                Wait.Until(driver =>driver.FindElement(By.Id("search_text")).Enabled);
+                // clear the input box for 
+                Driver.FindElement(By.Id("search_text")).Clear();
+                Driver.FindElement(By.Id("search_text")).Click();
+                // self.driver.find_element(By.ID, "search_text").send_keys("\"{}\"".format(ArtName))
+                Driver.FindElement(By.Id("search_text")).SendKeys(ArtName);
+                Driver.FindElement(By.Id("search_text")).SendKeys(Keys.Enter);
+            }
             // driver.FindElement(By.Name("q")).SendKeys("cheese" + Keys.Enter);
-            // wait.Until(driver =>driver.FindElement(By.CssSelector("h3>div")).Displayed);
             // IWebElement firstResult = driver.FindElement(By.CssSelector("h3>div"));
             // Console.WriteLine(firstResult.GetAttribute("textContent"));
             
