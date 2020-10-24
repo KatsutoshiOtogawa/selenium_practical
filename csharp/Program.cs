@@ -144,7 +144,40 @@ namespace csharp
                 // url からArtIdを取得。
                 // ex) https://www.dlsite.com/pro/work/=/product_id/VJ009935.html -> VJ000935
                 var ShopArtId = (Driver.Url.Split('/',1).Last()).Split('.')[0];
-        
+
+                // go to create affiliate link page
+                Wait.Until(driver =>driver.FindElement(By.LinkText("アフィリエイトリンク作成")).Enabled);
+                Driver.FindElement(By.LinkText("アフィリエイトリンク作成")).Click();
+
+                Wait.Until(driver =>driver.FindElement(By.Id("afid")).Enabled);
+                Driver.FindElement(By.Id("afid")).Click();
+
+                // from selenium.webdriver.support.select import Select
+                IWebElement element = Driver.FindElement(By.Id("afid"));
+
+                SelectElement oSelect = new SelectElement(element);
+                
+ 
+                //selectElement.SelectByText(String.Format("{0} ({1})",Environment.GetEnvironmentVariable("DLSITE_AFFILIATE_ID"),Environment.GetEnvironmentVariable("DLSITE_AFFILIATE_SITE")))
+
+        // # copy affliate link url.
+        // WebDriverWait(self.driver, 60).until(expected_conditions.element_to_be_clickable((By.CSS_SELECTOR, "#affiliate_link_box button.copy_btn._link_only")))
+        // self.driver.find_element(By.CSS_SELECTOR, "#affiliate_link_box button.copy_btn._link_only").click()
+
+        // AffiliateUrl = pyperclip.paste()
+
+        // # copy SmallImg link url
+        // WebDriverWait(self.driver, 60).until(expected_conditions.element_to_be_clickable((By.CSS_SELECTOR, "#preview_mini img.target_type"))) 
+        // AffiliateSmallImageUrl = self.driver.find_element(By.CSS_SELECTOR, "#preview_mini img.target_type").get_attribute("src")
+
+        // # copy MiddleImg link url
+        // WebDriverWait(self.driver, 60).until(expected_conditions.element_to_be_clickable((By.CSS_SELECTOR, "#preview_thum img.target_type"))) 
+        // AffiliateMiddleImageUrl = self.driver.find_element(By.CSS_SELECTOR, "#preview_thum img.target_type").get_attribute("src")
+
+        // # copy SmallImg link url
+        // WebDriverWait(self.driver, 60).until(expected_conditions.element_to_be_clickable((By.CSS_SELECTOR, "#preview_main img.target_type"))) 
+        // AffiliateBigImageUrl = self.driver.find_element(By.CSS_SELECTOR, "#preview_main img.target_type").get_attribute("src")
+
             }
             // driver.FindElement(By.Name("q")).SendKeys("cheese" + Keys.Enter);
             // IWebElement firstResult = driver.FindElement(By.CssSelector("h3>div"));
