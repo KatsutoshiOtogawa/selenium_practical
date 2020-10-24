@@ -91,7 +91,7 @@ class ScrapingDLSite():
         # Begining of line [#], this line is ignore.
         if line.startswith('#') or line in ['',None]:
           continue
-        
+
         ArtName = line
 
         # search for keyword using exact match. and go to page search result.
@@ -105,11 +105,8 @@ class ScrapingDLSite():
 
         # search result you
         # this operation is failuer is doesent looking for Art.
-
         try:
           WebDriverWait(self.driver, 60).until(expected_conditions.element_to_be_clickable((By.CSS_SELECTOR, ".search_result_img_box_inner a[title='{}']".format(ArtName))))
-          # WebDriverWait(self.driver, 60).until(expected_conditions.element_to_be_clickable((By.LINK_TEXT, ArtName)))
-          # self.driver.find_element(By.LINK_TEXT, "{}".format(ArtName)).click()
           self.driver.find_element(By.CSS_SELECTOR, ".search_result_img_box_inner a[title='{}']".format(ArtName)).click()
         except:
           continue
