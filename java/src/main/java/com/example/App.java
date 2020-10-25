@@ -72,21 +72,6 @@ public class App
     public static void main( String[] args )
     {
 
-        // .env file is the same format with propertiy file.
-        // properties.load(new FileInputStream(String.join("/",System.getProperty("user.dir"),"resources",".env")));
-        // Properties properties = new Properties();
-        // try 
-        // {
-        //     // .env file is the same format with propertiy file.
-        //     properties.load(new FileInputStream(String.join("/",System.getProperty("user.dir"),"resources",".env")));
-        // } catch (IOException e) {
-        //     System.out.println(e.getMessage());
-        //     e.printStackTrace();
-        //     return;
-        // }
-        // System.out.println(properties.getProperty("DLSITE_AFFILIATE_SITE"));
-        //System.getenv("PATH");
-
         FileInputStream fp = null;
         String resources = null;
         resources = String.join("/",System.getProperty("user.dir"),"resources",".env");
@@ -139,8 +124,6 @@ public class App
             instance.destructor();
             return;
         }
-        
-        // return instance;
 
         List<String> lines = null;
         try 
@@ -178,6 +161,5 @@ public class App
         instance.destructor();
 
         // dynamodbのclose処理はこちらでやる。
-
     }
 }

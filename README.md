@@ -126,6 +126,8 @@ aws dynamodb create-table --endpoint-url http://localhost:8000 \
 
 [aws cli Credential](https://docs.aws.amazon.com/ja_jp/cli/latest/userguide/cli-configure-quickstart.html#cli-configure-quickstart-precedence)
 ## Java
+
+- [Selenium java document](https://www.selenium.dev/selenium/docs/api/java/overview-summary.html)
 - [apache StringUtils](http://commons.apache.org/proper/commons-lang/apidocs/org/apache/commons/lang3/StringUtils.html)
 - [aws dynamoDB java document](https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/dynamodb/DynamoDbClient.html)
 

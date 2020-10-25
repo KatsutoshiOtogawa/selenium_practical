@@ -6,7 +6,10 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import static org.openqa.selenium.support.ui.ExpectedConditions.presenceOfElementLocated;
+import org.openqa.selenium.TimeoutException;
+
 import java.util.Properties;
 
 import java.nio.file.Files;
@@ -15,12 +18,11 @@ import java.nio.file.Paths;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.io.IOException;
-//import java.io.FileInputStream;
 import java.io.Reader;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 
-
+import java.lang.Thread;
 import java.util.Date;
 import software.amazon.awssdk.core.waiters.WaiterResponse;
 import software.amazon.awssdk.regions.Region;
@@ -43,7 +45,7 @@ import software.amazon.awssdk.services.dynamodb.waiters.DynamoDbWaiter;
 public class ScrapingDLSite
 {
     private WebDriver Driver;
-    //private TimeSpan TransitionInterval; Duration
+    private int TransitionInterval;
     private WebDriverWait Wait;
     private String CreatedAt;
     private String TableName;
@@ -55,9 +57,9 @@ public class ScrapingDLSite
     {
         this.Driver = new ChromeDriver();
         
-        this.CreatedAt = (new SimpleDateFormat("yyyy/MM/dd E HH:mm:ss")).format(new Date());
+        this.CreatedAt = (new SimpleDateFormat("yyyy-MM-dd")).format(new Date());
         this.Wait = new WebDriverWait(Driver, 60);
-        //WebDriverWait wait = new WebDriverWait(driver, 60);
+        this.TransitionInterval = 5 * 1000;
         this.TableName = "ArtCollection";
         this.ShopName = "DLSite";
         // this.DynamoDbClient = connection;
@@ -65,9 +67,6 @@ public class ScrapingDLSite
         this.properties = properties;
         // aws credential propertiesよりも環境変数を優先しているので
         // それと同じような作りにするとよいはず。
-        // this.properties = new Properties();
-
-        // this.properties.load(reader);
 
     }
 
@@ -77,50 +76,84 @@ public class ScrapingDLSite
         Driver.quit();
     }
 
-    public void setupScraping() throws Exception
+    public void setupScraping() throws TimeoutException,InterruptedException
     {
+        // // Driver.WindowHandles.
+        // self.driver.set_window_size(1440, 797)
+        goToTopPage();
+        ageValidation();
         userLogin();
+        shownCoupon();
     }
 
-    private void userLogin() throws Exception
+    private void goToTopPage() throws TimeoutException,InterruptedException
     {
+        Driver.get("https://www.dlsite.com/index.html");
+        Wait.until(ExpectedConditions.elementToBeClickable(By.xpath("(//a[contains(text(),\'同人\')])[2]")))
+            .click();
+        Thread.sleep(TransitionInterval);
+    }
 
+    private void ageValidation()
+    {
+        // this popup is shown when you visit first time.
+        // Because of ignore Exception operation.
+        try
+        {
+            Wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("li.btn_yes.btn-approval > a")))
+            .click();
+        }catch(Exception ignored)
+        {
+
+        }
+        Thread.sleep(TransitionInterval);
+    }
+
+    private void userLogin() throws TimeoutException,InterruptedException
+    {
+        Wait.until(ExpectedConditions.elementToBeClickable(By.linkText("ログイン")))
+            .click();
+
+        Wait.until(ExpectedConditions.elementToBeClickable(By.id("form_id")))
+            .click();
+        
+        Wait.until(ExpectedConditions.elementToBeClickable(By.id("form_id")))
+            .sendKeys(System.getenv("DLSITE_ID") != null ? System.getenv("DLSITE_ID") : properties.getProperty("DLSITE_ID"));
+
+        Wait.until(ExpectedConditions.elementToBeClickable(By.id("form_password")))
+            .click();
+        
+        Wait.until(ExpectedConditions.elementToBeClickable(By.id("form_password")))
+            .sendKeys(System.getenv("DLSITE_PASSWORD") != null ? System.getenv("DLSITE_PASSWORD") : properties.getProperty("DLSITE_PASSWORD"));
+
+        Wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".type-clrDefault")))
+            .click();
+        
+        Thread.sleep(TransitionInterval);
+    }
+
+    private void shownCoupon()
+    {
+        // close modal window for qupon. qupon is shown when user is just login.
+        // this popup dont know to show
+        // you dont know this popup show or not.
+        // このポップアップが表示されるかどうか分からない。
+        try
+        {
+            Wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("div > div.modal_close")))
+            .click();
+        }catch(Exception ignored)
+        {
+
+        }
+        Thread.sleep(TransitionInterval);
     }
 
     public void fetchScraping(String line)
     {
-        // throws 
+        // throws
     }
 
-    // // String apppath;
-    // // try
-    // // {
-    // //     apppath = (String)System.AppDomain.CurrentDomain.BaseDirectory;
-    // // }
-    // // catch(Exception ex)
-    // // {
-    // //     Console.WriteLine(ex.Message);
-    // //     return;
-    // // }
-
-    // // Driver.Navigate().GoToUrl("https://www.dlsite.com/index.html");
-    // // // Driver.WindowHandles.
-    // // // self.driver.set_window_size(1440, 797)
-
-    // // Wait.Until(driver =>driver.FindElement(By.XPath("(//a[contains(text(),\'同人\')])[2]")).Enabled);
-    // // Driver.FindElement(By.XPath("(//a[contains(text(),\'同人\')])[2]")).Click();
-
-    // // age validation
-    // // this popup is shown when you visit first time.
-    // try
-    // {
-    //     Wait.Until(driver =>driver.FindElement(By.CssSelector("li.btn_yes.btn-approval > a")).Enabled);
-    //     Driver.FindElement(By.CssSelector("li.btn_yes.btn-approval > a")).Click();
-    // }
-    // catch(Exception ex)
-    // {
-    //     Console.WriteLine(ex.Message);
-    // }
 
     // Thread.Sleep(TransitionInterval);
     // try 
