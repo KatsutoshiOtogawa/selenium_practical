@@ -7,7 +7,6 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import static org.openqa.selenium.support.ui.ExpectedConditions.presenceOfElementLocated;
-import io.github.cdimascio.dotenv.Dotenv;
 import java.util.Properties;
 
 import java.nio.file.Files;
@@ -19,8 +18,8 @@ import java.io.IOException;
 import java.io.FileInputStream;
 import java.io.InputStream;
 /**
- * Hello world!
- *
+ * Application Entory Point
+ * 
  */
 public class App 
 {
