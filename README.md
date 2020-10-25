@@ -22,6 +22,7 @@ unzip chromedriver_mac64.zip
 rm chromedriver_mac64.zip
 
 # build code.
+mvn package 
 mvn compile
 # execute class file.
 java -cp classes/:dependency-jars/* com.example.App #(execute in /path/to/java/target/)
@@ -119,4 +120,19 @@ aws dynamodb create-table --endpoint-url http://localhost:8000 \
 
 # Refference
 
-[Selenium Document](https://www.selenium.dev/documentation/en/)
+- [Selenium Document](https://www.selenium.dev/documentation/en/)
+
+## aws cli Credential
+
+[aws cli Credential](https://docs.aws.amazon.com/ja_jp/cli/latest/userguide/cli-configure-quickstart.html#cli-configure-quickstart-precedence)
+## Java
+- [apache StringUtils](http://commons.apache.org/proper/commons-lang/apidocs/org/apache/commons/lang3/StringUtils.html)
+- [aws dynamoDB java document](https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/dynamodb/DynamoDbClient.html)
+
+- [aws dynamoDB java SDK](https://docs.aws.amazon.com/sdk-for-java/v2/developer-guide/getting-started.html)
+
+## Csharp
+
+## Python
+
+- [boto3]()

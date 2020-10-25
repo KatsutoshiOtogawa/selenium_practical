@@ -15,9 +15,11 @@ import java.nio.file.Paths;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.io.IOException;
-import java.io.FileInputStream;
+//import java.io.FileInputStream;
+import java.io.Reader;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
+
 
 import java.util.Date;
 import software.amazon.awssdk.core.waiters.WaiterResponse;
@@ -46,9 +48,10 @@ public class ScrapingDLSite
     private String CreatedAt;
     private String TableName;
     private String ShopName;
-    //private AmazonDynamoDBClient DynamoDB;
+    private Properties properties;
+    //private DynamoDbClient DynamoDB;
 
-    public ScrapingDLSite(DynamoDbClient connection)
+    public ScrapingDLSite(Properties properties)
     {
         this.Driver = new ChromeDriver();
         
@@ -57,7 +60,76 @@ public class ScrapingDLSite
         //WebDriverWait wait = new WebDriverWait(driver, 60);
         this.TableName = "ArtCollection";
         this.ShopName = "DLSite";
-        //this.DynamoDB = connection;
-        
+        // this.DynamoDbClient = connection;
+
+        this.properties = properties;
+        // aws credential propertiesよりも環境変数を優先しているので
+        // それと同じような作りにするとよいはず。
+        // this.properties = new Properties();
+
+        // this.properties.load(reader);
+
     }
+
+    public void destructor()
+    {
+        Driver.close();
+        Driver.quit();
+    }
+
+    public void setupScraping() throws Exception
+    {
+        userLogin();
+    }
+
+    private void userLogin() throws Exception
+    {
+
+    }
+
+    public void fetchScraping(String line)
+    {
+        // throws 
+    }
+
+    // // String apppath;
+    // // try
+    // // {
+    // //     apppath = (String)System.AppDomain.CurrentDomain.BaseDirectory;
+    // // }
+    // // catch(Exception ex)
+    // // {
+    // //     Console.WriteLine(ex.Message);
+    // //     return;
+    // // }
+
+    // // Driver.Navigate().GoToUrl("https://www.dlsite.com/index.html");
+    // // // Driver.WindowHandles.
+    // // // self.driver.set_window_size(1440, 797)
+
+    // // Wait.Until(driver =>driver.FindElement(By.XPath("(//a[contains(text(),\'同人\')])[2]")).Enabled);
+    // // Driver.FindElement(By.XPath("(//a[contains(text(),\'同人\')])[2]")).Click();
+
+    // // age validation
+    // // this popup is shown when you visit first time.
+    // try
+    // {
+    //     Wait.Until(driver =>driver.FindElement(By.CssSelector("li.btn_yes.btn-approval > a")).Enabled);
+    //     Driver.FindElement(By.CssSelector("li.btn_yes.btn-approval > a")).Click();
+    // }
+    // catch(Exception ex)
+    // {
+    //     Console.WriteLine(ex.Message);
+    // }
+
+    // Thread.Sleep(TransitionInterval);
+    // try 
+    // {
+    //     driver.get("https://google.com/ncr");
+    //     driver.findElement(By.name("q")).sendKeys("cheese" + Keys.ENTER);
+    //     WebElement firstResult = wait.until(presenceOfElementLocated(By.cssSelector("h3>div")));
+    //     System.out.println(firstResult.getAttribute("textContent"));
+    // } finally {
+    //     driver.quit();
+    // }
 }
