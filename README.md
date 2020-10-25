@@ -2,15 +2,38 @@
 
 ## set up environment
 
-In advance, you install chrome.app,pipenv and selenium IDE chrome-extensions.
+In advance, you install chrome.app.
 
+# python
+you need to pipenv install.
 ```
 pipenv install
 pipenv shell
 
 # Execute your pyhton script.
-python3 test.py
+python3 main.py
 ```
+# java
+you need to install mvn.
+```
+# you download chrome driver binary.
+wget https://chromedriver.storage.googleapis.com/86.0.4240.22/chromedriver_mac64.zip #(execute in /path/to/you/Selenium_practical/)
+unzip chromedriver_mac64.zip
+rm chromedriver_mac64.zip
+
+# build code.
+mvn compile
+# execute class file.
+java -cp classes/:dependency-jars/* com.example.App #(execute in /path/to/java/target/)
+# create jar file.
+mvn package
+# execute jar file.
+java -jar java-1.0-SNAPSHOT.jar #(execute in /path/to/java/target/)
+# you need file is, chromedriver,java-1.0-SNAPSHOT.jar,dependency-jars/* and resources/ in production Environment.
+```
+
+# java
+you need to install dotnet-sdk.
 
 # Attension!
 you check chrome.app version, and you use chromedriver-binary version the same one that was chrome.app version you use.
@@ -92,3 +115,8 @@ aws dynamodb create-table --endpoint-url http://localhost:8000 \
                  AttributeName=CreatedAt,KeyType=RANGE \
     --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1
 ```
+
+
+# Refference
+
+[Selenium Document](https://www.selenium.dev/documentation/en/)

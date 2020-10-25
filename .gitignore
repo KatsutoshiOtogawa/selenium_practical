@@ -1,4 +1,5 @@
 .env
+chromedriver
 
 # These file are used DynamoDBLocal.jar
 DynamoDBLocal_lib
