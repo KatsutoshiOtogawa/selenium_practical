@@ -11,6 +11,9 @@ import org.openqa.selenium.support.ui.Select;
 import static org.openqa.selenium.support.ui.ExpectedConditions.presenceOfElementLocated;
 import org.openqa.selenium.TimeoutException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.util.Properties;
 import java.util.HashMap;
 
@@ -54,6 +57,7 @@ public class ScrapingDLSite
     private String TableName;
     private String ShopName;
     private Properties properties;
+    private static final Logger logger = LogManager.getFormatterLogger(ScrapingDLSite.class);
     //private DynamoDbClient DynamoDB;
 
     public ScrapingDLSite(Properties properties)
@@ -62,7 +66,7 @@ public class ScrapingDLSite
         
         this.CreatedAt = (new SimpleDateFormat("yyyy-MM-dd")).format(new Date());
         this.Wait = new WebDriverWait(Driver, 60);
-        this.TransitionInterval = 5 * 1000;
+        this.TransitionInterval = 10 * 1000;
         this.TableName = "ArtCollection";
         this.ShopName = "DLSite";
         // this.DynamoDbClient = connection;
@@ -107,7 +111,7 @@ public class ScrapingDLSite
             .click();
         }catch(TimeoutException ignored)
         {
-
+            logger.info("age validation isnt shown.");
         }
         Thread.sleep(TransitionInterval);
     }
@@ -148,14 +152,23 @@ public class ScrapingDLSite
             .click();
         }catch(TimeoutException ignored)
         {
-
+            logger.info("Coupon isnt shown.");
+            // [ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
         }
         Thread.sleep(TransitionInterval);
     }
 
     private void searchBox(String sentense) throws TimeoutException,InterruptedException,NotFoundException
     {
+
+        logger.info("start Search Box");
         // search for keyword using exact match. and go to page search result.
+
+        // global search use goto type-doujin        
+        Wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".headerCore-main .floorTab-item.type-doujin")))
+            .click();
+
+        Thread.sleep(TransitionInterval);
 
         // clear the input box for 
         Wait.until(ExpectedConditions.elementToBeClickable(By.id("search_text")))
@@ -178,21 +191,28 @@ public class ScrapingDLSite
                 .click();
         }catch(TimeoutException ex)
         {
-            // 例外キャストして例外できる?
+            // 例外キャストして例外できる? ex cast msgだけ変える。throwとして
             throw new NotFoundException();
         }
 
         Thread.sleep(TransitionInterval);
+
+        logger.info("Finish Search Box");
     }
 
-    private HashMap<String,Object> fetchSearchResult() throws TimeoutException,InterruptedException
+    private HashMap<String,Object> fetchSearchResult(String artName) throws TimeoutException,InterruptedException
     {
         HashMap<String,Object> data = new HashMap<String,Object>(){{
             put("ShopArtId", "");
-            put("ShopName", "");
-            put("ArtName", "");
+            put("ShopName", ShopName);
+            put("ArtName", artName);
+            put("Monopoly", false);
         }};
-        
+        // url からArtIdを取得。
+        // ex) https://www.dlsite.com/pro/work/=/product_id/VJ009935.html -> VJ000935
+        // var ShopArtId = (Driver.Url.Split('/',1).Last()).Split('.')[0];
+        logger.info("search result data=%s", data.toString());
+        // logger.info("Logging in user %s with birthday %s", data.toString()(), user.getBirthdayCalendar());
         return data;
     }
 
@@ -207,29 +227,16 @@ public class ScrapingDLSite
             put("Gallery", new ArrayList<String>());
         }};
 
-        // 'AffiliateUrl': {
-        //     'S': AffiliateUrl,
-        // },
-        // 'AffiliateBigImageUrl': {
-        //     'S': AffiliateBigImageUrl,
-        // },
-        // 'AffiliateMiddleImageUrl': {
-        //     'S': AffiliateMiddleImageUrl,
-        // },
-        // 'AffiliateSmallImageUrl': {
-        //     'S': AffiliateSmallImageUrl,
-        // },
-        // 'PlayerEmbed': {
-        //     'L': PlayerEmbed
-        // },
-        // 'Gallery': {
-        //     'L': [
-        //       {
-        //         'S': ''
-        //       }
-        //     ],
-        // },
 
+        // WebElement selectElement = driver.findElement(By.id("selectElementID"));
+        // Select selectObject = new Select(selectElement);
+        // WebElement element = Wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".globalSearchSelect select.globalSearchSelect-list")));
+
+        // Select select = new Select(element);
+
+        // select.selectByVisibleText("すべて");
+        
+        // select.select_by_visible_text("{} ({})".format(os.environ.get("DLSITE_AFFILIATE_ID"),os.environ.get("DLSITE_AFFILIATE_SITE")))
         // WebElement selectElement = driver.findElement(By.id("selectElementID"));
         // Select selectObject = new Select(selectElement);
         return data;
@@ -245,16 +252,4 @@ public class ScrapingDLSite
 
         //return data;
     }
-
-
-    // Thread.Sleep(TransitionInterval);
-    // try 
-    // {
-    //     driver.get("https://google.com/ncr");
-    //     driver.findElement(By.name("q")).sendKeys("cheese" + Keys.ENTER);
-    //     WebElement firstResult = wait.until(presenceOfElementLocated(By.cssSelector("h3>div")));
-    //     System.out.println(firstResult.getAttribute("textContent"));
-    // } finally {
-    //     driver.quit();
-    // }
 }

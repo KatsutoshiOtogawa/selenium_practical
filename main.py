@@ -99,7 +99,6 @@ class ScrapingDLSite():
         # clear the input box for 
         self.driver.find_element(By.ID, "search_text").clear()
         self.driver.find_element(By.ID, "search_text").click()
-        # self.driver.find_element(By.ID, "search_text").send_keys("\"{}\"".format(ArtName))
         self.driver.find_element(By.ID, "search_text").send_keys("{}".format(ArtName))
         self.driver.find_element(By.ID, "search_text").send_keys(Keys.ENTER)
 

@@ -25,6 +25,9 @@ import org.apache.commons.lang3.StringUtils;
 
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
  * Application Entory Point
  * 
@@ -71,6 +74,8 @@ public class App
     //     }
     //     return connection;
     // }
+
+    private static final Logger logger = LogManager.getFormatterLogger(App.class);
 
     public static void main( String[] args )
     {
@@ -144,16 +149,15 @@ public class App
             return;
         }
 
-        for (String line: lines)
+        for (String ArtName: lines)
         {
-            if(StringUtils.startsWith(line,"#") || StringUtils.isEmpty(line))
+            if(StringUtils.startsWith(ArtName,"#") || StringUtils.isEmpty(ArtName))
             {
 
             }else{
-                System.out.println(line);
                 try 
                 {
-                    instance.fetchScraping(line);
+                    instance.fetchScraping(ArtName);
 
                 } catch(TimeoutException ex){
                     System.out.println(ex.getMessage());
