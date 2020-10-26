@@ -9,6 +9,8 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import static org.openqa.selenium.support.ui.ExpectedConditions.presenceOfElementLocated;
 import java.util.Properties;
 
+import org.openqa.selenium.TimeoutException;
+
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -117,6 +119,10 @@ public class App
         {
             instance.setupScraping();
         }
+        catch(TimeoutException ex)
+        {
+
+        }
         catch(Exception ex)
         {
             System.out.println(ex.getMessage());
@@ -147,13 +153,20 @@ public class App
                 try 
                 {
                     instance.fetchScraping(line);
-                } catch (Exception ex) 
-                {
+
+                } catch(TimeoutException ex){
+                    System.out.println(ex.getMessage());
+                    ex.printStackTrace();
+                    continue;
+                } catch(NotFoundException ex){
+                    continue;
+                } catch (Exception ex){
                     System.out.println(ex.getMessage());
                     ex.printStackTrace();
                     instance.destructor();
                     return;
                 }
+                // スクレイピングのclassと分けた方がいい。dynamoDBの値を入れるクラスと。
             }
         }
 
