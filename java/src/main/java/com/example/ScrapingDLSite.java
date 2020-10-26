@@ -24,6 +24,7 @@ import java.io.Reader;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 
+import java.util.ArrayList;
 import java.lang.Thread;
 import java.util.Date;
 import software.amazon.awssdk.core.waiters.WaiterResponse;
@@ -175,8 +176,7 @@ public class ScrapingDLSite
         {
             Wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(String.format(".search_result_img_box_inner a[title='%s']",sentense))))
                 .click();
-        }
-        catch(TimeoutException ex)
+        }catch(TimeoutException ex)
         {
             // 例外キャストして例外できる?
             throw new NotFoundException();
@@ -185,23 +185,57 @@ public class ScrapingDLSite
         Thread.sleep(TransitionInterval);
     }
 
-    private HashMap<String,String> fetchSearchResult() throws TimeoutException,InterruptedException
+    private HashMap<String,Object> fetchSearchResult() throws TimeoutException,InterruptedException
     {
-        HashMap<String,String> data = null;
-
+        HashMap<String,Object> data = new HashMap<String,Object>(){{
+            put("ShopArtId", "");
+            put("ShopName", "");
+            put("ArtName", "");
+        }};
+        
         return data;
     }
 
-    private HashMap<String,String> fetchSearchResultAffiriate() throws TimeoutException,InterruptedException
+    private HashMap<String,Object> fetchSearchResultAffiriate() throws TimeoutException,InterruptedException
     {
-        HashMap<String,String> data = null;
+        HashMap<String,Object> data = new HashMap<String,Object>(){{
+            put("AffiliateUrl", "");
+            put("AffiliateBigImageUrl", "");
+            put("AffiliateMiddleImageUrl", "");
+            put("AffiliateSmallImageUrl", "");
+            put("PlayerEmbed", new ArrayList<String>());
+            put("Gallery", new ArrayList<String>());
+        }};
+
+        // 'AffiliateUrl': {
+        //     'S': AffiliateUrl,
+        // },
+        // 'AffiliateBigImageUrl': {
+        //     'S': AffiliateBigImageUrl,
+        // },
+        // 'AffiliateMiddleImageUrl': {
+        //     'S': AffiliateMiddleImageUrl,
+        // },
+        // 'AffiliateSmallImageUrl': {
+        //     'S': AffiliateSmallImageUrl,
+        // },
+        // 'PlayerEmbed': {
+        //     'L': PlayerEmbed
+        // },
+        // 'Gallery': {
+        //     'L': [
+        //       {
+        //         'S': ''
+        //       }
+        //     ],
+        // },
 
         // WebElement selectElement = driver.findElement(By.id("selectElementID"));
         // Select selectObject = new Select(selectElement);
         return data;
     }
 
-    //public HashMap<String,String> fetchScraping(String artName) throws TimeoutException,InterruptedException,NotFoundException
+    //public HashMap<String,Object> fetchScraping(String artName) throws TimeoutException,InterruptedException,NotFoundException
     public void fetchScraping(String artName) throws TimeoutException,InterruptedException,NotFoundException
     {
         // check ArtName is exist DLSite.

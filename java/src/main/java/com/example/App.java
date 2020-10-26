@@ -24,6 +24,7 @@ import java.io.FileNotFoundException;
 import org.apache.commons.lang3.StringUtils;
 
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
+
 /**
  * Application Entory Point
  * 
@@ -159,7 +160,14 @@ public class App
                     ex.printStackTrace();
                     continue;
                 } catch(NotFoundException ex){
+                    // 作成
                     continue;
+
+                }catch (InterruptedException ex){
+                    System.out.println(ex.getMessage());
+                    ex.printStackTrace();
+                    instance.destructor();
+                    return;
                 } catch (Exception ex){
                     System.out.println(ex.getMessage());
                     ex.printStackTrace();
