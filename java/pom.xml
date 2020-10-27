@@ -120,6 +120,29 @@
             </configuration>
           </execution>
           <execution>
+          <id>copy-resources3</id>
+          <!-- here the phase you need -->
+          <phase>validate</phase>
+          <goals>
+              <goal>copy-resources</goal>
+          </goals>
+          <configuration>
+            <outputDirectory>${project.build.directory}/classes</outputDirectory>
+            <resources>
+              <resource>
+                <directory>${basedir}</directory>
+                <includes>
+                  <include>log4j2.xml</include>
+                </includes>
+              </resource>
+              <resource>
+                <directory>input</directory>
+                <filtering>true</filtering>
+              </resource>
+              </resources>
+            </configuration>
+          </execution>
+          <execution>
           <id>copy-resources2</id>
           <!-- here the phase you need -->
           <phase>validate</phase>

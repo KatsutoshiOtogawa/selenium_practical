@@ -19,6 +19,8 @@
   <ItemGroup>
     <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.5.1.7" />
     <PackageReference Include="dotenv.net" Version="2.1.1" />
+    <PackageReference Include="Nlog" Version="4.7.5" />
+    <PackageReference Include="Nlog.Config" Version="4.7.5" />
     <PackageReference Include="Selenium.Support" Version="3.141.0" />
     <PackageReference Include="Selenium.WebDriver" Version="3.141.0" />
     <PackageReference Include="Selenium.WebDriver.ChromeDriver" Version="86.0.4240.2200" />
