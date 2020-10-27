@@ -146,22 +146,25 @@ public class ScrapingDLSite
         // this popup dont know to show
         // you dont know this popup show or not.
         // このポップアップが表示されるかどうか分からない。
+        logger.info("shownCoupon start");
+
         try
         {
             Wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("div > div.modal_close")))
             .click();
         }catch(TimeoutException ignored)
         {
-            logger.info("Coupon isnt shown.");
+            logger.info("shownCoupon comment Coupon isnt shown");
             // [ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
         }
         Thread.sleep(TransitionInterval);
+
+        logger.info("shownCoupon finish");
     }
 
     private void searchBox(String sentense) throws TimeoutException,InterruptedException,NotFoundException
     {
-
-        logger.info("start Search Box");
+        logger.info("searchBox start variable [sentense=%s]",sentense);
         // search for keyword using exact match. and go to page search result.
 
         // global search use goto type-doujin        
@@ -191,33 +194,39 @@ public class ScrapingDLSite
                 .click();
         }catch(TimeoutException ex)
         {
-            // 例外キャストして例外できる? ex cast msgだけ変える。throwとして
-            throw new NotFoundException();
+            logger.info("searchBox comment %s is NotFound. variable [sentense=%s]",sentense);
+
+            throw new NotFoundException(ex);
         }
 
         Thread.sleep(TransitionInterval);
 
-        logger.info("Finish Search Box");
+        logger.info("searchBox finish variable [sentense=%s]",sentense);
     }
 
     private HashMap<String,Object> fetchSearchResult(String artName) throws TimeoutException,InterruptedException
     {
+        logger.info("fetchSearchResult start variable [artName=%s]",artName);
+
         HashMap<String,Object> data = new HashMap<String,Object>(){{
             put("ShopArtId", "");
             put("ShopName", ShopName);
             put("ArtName", artName);
             put("Monopoly", false);
         }};
+
         // url からArtIdを取得。
         // ex) https://www.dlsite.com/pro/work/=/product_id/VJ009935.html -> VJ000935
         // var ShopArtId = (Driver.Url.Split('/',1).Last()).Split('.')[0];
-        logger.info("search result data=%s", data.toString());
+        logger.info("fetchSearchResult return data=%s", data.toString());
         // logger.info("Logging in user %s with birthday %s", data.toString()(), user.getBirthdayCalendar());
         return data;
     }
 
     private HashMap<String,Object> fetchSearchResultAffiriate() throws TimeoutException,InterruptedException
     {
+        logger.info("fetchSearchResultAffiriate start");
+
         HashMap<String,Object> data = new HashMap<String,Object>(){{
             put("AffiliateUrl", "");
             put("AffiliateBigImageUrl", "");
@@ -239,6 +248,9 @@ public class ScrapingDLSite
         // select.select_by_visible_text("{} ({})".format(os.environ.get("DLSITE_AFFILIATE_ID"),os.environ.get("DLSITE_AFFILIATE_SITE")))
         // WebElement selectElement = driver.findElement(By.id("selectElementID"));
         // Select selectObject = new Select(selectElement);
+
+        logger.info("fetchSearchResultAffiriate finish");
+
         return data;
     }
 
