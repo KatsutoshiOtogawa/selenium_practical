@@ -194,7 +194,7 @@ public class ScrapingDLSite
                 .click();
         }catch(TimeoutException ex)
         {
-            logger.info("searchBox comment %s is NotFound. variable [sentense=%s]",sentense);
+            logger.info("searchBox comment %s is NotFound. variable [sentense=%s]",sentense,sentense);
 
             throw new NotFoundException(ex);
         }
@@ -217,16 +217,16 @@ public class ScrapingDLSite
 
         // url からArtIdを取得。
         // ex) https://www.dlsite.com/pro/work/=/product_id/VJ009935.html -> VJ000935
-        // var ShopArtId = (Driver.Url.Split('/',1).Last()).Split('.')[0];
+        data.put("ShopArtId", Driver.getCurrentUrl().replaceAll("^.*/","").replaceAll("\\..*$",""));
+
         logger.info("fetchSearchResult return data=%s", data.toString());
-        // logger.info("Logging in user %s with birthday %s", data.toString()(), user.getBirthdayCalendar());
         return data;
     }
 
     private HashMap<String,Object> fetchSearchResultAffiriate() throws TimeoutException,InterruptedException
     {
         logger.info("fetchSearchResultAffiriate start");
-
+        
         HashMap<String,Object> data = new HashMap<String,Object>(){{
             put("AffiliateUrl", "");
             put("AffiliateBigImageUrl", "");
@@ -236,6 +236,26 @@ public class ScrapingDLSite
             put("Gallery", new ArrayList<String>());
         }};
 
+        Wait.until(ExpectedConditions.elementToBeClickable(By.linkText("アフィリエイトリンク作成")))
+            .click();
+
+        Thread.sleep(TransitionInterval);
+
+        WebElement selectElement = Wait.until(ExpectedConditions.elementToBeClickable(By.id("afid")));
+
+        Select selectObject = new Select(selectElement);
+
+        selectObject.selectByVisibleText(
+            String.format("%s (%s)"
+                ,System.getenv("DLSITE_AFFILIATE_ID") != null ? System.getenv("DLSITE_AFFILIATE_ID") : properties.getProperty("DLSITE_AFFILIATE_ID")
+                ,System.getenv("DLSITE_AFFILIATE_SITE") != null ? System.getenv("DLSITE_AFFILIATE_SITE") : properties.getProperty("DLSITE_AFFILIATE_SITE")
+            )
+        );
+        
+
+        // IWebElement element = Driver.FindElement(By.Id("afid"));
+                
+        // var selectObject = new SelectElement(element);
 
         // WebElement selectElement = driver.findElement(By.id("selectElementID"));
         // Select selectObject = new Select(selectElement);
@@ -249,7 +269,7 @@ public class ScrapingDLSite
         // WebElement selectElement = driver.findElement(By.id("selectElementID"));
         // Select selectObject = new Select(selectElement);
 
-        logger.info("fetchSearchResultAffiriate finish");
+        logger.info("fetchSearchResult return data=%s", data.toString());
 
         return data;
     }
@@ -259,6 +279,10 @@ public class ScrapingDLSite
     {
         // check ArtName is exist DLSite.
         searchBox(artName);
+
+        fetchSearchResult(artName);
+
+        fetchSearchResultAffiriate();
 
         //HashMap<String,String> data 
 

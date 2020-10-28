@@ -8,8 +8,12 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import static org.openqa.selenium.support.ui.ExpectedConditions.presenceOfElementLocated;
 import java.util.Properties;
-
+import java.io.UnsupportedEncodingException;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import org.openqa.selenium.TimeoutException;
+
+import java.io.File;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -80,14 +84,14 @@ public class App
     public static void main( String[] args )
     {
 
-        FileInputStream fp = null;
+        InputStreamReader fp = null;
         String resources = null;
         resources = String.join("/",System.getProperty("user.dir"),"resources",".env");
         try
         {
-            fp = new FileInputStream(resources);
+            fp = new InputStreamReader(new FileInputStream(new File(resources)),"UTF-8");
             
-        } catch (FileNotFoundException ex) {
+        } catch (FileNotFoundException | UnsupportedEncodingException ex) {
             System.out.println(ex.getMessage());
             ex.printStackTrace();
             return;
