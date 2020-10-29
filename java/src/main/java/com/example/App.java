@@ -63,76 +63,22 @@ public class App
     public static void main( String[] args )
     {
 
-        logger.info("main start");
-
-        InputStreamReader fp = null;
-        String resources = null;
-        resources = String.join("/",System.getProperty("user.dir"),"resources",".env");
+        ControllerDLSite controller = null;
         try
         {
-            fp = new InputStreamReader(new FileInputStream(new File(resources)),"UTF-8");
-            
-        } catch (FileNotFoundException | UnsupportedEncodingException ex) {
+            controller = new ControllerDLSite(String.join("/",System.getProperty("user.dir"),"resources",".env"));
+        }catch(Exception ex){
             logger.error("main message [%s]",ex.getMessage());
             ex.printStackTrace();
             return;
         }
 
-        Properties properties = new Properties();
-
         try
         {
-            properties.load(fp);
-        } catch (IOException ex) {
+            controller.setupController();
+        }catch(Exception ex){
             logger.error("main message [%s]",ex.getMessage());
             ex.printStackTrace();
-            properties = null;
-        }finally{
-            try
-            {
-                fp.close();
-            }
-            catch(IOException ex)
-            {
-                logger.error("main message [%s]",ex.getMessage());
-                ex.printStackTrace();
-            }
-
-            if(properties == null)
-            {
-                return;
-            }
-        }
-        
-        DynamoDbDLSite dbconnection = null;
-
-        try
-        {
-            dbconnection = new DynamoDbDLSite(properties);
-        }catch(IllegalArgumentException ex){
-            logger.error("main message [%s]",ex.getMessage());
-            ex.printStackTrace();
-            return;
-        }
-
-        ScrapingDLSite instance = new ScrapingDLSite(properties);
-
-        try
-        {
-            instance.setupScraping();
-        }catch(TimeoutException ex)    
-        {
-            logger.error("main message [%s]",ex.getMessage());
-            ex.printStackTrace();
-            dbconnection.destructor();
-            instance.destructor();
-            return;
-        }catch(Exception ex)
-        {
-            logger.error("main message [%s]",ex.getMessage());
-            ex.printStackTrace();
-            dbconnection.destructor();
-            instance.destructor();
             return;
         }
 
@@ -144,8 +90,7 @@ public class App
         {
             logger.error("main message [%s]",ex.getMessage());
             ex.printStackTrace();
-            dbconnection.destructor();
-            instance.destructor();
+            controller.destructor();
             return;
         }
 
@@ -158,59 +103,22 @@ public class App
             {
 
             }else{
-                try 
+                try
                 {
-                   data = instance.fetchScraping(itemName);
-
-                } catch(TimeoutException ex){
-                    logger.warn("main message [%s]",ex.getMessage());
-                    ex.printStackTrace();
-
-                } catch(NotFoundException ex){
-                    logger.warn("main message [%s]",ex.getMessage());
-                    ex.printStackTrace();
-
-                }catch (InterruptedException ex){
+                    controller.action(itemName);
+                }catch(Exception ex){
                     logger.error("main message [%s]",ex.getMessage());
                     ex.printStackTrace();
-                    dbconnection.destructor();
-                    instance.destructor();
-                    return;
-                } catch (Exception ex){
-                    logger.error("main message [%s]",ex.getMessage());
-                    ex.printStackTrace();
-                    dbconnection.destructor();
-                    instance.destructor();
+                    controller.destructor();
                     return;
                 }
-                
-                data.put("CreatedAt"
-                    ,(new SimpleDateFormat("yyyy-MM-dd")).format(new Date())
-                );
-
-                data.put("ItemName"
-                    ,itemName
-                );
-
-                data.put("ShopName"
-                    ,"DLSite"
-                );
-                data.put("ShopItemName"
-                    ,"DLSite" + itemName
-                );
-
-                logger.info("main variable {data=%s}",data.toString());
-
-                dbconnection.putItem(data);
 
             }
         }
 
         // final operation.
-        dbconnection.destructor();
-        instance.destructor();
-
+        controller.destructor();
         logger.info("main finish");
-        // dynamodbのclose処理はこちらでやる。
+
     }
 }

@@ -108,9 +108,13 @@ public class ControllerDLSite
             fp = new InputStreamReader(new FileInputStream(new File(path)),"UTF-8");
         }catch(FileNotFoundException ex)
         {
+            logger.error("openProperties message [%s]",ex.getMessage());
+            ex.printStackTrace();
             throw ex;
         }catch(UnsupportedEncodingException ex)
         {
+            logger.error("openProperties message [%s]",ex.getMessage());
+            ex.printStackTrace();
             throw ex;
         }
 
@@ -124,8 +128,12 @@ public class ControllerDLSite
             {
                 fp.close();
             }catch(IOException ex2){
+                logger.error("openProperties message [%s]",ex.getMessage());
+                ex.printStackTrace();
                 throw ex2;
             }
+            logger.error("openProperties message [%s]",ex.getMessage());
+            ex.printStackTrace();
             throw ex;
         }
         
@@ -133,6 +141,8 @@ public class ControllerDLSite
         {
             fp.close();
         }catch(IOException ex){
+            logger.error("openProperties message [%s]",ex.getMessage());
+            ex.printStackTrace();
             throw ex;
         }
         return properties;
@@ -156,264 +166,80 @@ public class ControllerDLSite
         logger.info("resource close");
     }
 
-    public void setupDB() throws TimeoutException,InterruptedException
+    public void setupController() throws TimeoutException,InterruptedException
     {
-
+        logger.info("setupController start");
         try
         {
             scrapingDLSite.setupScraping();
-        }catch(TimeoutException ex)    
-        {
+        }catch(TimeoutException ex){
             logger.error("main message [%s]",ex.getMessage());
             ex.printStackTrace();
-            destructor();
-            return;
-        }catch(Exception ex)
-        {
+            throw ex;
+        }catch(InterruptedException ex){
             logger.error("main message [%s]",ex.getMessage());
             ex.printStackTrace();
-            destructor();
-            return;
+            throw ex;
+        }catch(Exception ex){
+            logger.error("main message [%s]",ex.getMessage());
+            ex.printStackTrace();
+            throw ex;
         }
-
-        // // Driver.WindowHandles.
-        // self.driver.set_window_size(1440, 797)
-        // goToTopPage();
-        // ageValidation();
-        // userLogin();
-        // shownCoupon();
+        logger.info("setupController finish");
     }
 
-    // private void goToTopPage() throws TimeoutException,InterruptedException
-    // {
-    //     Driver.get("https://www.dlsite.com/index.html");
-    //     Wait.until(ExpectedConditions.elementToBeClickable(By.xpath("(//a[contains(text(),\'同人\')])[2]")))
-    //         .click();
-    //     Thread.sleep(TransitionInterval);
-    // }
+    public void action(String itemName) throws InterruptedException,IOException,UnsupportedFlavorException
+    {
 
-    // private void ageValidation() throws InterruptedException
-    // {
-    //     // this popup is shown when you visit first time.
-    //     // Because of ignore Exception operation.
-    //     try
-    //     {
-    //         Wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("li.btn_yes.btn-approval > a")))
-    //         .click();
-    //     }catch(TimeoutException ignored)
-    //     {
-    //         logger.info("age validation isnt shown.");
-    //     }
-    //     Thread.sleep(TransitionInterval);
-    // }
+        logger.info("action start");
+        HashMap<String,Object> data = null;
+        try 
+        {
+            data = scrapingDLSite.fetchScraping(itemName);
 
-    // private void userLogin() throws TimeoutException,InterruptedException
-    // {
-    //     Wait.until(ExpectedConditions.elementToBeClickable(By.linkText("ログイン")))
-    //         .click();
+        } catch(TimeoutException ex){
+            logger.warn("main message [%s]",ex.getMessage());
+            ex.printStackTrace();
 
-    //     Wait.until(ExpectedConditions.elementToBeClickable(By.id("form_id")))
-    //         .click();
+        } catch(NotFoundException ex){
+            logger.warn("main message [%s]",ex.getMessage());
+            ex.printStackTrace();
+
+        }catch (InterruptedException ex){
+            logger.error("main message [%s]",ex.getMessage());
+            ex.printStackTrace();
+            throw ex;
+        }catch(UnsupportedFlavorException ex){
+            logger.error("main message [%s]",ex.getMessage());
+            ex.printStackTrace();
+            throw ex;
+        }catch(IOException ex){
+            logger.error("main message [%s]",ex.getMessage());
+            ex.printStackTrace();
+            throw ex;
+        } catch (Exception ex){
+            logger.error("main message [%s]",ex.getMessage());
+            ex.printStackTrace();
+            throw ex;
+        }
         
-    //     Wait.until(ExpectedConditions.elementToBeClickable(By.id("form_id")))
-    //         .sendKeys(System.getenv("DLSITE_ID") != null ? System.getenv("DLSITE_ID") : properties.getProperty("DLSITE_ID"));
+        data.put("CreatedAt"
+            ,(new SimpleDateFormat("yyyy-MM-dd")).format(new Date())
+        );
 
-    //     Wait.until(ExpectedConditions.elementToBeClickable(By.id("form_password")))
-    //         .click();
-        
-    //     Wait.until(ExpectedConditions.elementToBeClickable(By.id("form_password")))
-    //         .sendKeys(System.getenv("DLSITE_PASSWORD") != null ? System.getenv("DLSITE_PASSWORD") : properties.getProperty("DLSITE_PASSWORD"));
-        
-    //     Wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".type-clrDefault")))
-    //         .click();
-    //     // WebDriverWait(self.driver, 60).until(expected_conditions.element_to_be_clickable((By.CSS_SELECTOR, ".type-clrDefault")))
-    //     //     self.driver.find_element(By.CSS_SELECTOR, ".type-clrDefault").click()
-    //     Thread.sleep(TransitionInterval);
-    // }
+        data.put("ItemName"
+            ,itemName
+        );
 
-    // private void shownCoupon() throws InterruptedException
-    // {
-    //     // close modal window for qupon. qupon is shown when user is just login.
-    //     // this popup dont know to show
-    //     // you dont know this popup show or not.
-    //     // このポップアップが表示されるかどうか分からない。
-    //     logger.info("shownCoupon start");
+        data.put("ShopName"
+            ,"DLSite"
+        );
+        data.put("ShopItemName"
+            ,"DLSite" + itemName
+        );
 
-    //     try
-    //     {
-    //         Wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("div > div.modal_close")))
-    //         .click();
-    //     }catch(TimeoutException ignored)
-    //     {
-    //         logger.info("shownCoupon comment Coupon isnt shown");
-    //         // [ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
-    //     }
-    //     Thread.sleep(TransitionInterval);
+        logger.info("action variable {data=%s}",data.toString());
 
-    //     logger.info("shownCoupon finish");
-    // }
-
-    // private void searchBox(String sentense) throws TimeoutException,InterruptedException,NotFoundException
-    // {
-    //     logger.info("searchBox start variable [sentense=%s]",sentense);
-    //     // search for keyword using exact match. and go to page search result.
-
-    //     // global search use goto type-doujin        
-    //     Wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".headerCore-main .floorTab-item.type-doujin")))
-    //         .click();
-
-    //     Thread.sleep(TransitionInterval);
-
-    //     // clear the input box for 
-    //     Wait.until(ExpectedConditions.elementToBeClickable(By.id("search_text")))
-    //         .clear();
-        
-    //     Wait.until(ExpectedConditions.elementToBeClickable(By.id("search_text")))
-    //         .click();
-
-    //     Wait.until(ExpectedConditions.elementToBeClickable(By.id("search_text")))
-    //         .sendKeys(sentense);
-
-    //     Wait.until(ExpectedConditions.elementToBeClickable(By.id("search_text")))
-    //         .sendKeys(Keys.ENTER);
-            
-    //     Thread.sleep(TransitionInterval);
-
-    //     try
-    //     {
-    //         Wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(String.format(".search_result_img_box_inner a[title='%s']",sentense))))
-    //             .click();
-    //     }catch(TimeoutException ex)
-    //     {
-    //         logger.info("searchBox comment %s is NotFound. variable [sentense=%s]",sentense,sentense);
-
-    //         throw new NotFoundException(ex);
-    //     }
-
-    //     Thread.sleep(TransitionInterval);
-
-    //     logger.info("searchBox finish variable [sentense=%s]",sentense);
-    // }
-
-    // private HashMap<String,Object> getShopItemInfo(String shopItemName) throws TimeoutException,InterruptedException
-    // {
-    //     logger.info("getShopItemInfo start variable [shopItemName=%s]",shopItemName);
-
-    //     HashMap<String,Object> data = new HashMap<String,Object>(){{
-    //         put("ShopArtId", "");
-    //         put("ShopName", ShopName);
-    //         put("ShopItemName", shopItemName);
-    //         put("Monopoly", false);
-    //     }};
-
-    //     // url からArtIdを取得。
-    //     // ex) https://www.dlsite.com/pro/work/=/product_id/VJ009935.html -> VJ000935
-    //     data.put("ShopArtId", Driver.getCurrentUrl().replaceAll("^.*/","").replaceAll("\\..*$",""));
-
-    //     logger.info("getShopItemInfo return data=%s", data.toString());
-
-    //     return data;
-    // }
-
-    // private HashMap<String,Object> getShopItemAffiriateInfo() throws TimeoutException,InterruptedException,IOException,UnsupportedFlavorException
-    // {
-    //     logger.info("getShopItemAffiriateInfo start");
-        
-    //     ArrayList<String> PlayerEmbed = new ArrayList<String>();
-
-    //     HashMap<String,Object> data = new HashMap<String,Object>(){{
-    //         put("AffiliateUrl", "");
-    //         put("AffiliateBigImageUrl", "");
-    //         put("AffiliateMiddleImageUrl", "");
-    //         put("AffiliateSmallImageUrl", "");
-    //         put("PlayerEmbed", PlayerEmbed);
-    //         put("Gallery", new ArrayList<String>());
-    //     }};
-
-    //     Wait.until(ExpectedConditions.elementToBeClickable(By.linkText("アフィリエイトリンク作成")))
-    //         .click();
-
-    //     Thread.sleep(TransitionInterval);
-
-    //     WebElement selectElement = Wait.until(ExpectedConditions.elementToBeClickable(By.id("afid")));
-
-    //     Select selectObject = new Select(selectElement);
-
-    //     selectObject.selectByVisibleText(
-    //         String.format("%s (%s)"
-    //             ,System.getenv("DLSITE_AFFILIATE_ID") != null ? System.getenv("DLSITE_AFFILIATE_ID") : properties.getProperty("DLSITE_AFFILIATE_ID")
-    //             ,System.getenv("DLSITE_AFFILIATE_SITE") != null ? System.getenv("DLSITE_AFFILIATE_SITE") : properties.getProperty("DLSITE_AFFILIATE_SITE")
-    //         )
-    //     );
-
-        
-    //     data.put("AffiliateUrl"
-    //         , Wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("#preview_wname_sns a"))).getAttribute("href")
-    //     );
-        
-    //     data.put("AffiliateSmallImageUrl"
-    //         , Wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("#preview_mini img"))).getAttribute("src")
-    //     );
-
-    //     data.put("AffiliateMiddleImageUrl"
-    //         , Wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("#preview_thum img"))).getAttribute("src")
-    //     );
-
-    //     data.put("AffiliateBigImageUrl"
-    //         , Wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("#preview_main img"))).getAttribute("src")
-    //     );
-
-    //     Wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".main_modify_box button.copy_btn")))
-    //         .click();
-
-
-    //     PlayerEmbed.add(
-    //         (String)clipboard.getContents(null).getTransferData(DataFlavor.stringFlavor)
-    //     );
-
-    //     logger.info("getShopItemAffiriateInfo return data=%s", data.toString());
-
-    //     return data;
-    // }
-
-    // public HashMap<String,Object> fetchScraping(String shopItemName) throws TimeoutException,InterruptedException,IOException,UnsupportedFlavorException,NotFoundException
-    // {
-    //     // HashMap<String,Object> data = new HashMap<String,Object>(){{
-    //     //     put("ShopArtId", "");
-    //     //     put("ShopName", ShopName);
-    //     //     put("ShopItemName", shopItemName);
-    //     //     put("Monopoly", false);
-    //     //     put("AffiliateUrl", "");
-    //     //     put("AffiliateBigImageUrl", "");
-    //     //     put("AffiliateMiddleImageUrl", "");
-    //     //     put("AffiliateSmallImageUrl", "");
-    //     //     put("PlayerEmbed", new ArrayList<String>());
-    //     //     put("Gallery", new ArrayList<String>());
-    //     // }};
-
-    //     // check shopItemName is exist DLSite.
-    //     logger.info("fetchScraping start");
-    //     searchBox(shopItemName);
-
-    //     HashMap<String,Object> shopItemInfo = getShopItemInfo(shopItemName);
-
-    //     HashMap<String,Object> shopItemAffiriateInfo = getShopItemAffiriateInfo();
-
-    //     HashMap<String,Object> data = new HashMap<String,Object>(){{
-    //         put("ShopArtId", shopItemInfo.get("ShopArtId"));
-    //         put("ShopName", ShopName);
-    //         put("ShopItemName", shopItemName);
-    //         put("Monopoly", shopItemInfo.get("Monopoly"));
-    //         put("AffiliateUrl", shopItemAffiriateInfo.get("AffiliateUrl"));
-    //         put("AffiliateBigImageUrl", shopItemAffiriateInfo.get("AffiliateBigImageUrl"));
-    //         put("AffiliateMiddleImageUrl", shopItemAffiriateInfo.get("AffiliateMiddleImageUrl"));
-    //         put("AffiliateSmallImageUrl", shopItemAffiriateInfo.get("AffiliateSmallImageUrl"));
-    //         put("PlayerEmbed", shopItemAffiriateInfo.get("PlayerEmbed"));
-    //         put("Gallery", shopItemAffiriateInfo.get("Gallery"));
-    //     }};
-
-    //     logger.info("fetchScraping return data=%s", data.toString());
-
-    //     return data;
-    // }
+        dynamodbClient.putItem(data);
+    }
 }
