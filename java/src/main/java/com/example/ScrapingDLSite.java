@@ -222,8 +222,26 @@ public class ScrapingDLSite extends Scraper
         HashMap<String,Object> data = new HashMap<String,Object>(){{
             put("ShopArtId", "");
             put("CircleName", "");
-            put("IlustratorName", "");
-            put("VoiceActor", "");
+            put("SalePrice", 0);
+            put("DiscountRate", 0);
+            put("UntilHavingSale", "");
+            put("NormalPrice", 0);
+            put("CircleFollowerNum", 0);
+            put("Hyouka", 0);
+            put("HyoukaSu", 0);
+            put("IlustratorName", new ArrayList<String>());
+            put("RerationMatome", new ArrayList<String>());
+            put("ItemFormat", "");
+            put("FileFormat", "");
+            put("FileSize", "");
+            put("UnitsSold", 0);
+            put("StarNum", 0);
+            put("AgeVeridation", "");
+            put("VoiceActor", new ArrayList<String>());
+            put("Genru", new ArrayList<String>());
+            put("BuyingUserViewItems", new ArrayList<String>());
+            put("LookingUserViewItems", new ArrayList<String>());
+            put("reviews", new ArrayList<String>());
             put("Monopoly", false);
         }};
 
