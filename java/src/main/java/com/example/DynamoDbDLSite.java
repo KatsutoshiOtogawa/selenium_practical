@@ -66,20 +66,13 @@ import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 /**
  * 
  */
-public class DynamoDbDLSite
+public class DynamoDbDLSite extends Model
 {
-    // private int TransitionInterval;
-    private String CreatedAt;
-    private String TableName;
-    private String ShopName;
-    private Properties properties;
     private DynamoDbClient dynamodbClient;
     private static final Logger logger = LogManager.getFormatterLogger(DynamoDbDLSite.class);
     
     public DynamoDbDLSite(Properties properties) throws IllegalArgumentException
-    {
-        // this.Driver = constructor();
-        
+    {   
         this.CreatedAt = (new SimpleDateFormat("yyyy-MM-dd")).format(new Date());
         this.TableName = "ArtCollection";
         this.ShopName = "DLSite";
@@ -89,7 +82,7 @@ public class DynamoDbDLSite
 
     }
 
-    private DynamoDbClient constructor() throws IllegalArgumentException
+    protected DynamoDbClient constructor() throws IllegalArgumentException
     {
         // 手動で開放しないといけないリソースはここに書く。
         DynamoDbClient connection = null;
@@ -125,7 +118,7 @@ public class DynamoDbDLSite
         logger.info("resource close");
     }
 
-    private PutItemRequest buildPutRequest(Map<String,Object> data)
+    protected PutItemRequest buildPutRequest(Map<String,Object> data)
     {
         logger.info("buildPutRequest start");
         Map<String,AttributeValue> items = new HashMap<String,AttributeValue>(){{

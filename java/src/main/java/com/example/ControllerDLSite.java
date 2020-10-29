@@ -69,19 +69,14 @@ import software.amazon.awssdk.services.dynamodb.DynamoDbClientBuilder;
 /**
  * 
  */
-public class ControllerDLSite
+public class ControllerDLSite extends Controller
 {
-    // private int TransitionInterval;
-    private String CreatedAt;
-    private String TableName;
-    private String ShopName;
     private DynamoDbDLSite dynamodbClient;
     private ScrapingDLSite scrapingDLSite;
     private static final Logger logger = LogManager.getFormatterLogger(ControllerDLSite.class);
     
     public ControllerDLSite(String path) throws IllegalArgumentException,FileNotFoundException,IOException
     {
-        // this.Driver = constructor();
         
         this.CreatedAt = (new SimpleDateFormat("yyyy-MM-dd")).format(new Date());
 
@@ -91,14 +86,13 @@ public class ControllerDLSite
 
         this.TableName = "ArtCollection";
         this.ShopName = "DLSite";
-
-        // this.dynamodbClient = constructor();
+        
         // aws credential propertiesよりも環境変数を優先しているので
         // それと同じような作りにするとよいはず。
 
     }
 
-    private Properties openProperties(String path) throws FileNotFoundException,IOException,UnsupportedEncodingException
+    protected Properties openProperties(String path) throws FileNotFoundException,IOException,UnsupportedEncodingException
     {
 
         InputStreamReader fp = null;
@@ -148,7 +142,7 @@ public class ControllerDLSite
         return properties;
     }
 
-    private Map<String,Object> constructor(String path) throws IllegalArgumentException,FileNotFoundException,IOException,UnsupportedEncodingException
+    protected Map<String,Object> constructor(String path) throws IllegalArgumentException,FileNotFoundException,IOException,UnsupportedEncodingException
     {
         
         Properties properties = openProperties(path);

@@ -55,15 +55,9 @@ import software.amazon.awssdk.services.dynamodb.waiters.DynamoDbWaiter;
 /**
  * 
  */
-public class ScrapingDLSite
+public class ScrapingDLSite extends Scraper
 {
-    private WebDriver Driver;
-    private int TransitionInterval;
-    private WebDriverWait Wait;
-    private String CreatedAt;
-    private String TableName;
-    private String ShopName;
-    private Properties properties;
+
     private final Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
     private static final Logger logger = LogManager.getFormatterLogger(ScrapingDLSite.class);
     
@@ -83,7 +77,7 @@ public class ScrapingDLSite
 
     }
 
-    private ChromeDriver constructor()
+    protected ChromeDriver constructor()
     {
         // 手動で開放しないといけないリソースはここに書く。
         ChromeDriver driver = new ChromeDriver();
@@ -110,7 +104,7 @@ public class ScrapingDLSite
         shownCoupon();
     }
 
-    private void goToTopPage() throws TimeoutException,InterruptedException
+    protected void goToTopPage() throws TimeoutException,InterruptedException
     {
         Driver.get("https://www.dlsite.com/index.html");
         Wait.until(ExpectedConditions.elementToBeClickable(By.xpath("(//a[contains(text(),\'同人\')])[2]")))
@@ -118,7 +112,7 @@ public class ScrapingDLSite
         Thread.sleep(TransitionInterval);
     }
 
-    private void ageValidation() throws InterruptedException
+    protected void ageValidation() throws InterruptedException
     {
         // this popup is shown when you visit first time.
         // Because of ignore Exception operation.
@@ -133,7 +127,7 @@ public class ScrapingDLSite
         Thread.sleep(TransitionInterval);
     }
 
-    private void userLogin() throws TimeoutException,InterruptedException
+    protected void userLogin() throws TimeoutException,InterruptedException
     {
         Wait.until(ExpectedConditions.elementToBeClickable(By.linkText("ログイン")))
             .click();
@@ -157,7 +151,7 @@ public class ScrapingDLSite
         Thread.sleep(TransitionInterval);
     }
 
-    private void shownCoupon() throws InterruptedException
+    protected void shownCoupon() throws InterruptedException
     {
         // close modal window for qupon. qupon is shown when user is just login.
         // this popup dont know to show
@@ -179,7 +173,7 @@ public class ScrapingDLSite
         logger.info("shownCoupon finish");
     }
 
-    private void searchBox(String sentense) throws TimeoutException,InterruptedException,NotFoundException
+    protected void searchBox(String sentense) throws TimeoutException,InterruptedException,NotFoundException
     {
         logger.info("searchBox start variable [sentense=%s]",sentense);
         // search for keyword using exact match. and go to page search result.
@@ -221,12 +215,15 @@ public class ScrapingDLSite
         logger.info("searchBox finish variable [sentense=%s]",sentense);
     }
 
-    private HashMap<String,Object> getShopItemInfo(String itemName) throws TimeoutException,InterruptedException
+    protected HashMap<String,Object> getShopItemInfo(String itemName) throws TimeoutException,InterruptedException
     {
         logger.info("getShopItemInfo start variable [shopItemName=%s]",itemName);
 
         HashMap<String,Object> data = new HashMap<String,Object>(){{
             put("ShopArtId", "");
+            put("CircleName", "");
+            put("IlustratorName", "");
+            put("VoiceActor", "");
             put("Monopoly", false);
         }};
 
@@ -234,12 +231,13 @@ public class ScrapingDLSite
         // ex) https://www.dlsite.com/pro/work/=/product_id/VJ009935.html -> VJ000935
         data.put("ShopArtId", Driver.getCurrentUrl().replaceAll("^.*/","").replaceAll("\\..*$",""));
 
+
         logger.info("getShopItemInfo return data=%s", data.toString());
 
         return data;
     }
 
-    private HashMap<String,Object> getShopItemAffiriateInfo() throws TimeoutException,InterruptedException,IOException,UnsupportedFlavorException
+    protected HashMap<String,Object> getShopItemAffiriateInfo() throws TimeoutException,InterruptedException,IOException,UnsupportedFlavorException
     {
         logger.info("getShopItemAffiriateInfo start");
         
