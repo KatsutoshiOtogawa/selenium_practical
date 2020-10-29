@@ -89,8 +89,8 @@ public class ControllerDLSite
         this.dynamodbClient = (DynamoDbDLSite) data.get("DynamoDbDLSite");
         this.scrapingDLSite = (ScrapingDLSite) data.get("ScrapingDLSite");
 
-        // this.TableName = "ArtCollection";
-        // this.ShopName = "DLSite";
+        this.TableName = "ArtCollection";
+        this.ShopName = "DLSite";
 
         // this.dynamodbClient = constructor();
         // aws credential propertiesよりも環境変数を優先しているので
@@ -224,7 +224,7 @@ public class ControllerDLSite
         }
         
         data.put("CreatedAt"
-            ,(new SimpleDateFormat("yyyy-MM-dd")).format(new Date())
+            ,CreatedAt
         );
 
         data.put("ItemName"
@@ -232,10 +232,10 @@ public class ControllerDLSite
         );
 
         data.put("ShopName"
-            ,"DLSite"
+            ,ShopName
         );
         data.put("ShopItemName"
-            ,"DLSite" + itemName
+            ,ShopName + itemName
         );
 
         logger.info("action variable {data=%s}",data.toString());
