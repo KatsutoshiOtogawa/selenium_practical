@@ -123,9 +123,9 @@ docker run -p 8000:8000 amazon/dynamodb-local:latest -jar DynamoDBLocal.jar -inM
 ```
 aws dynamodb create-table --endpoint-url http://localhost:8000 \
     --table-name ArtCollection \
-    --attribute-definitions AttributeName=ShopArtId,AttributeType=S \
+    --attribute-definitions AttributeName=ShopItemName,AttributeType=S \
                             AttributeName=CreatedAt,AttributeType=S \
-    --key-schema AttributeName=ShopArtId,KeyType=HASH \
+    --key-schema AttributeName=ShopItemName,KeyType=HASH \
                  AttributeName=CreatedAt,KeyType=RANGE \
     --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1
 ```
