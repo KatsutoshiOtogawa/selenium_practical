@@ -13,6 +13,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import org.openqa.selenium.TimeoutException;
 import java.io.File;
+import java.util.HashMap;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -31,53 +32,32 @@ import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import software.amazon.awssdk.core.waiters.WaiterResponse;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.dynamodb.model.CreateTableRequest;
+import software.amazon.awssdk.services.dynamodb.model.AttributeDefinition;
+import software.amazon.awssdk.services.dynamodb.model.ScalarAttributeType;
+import software.amazon.awssdk.services.dynamodb.model.ScalarAttributeType;
+import software.amazon.awssdk.services.dynamodb.model.KeySchemaElement;
+import software.amazon.awssdk.services.dynamodb.model.ProvisionedThroughput;
+import software.amazon.awssdk.services.dynamodb.model.KeyType;
+import software.amazon.awssdk.services.dynamodb.model.CreateTableResponse;
+import software.amazon.awssdk.services.dynamodb.model.DescribeTableRequest;
+import software.amazon.awssdk.services.dynamodb.model.DescribeTableResponse;
+import software.amazon.awssdk.services.dynamodb.model.DynamoDbException;
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
+import software.amazon.awssdk.services.dynamodb.waiters.DynamoDbWaiter;
+
 /**
  * Application Entory Point
  * 
  */
 public class App 
 {
-    // public static DynamoDbClient CreateDynamodbConnection() throws IOException,IllegalArgumentException
-    // {
-    //     DynamoDbClient connection = null;
-
-    //     Properties properties = new Properties();
-    //     try 
-    //     {
-    //         // .env file is the same format with propertiy file.
-    //         properties.load(new FileInputStream(String.join("/",System.getProperty("user.dir"),"resources",".env")));
-    //     } catch (IOException e) {
-    //         System.out.println(e.getMessage());
-    //         e.printStackTrace();
-    //         return;
-    //     }
-
-    //     if(String.IsNullOrEmpty(Environment.GetEnvironmentVariable("HOST"))){
-    //         // connection = new DynamoDbClient();
-
-    //         // connection = DynamoDbClient.builder()
-    //         connection = DynamoDbClient.create();
-    //     }else{
-    //         AmazonDynamoDBConfig ddbConfig = new AmazonDynamoDBConfig();
-    //         ddbConfig.ServiceURL = String.Format(
-    //             "http://{0}:{1}"
-    //             ,Environment.GetEnvironmentVariable("HOST")
-    //             ,Environment.GetEnvironmentVariable("PORT")
-    //             );
-    //         connection = new AmazonDynamoDBClient(ddbConfig);
-
-    //         properties.getProperty("HOST")
-    //         properties.getProperty("PORT")
-    //         connection = DynamoDbClient.builder()
-    //                     .region(Region.US_WEST_2)
-    //                     .credentialsProvider(ProfileCredentialsProvider.builder()
-    //                                  .profileName("myProfile")
-    //                                  .build())
-    //                     .build();
-    //     }
-    //     return connection;
-    // }
-
+    
     private static final Logger logger = LogManager.getFormatterLogger(App.class);
 
     public static void main( String[] args )
@@ -93,7 +73,6 @@ public class App
             fp = new InputStreamReader(new FileInputStream(new File(resources)),"UTF-8");
             
         } catch (FileNotFoundException | UnsupportedEncodingException ex) {
-            // System.out.println(ex.getMessage());
             logger.error("main message [%s]",ex.getMessage());
             ex.printStackTrace();
             return;
@@ -105,7 +84,6 @@ public class App
         {
             properties.load(fp);
         } catch (IOException ex) {
-            // System.out.println(ex.getMessage());
             logger.error("main message [%s]",ex.getMessage());
             ex.printStackTrace();
             properties = null;
@@ -116,7 +94,6 @@ public class App
             }
             catch(IOException ex)
             {
-                // System.out.println(ex.getMessage());
                 logger.error("main message [%s]",ex.getMessage());
                 ex.printStackTrace();
             }
@@ -127,21 +104,34 @@ public class App
             }
         }
         
-        // ScrapingDLSite instance = new ScrapingDLSite(properties,Clipboard.getSystemClipboard());
+        DynamoDbDLSite dbconnection = null;
+
+        try
+        {
+            dbconnection = new DynamoDbDLSite(properties);
+        }catch(IllegalArgumentException ex){
+            logger.error("main message [%s]",ex.getMessage());
+            ex.printStackTrace();
+            return;
+        }
+
         ScrapingDLSite instance = new ScrapingDLSite(properties);
 
         try
         {
             instance.setupScraping();
-        }
-        catch(TimeoutException ex)
-        {
-
-        }
-        catch(Exception ex)
+        }catch(TimeoutException ex)    
         {
             logger.error("main message [%s]",ex.getMessage());
             ex.printStackTrace();
+            dbconnection.destructor();
+            instance.destructor();
+            return;
+        }catch(Exception ex)
+        {
+            logger.error("main message [%s]",ex.getMessage());
+            ex.printStackTrace();
+            dbconnection.destructor();
             instance.destructor();
             return;
         }
@@ -154,48 +144,70 @@ public class App
         {
             logger.error("main message [%s]",ex.getMessage());
             ex.printStackTrace();
+            dbconnection.destructor();
             instance.destructor();
             return;
         }
 
-        for (String ArtName: lines)
+        for (String itemName: lines)
         {
-            if(StringUtils.startsWith(ArtName,"#") || StringUtils.isEmpty(ArtName))
+
+            HashMap<String,Object> data = null;
+
+            if(StringUtils.startsWith(itemName,"#") || StringUtils.isEmpty(itemName))
             {
 
             }else{
                 try 
                 {
-                    instance.fetchScraping(ArtName);
+                   data = instance.fetchScraping(itemName);
 
                 } catch(TimeoutException ex){
-                    // System.out.println(ex.getMessage());
                     logger.warn("main message [%s]",ex.getMessage());
                     ex.printStackTrace();
-                    continue;
+
                 } catch(NotFoundException ex){
                     logger.warn("main message [%s]",ex.getMessage());
                     ex.printStackTrace();
-                    continue;
 
                 }catch (InterruptedException ex){
-                    // System.out.println(ex.getMessage());
                     logger.error("main message [%s]",ex.getMessage());
                     ex.printStackTrace();
+                    dbconnection.destructor();
                     instance.destructor();
                     return;
                 } catch (Exception ex){
-                    // System.out.println(ex.getMessage());
                     logger.error("main message [%s]",ex.getMessage());
                     ex.printStackTrace();
+                    dbconnection.destructor();
                     instance.destructor();
                     return;
                 }
-                // スクレイピングのclassと分けた方がいい。dynamoDBの値を入れるクラスと。
+                
+                data.put("CreatedAt"
+                    ,(new SimpleDateFormat("yyyy-MM-dd")).format(new Date())
+                );
+
+                data.put("ItemName"
+                    ,itemName
+                );
+
+                data.put("ShopName"
+                    ,"DLSite"
+                );
+                data.put("ShopItemName"
+                    ,"DLSite" + itemName
+                );
+
+                logger.info("main variable {data=%s}",data.toString());
+
+                dbconnection.putItem(data);
+
             }
         }
 
         // final operation.
+        dbconnection.destructor();
         instance.destructor();
 
         logger.info("main finish");

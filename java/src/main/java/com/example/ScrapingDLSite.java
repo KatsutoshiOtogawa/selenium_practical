@@ -32,10 +32,11 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import java.util.ArrayList;
 import java.lang.Thread;
-import java.util.Date;
+
 import software.amazon.awssdk.core.waiters.WaiterResponse;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.model.CreateTableRequest;
@@ -63,11 +64,9 @@ public class ScrapingDLSite
     private String TableName;
     private String ShopName;
     private Properties properties;
-    // private final Clipboard clipboard = Clipboard.getSystemClipboard();
     private final Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
     private static final Logger logger = LogManager.getFormatterLogger(ScrapingDLSite.class);
-    //private DynamoDbClient DynamoDB;
-
+    
     public ScrapingDLSite(Properties properties)
     {
         this.Driver = constructor();
@@ -222,14 +221,12 @@ public class ScrapingDLSite
         logger.info("searchBox finish variable [sentense=%s]",sentense);
     }
 
-    private HashMap<String,Object> getShopItemInfo(String shopItemName) throws TimeoutException,InterruptedException
+    private HashMap<String,Object> getShopItemInfo(String itemName) throws TimeoutException,InterruptedException
     {
-        logger.info("getShopItemInfo start variable [shopItemName=%s]",shopItemName);
+        logger.info("getShopItemInfo start variable [shopItemName=%s]",itemName);
 
         HashMap<String,Object> data = new HashMap<String,Object>(){{
             put("ShopArtId", "");
-            put("ShopName", ShopName);
-            put("ShopItemName", shopItemName);
             put("Monopoly", false);
         }};
 
@@ -303,33 +300,18 @@ public class ScrapingDLSite
         return data;
     }
 
-    public HashMap<String,Object> fetchScraping(String shopItemName) throws TimeoutException,InterruptedException,IOException,UnsupportedFlavorException,NotFoundException
+    public HashMap<String,Object> fetchScraping(String itemName) throws TimeoutException,InterruptedException,IOException,UnsupportedFlavorException,NotFoundException
     {
-        // HashMap<String,Object> data = new HashMap<String,Object>(){{
-        //     put("ShopArtId", "");
-        //     put("ShopName", ShopName);
-        //     put("ShopItemName", shopItemName);
-        //     put("Monopoly", false);
-        //     put("AffiliateUrl", "");
-        //     put("AffiliateBigImageUrl", "");
-        //     put("AffiliateMiddleImageUrl", "");
-        //     put("AffiliateSmallImageUrl", "");
-        //     put("PlayerEmbed", new ArrayList<String>());
-        //     put("Gallery", new ArrayList<String>());
-        // }};
-
-        // check shopItemName is exist DLSite.
         logger.info("fetchScraping start");
-        searchBox(shopItemName);
+        // check shopItemName is exist DLSite.
+        searchBox(itemName);
 
-        HashMap<String,Object> shopItemInfo = getShopItemInfo(shopItemName);
+        HashMap<String,Object> shopItemInfo = getShopItemInfo(itemName);
 
         HashMap<String,Object> shopItemAffiriateInfo = getShopItemAffiriateInfo();
 
         HashMap<String,Object> data = new HashMap<String,Object>(){{
             put("ShopArtId", shopItemInfo.get("ShopArtId"));
-            put("ShopName", ShopName);
-            put("ShopItemName", shopItemName);
             put("Monopoly", shopItemInfo.get("Monopoly"));
             put("AffiliateUrl", shopItemAffiriateInfo.get("AffiliateUrl"));
             put("AffiliateBigImageUrl", shopItemAffiriateInfo.get("AffiliateBigImageUrl"));
