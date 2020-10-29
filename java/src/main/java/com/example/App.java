@@ -12,7 +12,6 @@ import java.io.UnsupportedEncodingException;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import org.openqa.selenium.TimeoutException;
-
 import java.io.File;
 
 import java.nio.file.Files;
@@ -84,6 +83,8 @@ public class App
     public static void main( String[] args )
     {
 
+        logger.info("main start");
+
         InputStreamReader fp = null;
         String resources = null;
         resources = String.join("/",System.getProperty("user.dir"),"resources",".env");
@@ -92,7 +93,8 @@ public class App
             fp = new InputStreamReader(new FileInputStream(new File(resources)),"UTF-8");
             
         } catch (FileNotFoundException | UnsupportedEncodingException ex) {
-            System.out.println(ex.getMessage());
+            // System.out.println(ex.getMessage());
+            logger.error("main message [%s]",ex.getMessage());
             ex.printStackTrace();
             return;
         }
@@ -103,7 +105,8 @@ public class App
         {
             properties.load(fp);
         } catch (IOException ex) {
-            System.out.println(ex.getMessage());
+            // System.out.println(ex.getMessage());
+            logger.error("main message [%s]",ex.getMessage());
             ex.printStackTrace();
             properties = null;
         }finally{
@@ -113,7 +116,8 @@ public class App
             }
             catch(IOException ex)
             {
-                System.out.println(ex.getMessage());
+                // System.out.println(ex.getMessage());
+                logger.error("main message [%s]",ex.getMessage());
                 ex.printStackTrace();
             }
 
@@ -122,7 +126,8 @@ public class App
                 return;
             }
         }
-
+        
+        // ScrapingDLSite instance = new ScrapingDLSite(properties,Clipboard.getSystemClipboard());
         ScrapingDLSite instance = new ScrapingDLSite(properties);
 
         try
@@ -135,7 +140,7 @@ public class App
         }
         catch(Exception ex)
         {
-            System.out.println(ex.getMessage());
+            logger.error("main message [%s]",ex.getMessage());
             ex.printStackTrace();
             instance.destructor();
             return;
@@ -147,7 +152,7 @@ public class App
             lines = Files.readAllLines(Paths.get(System.getProperty("user.dir"),"resources","ArtName.txt"), StandardCharsets.UTF_8);
         } catch (IOException ex) 
         {
-            System.out.println(ex.getMessage());
+            logger.error("main message [%s]",ex.getMessage());
             ex.printStackTrace();
             instance.destructor();
             return;
@@ -164,20 +169,24 @@ public class App
                     instance.fetchScraping(ArtName);
 
                 } catch(TimeoutException ex){
-                    System.out.println(ex.getMessage());
+                    // System.out.println(ex.getMessage());
+                    logger.warn("main message [%s]",ex.getMessage());
                     ex.printStackTrace();
                     continue;
                 } catch(NotFoundException ex){
-                    // 作成
+                    logger.warn("main message [%s]",ex.getMessage());
+                    ex.printStackTrace();
                     continue;
 
                 }catch (InterruptedException ex){
-                    System.out.println(ex.getMessage());
+                    // System.out.println(ex.getMessage());
+                    logger.error("main message [%s]",ex.getMessage());
                     ex.printStackTrace();
                     instance.destructor();
                     return;
                 } catch (Exception ex){
-                    System.out.println(ex.getMessage());
+                    // System.out.println(ex.getMessage());
+                    logger.error("main message [%s]",ex.getMessage());
                     ex.printStackTrace();
                     instance.destructor();
                     return;
@@ -189,6 +198,7 @@ public class App
         // final operation.
         instance.destructor();
 
+        logger.info("main finish");
         // dynamodbのclose処理はこちらでやる。
     }
 }

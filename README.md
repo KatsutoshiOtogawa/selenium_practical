@@ -33,8 +33,21 @@ java -jar java-1.0-SNAPSHOT.jar #(execute in /path/to/java/target/)
 # you need file is, chromedriver,java-1.0-SNAPSHOT.jar,dependency-jars/* and resources/ in production Environment.
 ```
 
-# java
+# C#
 you need to install dotnet-sdk.
+```
+# build code.
+dotnet build
+# start code.
+dotnet run 
+# execute class file.
+java -cp classes/:dependency-jars/* com.example.App #(execute in /path/to/java/target/)
+# create jar file.
+mvn package
+# execute jar file.
+java -jar java-1.0-SNAPSHOT.jar #(execute in /path/to/java/target/)
+# you need file is, chromedriver,java-1.0-SNAPSHOT.jar,dependency-jars/* and resources/ in production Environment.
+```
 
 # Attension!
 you check chrome.app version, and you use chromedriver-binary version the same one that was chrome.app version you use.
@@ -128,6 +141,7 @@ aws dynamodb create-table --endpoint-url http://localhost:8000 \
 ## Java
 
 - [apache log4j](https://logging.apache.org/log4j/2.x/index.html)
+- [log4j json](https://github.com/prayagupd/log4j2-JSONLayout)
 - [Selenium java document](https://www.selenium.dev/selenium/docs/api/java/overview-summary.html)
 - [apache StringUtils](http://commons.apache.org/proper/commons-lang/apidocs/org/apache/commons/lang3/StringUtils.html)
 - [aws dynamoDB java document](https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/dynamodb/DynamoDbClient.html)

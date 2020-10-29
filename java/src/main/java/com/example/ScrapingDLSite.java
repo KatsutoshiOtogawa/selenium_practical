@@ -11,6 +11,12 @@ import org.openqa.selenium.support.ui.Select;
 import static org.openqa.selenium.support.ui.ExpectedConditions.presenceOfElementLocated;
 import org.openqa.selenium.TimeoutException;
 
+import java.awt.datatransfer.Clipboard;
+import java.awt.Toolkit;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -57,12 +63,14 @@ public class ScrapingDLSite
     private String TableName;
     private String ShopName;
     private Properties properties;
+    // private final Clipboard clipboard = Clipboard.getSystemClipboard();
+    private final Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
     private static final Logger logger = LogManager.getFormatterLogger(ScrapingDLSite.class);
     //private DynamoDbClient DynamoDB;
 
     public ScrapingDLSite(Properties properties)
     {
-        this.Driver = new ChromeDriver();
+        this.Driver = constructor();
         
         this.CreatedAt = (new SimpleDateFormat("yyyy-MM-dd")).format(new Date());
         this.Wait = new WebDriverWait(Driver, 60);
@@ -70,17 +78,27 @@ public class ScrapingDLSite
         this.TableName = "ArtCollection";
         this.ShopName = "DLSite";
         // this.DynamoDbClient = connection;
-
         this.properties = properties;
         // aws credential propertiesよりも環境変数を優先しているので
         // それと同じような作りにするとよいはず。
 
     }
 
+    private ChromeDriver constructor()
+    {
+        // 手動で開放しないといけないリソースはここに書く。
+        ChromeDriver driver = new ChromeDriver();
+        logger.info("resource open");
+
+        return driver;
+    }
+
     public void destructor()
     {
         Driver.close();
         Driver.quit();
+
+        logger.info("resource close");
     }
 
     public void setupScraping() throws TimeoutException,InterruptedException
@@ -204,14 +222,14 @@ public class ScrapingDLSite
         logger.info("searchBox finish variable [sentense=%s]",sentense);
     }
 
-    private HashMap<String,Object> fetchSearchResult(String artName) throws TimeoutException,InterruptedException
+    private HashMap<String,Object> getShopItemInfo(String shopItemName) throws TimeoutException,InterruptedException
     {
-        logger.info("fetchSearchResult start variable [artName=%s]",artName);
+        logger.info("getShopItemInfo start variable [shopItemName=%s]",shopItemName);
 
         HashMap<String,Object> data = new HashMap<String,Object>(){{
             put("ShopArtId", "");
             put("ShopName", ShopName);
-            put("ArtName", artName);
+            put("ShopItemName", shopItemName);
             put("Monopoly", false);
         }};
 
@@ -219,20 +237,23 @@ public class ScrapingDLSite
         // ex) https://www.dlsite.com/pro/work/=/product_id/VJ009935.html -> VJ000935
         data.put("ShopArtId", Driver.getCurrentUrl().replaceAll("^.*/","").replaceAll("\\..*$",""));
 
-        logger.info("fetchSearchResult return data=%s", data.toString());
+        logger.info("getShopItemInfo return data=%s", data.toString());
+
         return data;
     }
 
-    private HashMap<String,Object> fetchSearchResultAffiriate() throws TimeoutException,InterruptedException
+    private HashMap<String,Object> getShopItemAffiriateInfo() throws TimeoutException,InterruptedException,IOException,UnsupportedFlavorException
     {
-        logger.info("fetchSearchResultAffiriate start");
+        logger.info("getShopItemAffiriateInfo start");
         
+        ArrayList<String> PlayerEmbed = new ArrayList<String>();
+
         HashMap<String,Object> data = new HashMap<String,Object>(){{
             put("AffiliateUrl", "");
             put("AffiliateBigImageUrl", "");
             put("AffiliateMiddleImageUrl", "");
             put("AffiliateSmallImageUrl", "");
-            put("PlayerEmbed", new ArrayList<String>());
+            put("PlayerEmbed", PlayerEmbed);
             put("Gallery", new ArrayList<String>());
         }};
 
@@ -251,41 +272,75 @@ public class ScrapingDLSite
                 ,System.getenv("DLSITE_AFFILIATE_SITE") != null ? System.getenv("DLSITE_AFFILIATE_SITE") : properties.getProperty("DLSITE_AFFILIATE_SITE")
             )
         );
+
         
-
-        // IWebElement element = Driver.FindElement(By.Id("afid"));
-                
-        // var selectObject = new SelectElement(element);
-
-        // WebElement selectElement = driver.findElement(By.id("selectElementID"));
-        // Select selectObject = new Select(selectElement);
-        // WebElement element = Wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".globalSearchSelect select.globalSearchSelect-list")));
-
-        // Select select = new Select(element);
-
-        // select.selectByVisibleText("すべて");
+        data.put("AffiliateUrl"
+            , Wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("#preview_wname_sns a"))).getAttribute("href")
+        );
         
-        // select.select_by_visible_text("{} ({})".format(os.environ.get("DLSITE_AFFILIATE_ID"),os.environ.get("DLSITE_AFFILIATE_SITE")))
-        // WebElement selectElement = driver.findElement(By.id("selectElementID"));
-        // Select selectObject = new Select(selectElement);
+        data.put("AffiliateSmallImageUrl"
+            , Wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("#preview_mini img"))).getAttribute("src")
+        );
 
-        logger.info("fetchSearchResult return data=%s", data.toString());
+        data.put("AffiliateMiddleImageUrl"
+            , Wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("#preview_thum img"))).getAttribute("src")
+        );
+
+        data.put("AffiliateBigImageUrl"
+            , Wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("#preview_main img"))).getAttribute("src")
+        );
+
+        Wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".main_modify_box button.copy_btn")))
+            .click();
+
+
+        PlayerEmbed.add(
+            (String)clipboard.getContents(null).getTransferData(DataFlavor.stringFlavor)
+        );
+
+        logger.info("getShopItemAffiriateInfo return data=%s", data.toString());
 
         return data;
     }
 
-    //public HashMap<String,Object> fetchScraping(String artName) throws TimeoutException,InterruptedException,NotFoundException
-    public void fetchScraping(String artName) throws TimeoutException,InterruptedException,NotFoundException
+    public HashMap<String,Object> fetchScraping(String shopItemName) throws TimeoutException,InterruptedException,IOException,UnsupportedFlavorException,NotFoundException
     {
-        // check ArtName is exist DLSite.
-        searchBox(artName);
+        // HashMap<String,Object> data = new HashMap<String,Object>(){{
+        //     put("ShopArtId", "");
+        //     put("ShopName", ShopName);
+        //     put("ShopItemName", shopItemName);
+        //     put("Monopoly", false);
+        //     put("AffiliateUrl", "");
+        //     put("AffiliateBigImageUrl", "");
+        //     put("AffiliateMiddleImageUrl", "");
+        //     put("AffiliateSmallImageUrl", "");
+        //     put("PlayerEmbed", new ArrayList<String>());
+        //     put("Gallery", new ArrayList<String>());
+        // }};
 
-        fetchSearchResult(artName);
+        // check shopItemName is exist DLSite.
+        logger.info("fetchScraping start");
+        searchBox(shopItemName);
 
-        fetchSearchResultAffiriate();
+        HashMap<String,Object> shopItemInfo = getShopItemInfo(shopItemName);
 
-        //HashMap<String,String> data 
+        HashMap<String,Object> shopItemAffiriateInfo = getShopItemAffiriateInfo();
 
-        //return data;
+        HashMap<String,Object> data = new HashMap<String,Object>(){{
+            put("ShopArtId", shopItemInfo.get("ShopArtId"));
+            put("ShopName", ShopName);
+            put("ShopItemName", shopItemName);
+            put("Monopoly", shopItemInfo.get("Monopoly"));
+            put("AffiliateUrl", shopItemAffiriateInfo.get("AffiliateUrl"));
+            put("AffiliateBigImageUrl", shopItemAffiriateInfo.get("AffiliateBigImageUrl"));
+            put("AffiliateMiddleImageUrl", shopItemAffiriateInfo.get("AffiliateMiddleImageUrl"));
+            put("AffiliateSmallImageUrl", shopItemAffiriateInfo.get("AffiliateSmallImageUrl"));
+            put("PlayerEmbed", shopItemAffiriateInfo.get("PlayerEmbed"));
+            put("Gallery", shopItemAffiriateInfo.get("Gallery"));
+        }};
+
+        logger.info("fetchScraping return data=%s", data.toString());
+
+        return data;
     }
 }
