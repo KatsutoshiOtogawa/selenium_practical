@@ -23,9 +23,17 @@ public abstract class Scraper {
     protected String TableName;
     protected String ShopName;
     protected Properties properties;
-    
+
     abstract protected ChromeDriver constructor();
-    abstract public void setupScraping() throws TimeoutException,InterruptedException;
+    public void setupScraping() throws TimeoutException,InterruptedException
+    {
+        // // Driver.WindowHandles.
+        // self.driver.set_window_size(1440, 797)
+        goToTopPage();
+        ageValidation();
+        userLogin();
+        shownCoupon();
+    }
     abstract protected void goToTopPage() throws TimeoutException,InterruptedException;
     abstract protected void ageValidation() throws InterruptedException;
     abstract protected void userLogin() throws TimeoutException,InterruptedException;
@@ -34,5 +42,9 @@ public abstract class Scraper {
     abstract protected HashMap<String,Object> getShopItemInfo(String itemName) throws TimeoutException,InterruptedException;
     abstract protected HashMap<String,Object> getShopItemAffiriateInfo() throws TimeoutException,InterruptedException,IOException,UnsupportedFlavorException;
     abstract public HashMap<String,Object> fetchScraping(String itemName) throws TimeoutException,InterruptedException,IOException,UnsupportedFlavorException,NotFoundException;
-    abstract public void destructor();
+    public void destructor()
+    {
+        Driver.close();
+        Driver.quit();
+    }
 }

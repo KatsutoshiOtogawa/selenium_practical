@@ -139,6 +139,111 @@ public class DynamoDbDLSite extends Model
                 .s((String)data.get("ShopItemName"))
                 .build()
             );
+            put("CircleName"
+                , StringUtils.isEmpty((String) data.get("CircleName"))
+                    ? AttributeValue.builder().nul(true).build()
+                    : AttributeValue.builder().s((String) data.get("CircleName")).build()
+            );
+            put("CircleFollowerNum"
+                , StringUtils.isEmpty((String) data.get("CircleFollowerNum"))
+                    ? AttributeValue.builder().nul(true).build()
+                    : AttributeValue.builder().n((String) data.get("CircleFollowerNum")).build()
+            );
+            put("UnitsSold"
+                , StringUtils.isEmpty((String) data.get("UnitsSold"))
+                    ? AttributeValue.builder().nul(true).build()
+                    : AttributeValue.builder().n((String) data.get("UnitsSold")).build()
+            );
+            put("SalePrice"
+                , StringUtils.isEmpty((String) data.get("SalePrice"))
+                    ? AttributeValue.builder().nul(true).build()
+                    : AttributeValue.builder().n((String) data.get("SalePrice")).build()
+            );
+            put("DiscountRate"
+                , StringUtils.isEmpty((String) data.get("DiscountRate"))
+                    ? AttributeValue.builder().nul(true).build()
+                    : AttributeValue.builder().n((String) data.get("DiscountRate")).build()
+            );
+            put("UntilHavingSale"
+                , StringUtils.isEmpty((String) data.get("UntilHavingSale"))
+                    ? AttributeValue.builder().nul(true).build()
+                    : AttributeValue.builder().s((String) data.get("UntilHavingSale")).build()
+            );
+            put("NormalPrice"
+                , StringUtils.isEmpty((String) data.get("NormalPrice"))
+                    ? AttributeValue.builder().nul(true).build()
+                    : AttributeValue.builder().n((String) data.get("NormalPrice")).build()
+            );
+            put("Assessment"
+                , StringUtils.isEmpty((String) data.get("Assessment"))
+                    ? AttributeValue.builder().nul(true).build()
+                    : AttributeValue.builder().n((String) data.get("Assessment")).build()
+            );
+            put("AssessmentNum"
+                , StringUtils.isEmpty((String) data.get("AssessmentNum"))
+                    ? AttributeValue.builder().nul(true).build()
+                    : AttributeValue.builder().n((String) data.get("AssessmentNum")).build()
+            );
+            put("IlustratorName"
+                , ((ArrayList<String>) data.get("IlustratorName")).size() == 0
+                    ? AttributeValue.builder().nul(true).build()
+                    : AttributeValue.builder().ss((ArrayList<String>) data.get("IlustratorName")).build()
+            );
+            put("RerationMatome"
+                , ((ArrayList<String>) data.get("RerationMatome")).size() == 0
+                    ? AttributeValue.builder().nul(true).build()
+                    : AttributeValue.builder().ss((ArrayList<String>) data.get("RerationMatome")).build()
+            );
+            put("ItemCategory"
+                , StringUtils.isEmpty((String) data.get("ItemCategory"))
+                    ? AttributeValue.builder().nul(true).build()
+                    : AttributeValue.builder().s((String) data.get("ItemCategory")).build()
+            );
+            put("FileFormat"
+                , StringUtils.isEmpty((String) data.get("FileFormat"))
+                    ? AttributeValue.builder().nul(true).build()
+                    : AttributeValue.builder().s((String) data.get("FileFormat")).build()
+            );
+            put("FileSize"
+                , StringUtils.isEmpty((String) data.get("FileSize"))
+                    ? AttributeValue.builder().nul(true).build()
+                    : AttributeValue.builder().n((String) data.get("FileSize")).build()
+            );
+            put("AgeVeridation"
+                , StringUtils.isEmpty((String) data.get("AgeVeridation"))
+                    ? AttributeValue.builder().nul(true).build()
+                    : AttributeValue.builder().s((String) data.get("AgeVeridation")).build()
+            );
+            put("VoiceActor"
+                , ((ArrayList<String>) data.get("VoiceActor")).size() == 0
+                    ? AttributeValue.builder().nul(true).build()
+                    : AttributeValue.builder().ss((ArrayList<String>) data.get("VoiceActor")).build()
+            );
+            put("StarNum"
+                , StringUtils.isEmpty((String) data.get("StarNum"))
+                    ? AttributeValue.builder().nul(true).build()
+                    : AttributeValue.builder().n((String) data.get("StarNum")).build()
+            );
+            put("Genru"
+                , ((ArrayList<String>) data.get("Genru")).size() == 0
+                    ? AttributeValue.builder().nul(true).build()
+                    : AttributeValue.builder().ss((ArrayList<String>) data.get("Genru")).build()
+            );
+            put("BuyingUserViewItems"
+                , ((ArrayList<String>) data.get("BuyingUserViewItems")).size() == 0
+                    ? AttributeValue.builder().nul(true).build()
+                    : AttributeValue.builder().ss((ArrayList<String>) data.get("BuyingUserViewItems")).build()
+            );
+            put("LookingUserViewItems"
+                , ((ArrayList<String>) data.get("LookingUserViewItems")).size() == 0
+                    ? AttributeValue.builder().nul(true).build()
+                    : AttributeValue.builder().ss((ArrayList<String>) data.get("LookingUserViewItems")).build()
+            );
+            put("reviews"
+                , ((ArrayList<String>) data.get("reviews")).size() == 0
+                    ? AttributeValue.builder().nul(true).build()
+                    : AttributeValue.builder().ss((ArrayList<String>) data.get("reviews")).build()
+            );
             put("Monopoly"
                 , data.get("Monopoly") == null 
                     ? AttributeValue.builder().nul(true).build()
@@ -181,7 +286,6 @@ public class DynamoDbDLSite extends Model
                 .build()
             );
         }};
-
         logger.info("buildPutRequest finish");
 
         return PutItemRequest.builder()

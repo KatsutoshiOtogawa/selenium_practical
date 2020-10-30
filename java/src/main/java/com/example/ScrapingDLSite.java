@@ -79,37 +79,39 @@ public class ScrapingDLSite extends Scraper
 
     protected ChromeDriver constructor()
     {
+        logger.info("resource opening...");
         // 手動で開放しないといけないリソースはここに書く。
         ChromeDriver driver = new ChromeDriver();
-        logger.info("resource open");
+        logger.info("resource opened");
 
         return driver;
     }
 
+    @Override
     public void destructor()
     {
-        Driver.close();
-        Driver.quit();
-
-        logger.info("resource close");
+        logger.info("resource closesing...");
+        super.destructor();
+        logger.info("resource closed");
     }
 
+    @Override
     public void setupScraping() throws TimeoutException,InterruptedException
     {
-        // // Driver.WindowHandles.
-        // self.driver.set_window_size(1440, 797)
-        goToTopPage();
-        ageValidation();
-        userLogin();
-        shownCoupon();
+        logger.info("setupScraping start");
+        super.setupScraping();
+        logger.info("setupScraping finish");
     }
 
     protected void goToTopPage() throws TimeoutException,InterruptedException
     {
+        logger.info("goToTopPage start");
         Driver.get("https://www.dlsite.com/index.html");
         Wait.until(ExpectedConditions.elementToBeClickable(By.xpath("(//a[contains(text(),\'同人\')])[2]")))
             .click();
         Thread.sleep(TransitionInterval);
+
+        logger.info("goToTopPage finish");
     }
 
     protected void ageValidation() throws InterruptedException
@@ -146,8 +148,6 @@ public class ScrapingDLSite extends Scraper
         
         Wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".type-clrDefault")))
             .click();
-        // WebDriverWait(self.driver, 60).until(expected_conditions.element_to_be_clickable((By.CSS_SELECTOR, ".type-clrDefault")))
-        //     self.driver.find_element(By.CSS_SELECTOR, ".type-clrDefault").click()
         Thread.sleep(TransitionInterval);
     }
 
@@ -222,20 +222,20 @@ public class ScrapingDLSite extends Scraper
         HashMap<String,Object> data = new HashMap<String,Object>(){{
             put("ShopArtId", "");
             put("CircleName", "");
-            put("SalePrice", 0);
-            put("DiscountRate", 0);
+            put("CircleFollowerNum", "");
+            put("UnitsSold", "");
+            put("SalePrice", "");
+            put("DiscountRate", "");
             put("UntilHavingSale", "");
-            put("NormalPrice", 0);
-            put("CircleFollowerNum", 0);
-            put("Hyouka", 0);
-            put("HyoukaSu", 0);
+            put("NormalPrice", "");
+            put("Assessment", "");
+            put("AssessmentNum", "");
             put("IlustratorName", new ArrayList<String>());
             put("RerationMatome", new ArrayList<String>());
-            put("ItemFormat", "");
+            put("ItemCategory", "");
             put("FileFormat", "");
             put("FileSize", "");
-            put("UnitsSold", 0);
-            put("StarNum", 0);
+            put("StarNum", "");
             put("AgeVeridation", "");
             put("VoiceActor", new ArrayList<String>());
             put("Genru", new ArrayList<String>());
@@ -244,11 +244,18 @@ public class ScrapingDLSite extends Scraper
             put("reviews", new ArrayList<String>());
             put("Monopoly", false);
         }};
-
         // url からArtIdを取得。
         // ex) https://www.dlsite.com/pro/work/=/product_id/VJ009935.html -> VJ000935
         data.put("ShopArtId", Driver.getCurrentUrl().replaceAll("^.*/","").replaceAll("\\..*$",""));
 
+        data.put("UnitsSold"
+            ,Wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id='work_right']/div[1]/div[2]/dl/dd[1]"))).getAttribute("href")
+        );
+
+        
+        //*[@id="work_right"]/div[1]/div[2]/dl/dd[1]
+        //*[@id="work_right"]/div[1]/div[2]/dl/dd[1]
+        // koganName = driver.findElement(By.xpath(("//div[@class='row mb-1']//dd[1]")).getText();
 
         logger.info("getShopItemInfo return data=%s", data.toString());
 
@@ -329,6 +336,27 @@ public class ScrapingDLSite extends Scraper
         HashMap<String,Object> data = new HashMap<String,Object>(){{
             put("ShopArtId", shopItemInfo.get("ShopArtId"));
             put("Monopoly", shopItemInfo.get("Monopoly"));
+            put("CircleName", shopItemInfo.get("CircleName"));
+            put("CircleFollowerNum", shopItemInfo.get("CircleFollowerNum"));
+            put("UnitsSold", shopItemInfo.get("UnitsSold"));
+            put("SalePrice", shopItemInfo.get("SalePrice"));
+            put("DiscountRate", shopItemInfo.get("DiscountRate"));
+            put("UntilHavingSale", shopItemInfo.get("UntilHavingSale"));
+            put("NormalPrice", shopItemInfo.get("NormalPrice"));
+            put("Assessment", shopItemInfo.get("Assessment"));
+            put("AssessmentNum", shopItemInfo.get("AssessmentNum"));
+            put("IlustratorName", shopItemInfo.get("IlustratorName"));
+            put("RerationMatome", shopItemInfo.get("RerationMatome"));
+            put("ItemCategory", shopItemInfo.get("ItemCategory"));
+            put("FileFormat", shopItemInfo.get("FileFormat"));
+            put("FileSize", shopItemInfo.get("FileSize"));
+            put("AgeVeridation", shopItemInfo.get("AgeVeridation"));
+            put("VoiceActor", shopItemInfo.get("VoiceActor"));
+            put("StarNum", shopItemInfo.get("StarNum"));
+            put("Genru", shopItemInfo.get("Genru"));
+            put("BuyingUserViewItems", shopItemInfo.get("BuyingUserViewItems"));
+            put("LookingUserViewItems", shopItemInfo.get("LookingUserViewItems"));
+            put("reviews", shopItemInfo.get("reviews"));
             put("AffiliateUrl", shopItemAffiriateInfo.get("AffiliateUrl"));
             put("AffiliateBigImageUrl", shopItemAffiriateInfo.get("AffiliateBigImageUrl"));
             put("AffiliateMiddleImageUrl", shopItemAffiriateInfo.get("AffiliateMiddleImageUrl"));
