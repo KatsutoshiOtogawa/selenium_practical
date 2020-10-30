@@ -221,8 +221,8 @@ public class ScrapingDLSite extends Scraper
 
         HashMap<String,Object> data = new HashMap<String,Object>(){{
             put("ShopArtId", "");
-            put("CircleName", "");
-            put("CircleFollowerNum", "");
+            put("MakerName", "");
+            put("MakerFollowerNum", "");
             put("UnitsSold", "");
             put("SalePrice", "");
             put("DiscountRate", "");
@@ -248,10 +248,36 @@ public class ScrapingDLSite extends Scraper
         // ex) https://www.dlsite.com/pro/work/=/product_id/VJ009935.html -> VJ000935
         data.put("ShopArtId", Driver.getCurrentUrl().replaceAll("^.*/","").replaceAll("\\..*$",""));
 
-        data.put("UnitsSold"
-            ,Wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id='work_right']/div[1]/div[2]/dl/dd[1]"))).getAttribute("href")
-        );
-
+        try
+        {
+            data.put("UnitsSold"
+                ,Wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id='work_right']/div[1]/div[2]/dl/dt[text() = '販売数：']/following-sibling::dd[1]"))).getAttribute("textContent")
+            );
+        }catch(TimeoutException ex){
+            
+        }
+        try
+        {
+            data.put("Assessment"
+                ,Wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("#work_right > div.work_right_info > div:nth-child(2) > dl > dd > span.point.average_count"))).getAttribute("textContent")
+            );
+        }catch(TimeoutException ex){
+            
+        }
+        try
+        {
+            data.put("MakerName"
+                ,Wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("#work_maker span.maker_name > a"))).getAttribute("textContent")
+            );
+        }catch(TimeoutException ex){
+            
+        }
+        
+        
+        // data.put("UnitsSold"
+        //     ,Wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id='work_right']/div[1]/div[2]/dl/dd[1][@class='point']"))).getAttribute("textContent")
+        // );
+        
         
         //*[@id="work_right"]/div[1]/div[2]/dl/dd[1]
         //*[@id="work_right"]/div[1]/div[2]/dl/dd[1]
@@ -336,8 +362,8 @@ public class ScrapingDLSite extends Scraper
         HashMap<String,Object> data = new HashMap<String,Object>(){{
             put("ShopArtId", shopItemInfo.get("ShopArtId"));
             put("Monopoly", shopItemInfo.get("Monopoly"));
-            put("CircleName", shopItemInfo.get("CircleName"));
-            put("CircleFollowerNum", shopItemInfo.get("CircleFollowerNum"));
+            put("MakerName", shopItemInfo.get("MakerName"));
+            put("MakerFollowerNum", shopItemInfo.get("MakerFollowerNum"));
             put("UnitsSold", shopItemInfo.get("UnitsSold"));
             put("SalePrice", shopItemInfo.get("SalePrice"));
             put("DiscountRate", shopItemInfo.get("DiscountRate"));

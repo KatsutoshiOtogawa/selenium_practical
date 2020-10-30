@@ -139,15 +139,15 @@ public class DynamoDbDLSite extends Model
                 .s((String)data.get("ShopItemName"))
                 .build()
             );
-            put("CircleName"
-                , StringUtils.isEmpty((String) data.get("CircleName"))
+            put("MakerName"
+                , StringUtils.isEmpty((String) data.get("MakerName"))
                     ? AttributeValue.builder().nul(true).build()
-                    : AttributeValue.builder().s((String) data.get("CircleName")).build()
+                    : AttributeValue.builder().s((String) data.get("MakerName")).build()
             );
-            put("CircleFollowerNum"
-                , StringUtils.isEmpty((String) data.get("CircleFollowerNum"))
+            put("MakerFollowerNum"
+                , StringUtils.isEmpty((String) data.get("MakerFollowerNum"))
                     ? AttributeValue.builder().nul(true).build()
-                    : AttributeValue.builder().n((String) data.get("CircleFollowerNum")).build()
+                    : AttributeValue.builder().n((String) data.get("MakerFollowerNum")).build()
             );
             put("UnitsSold"
                 , StringUtils.isEmpty((String) data.get("UnitsSold"))
