@@ -144,6 +144,11 @@ public class DynamoDbDLSite extends Model
                     ? AttributeValue.builder().nul(true).build()
                     : AttributeValue.builder().s((String) data.get("MakerName")).build()
             );
+            put("ReleaseDate"
+                , StringUtils.isEmpty((String) data.get("ReleaseDate"))
+                    ? AttributeValue.builder().nul(true).build()
+                    : AttributeValue.builder().s((String) data.get("ReleaseDate")).build()
+            );
             put("MakerFollowerNum"
                 , StringUtils.isEmpty((String) data.get("MakerFollowerNum"))
                     ? AttributeValue.builder().nul(true).build()
@@ -189,15 +194,25 @@ public class DynamoDbDLSite extends Model
                     ? AttributeValue.builder().nul(true).build()
                     : AttributeValue.builder().ss((ArrayList<String>) data.get("IlustratorName")).build()
             );
+            put("ScreenWriter"
+                , ((ArrayList<String>) data.get("ScreenWriter")).size() == 0
+                    ? AttributeValue.builder().nul(true).build()
+                    : AttributeValue.builder().ss((ArrayList<String>) data.get("ScreenWriter")).build()
+            );
+            put("Musician"
+                , ((ArrayList<String>) data.get("Musician")).size() == 0
+                    ? AttributeValue.builder().nul(true).build()
+                    : AttributeValue.builder().ss((ArrayList<String>) data.get("Musician")).build()
+            );
             put("RerationMatome"
                 , ((ArrayList<String>) data.get("RerationMatome")).size() == 0
                     ? AttributeValue.builder().nul(true).build()
                     : AttributeValue.builder().ss((ArrayList<String>) data.get("RerationMatome")).build()
             );
             put("ItemCategory"
-                , StringUtils.isEmpty((String) data.get("ItemCategory"))
+                , ((ArrayList<String>) data.get("ItemCategory")).size() == 0
                     ? AttributeValue.builder().nul(true).build()
-                    : AttributeValue.builder().s((String) data.get("ItemCategory")).build()
+                    : AttributeValue.builder().ss((ArrayList<String>) data.get("ItemCategory")).build()
             );
             put("FileFormat"
                 , StringUtils.isEmpty((String) data.get("FileFormat"))

@@ -231,6 +231,10 @@ public class ScrapingDLSite extends Scraper
         ArrayList<String> LookingUserViewItems = new ArrayList<String>();
         ArrayList<String> reviews = new ArrayList<String>();
 
+        ArrayList<String> ScreenWriter = new ArrayList<String>();
+        
+        ArrayList<String> ItemCategory = new ArrayList<String>();
+        ArrayList<String> Musician = new ArrayList<String>();
         HashMap<String,Object> data = new HashMap<String,Object>(){{
             put("ShopArtId", "");
             put("MakerName", "");
@@ -244,12 +248,15 @@ public class ScrapingDLSite extends Scraper
             put("AssessmentNum", "");
             put("IlustratorName", IlustratorName);
             put("RerationMatome", RerationMatome);
-            put("ItemCategory", "");
+            put("ItemCategory", ItemCategory);
+            put("ReleaseDate", "");
             put("FileFormat", "");
             put("FileSize", "");
             put("StarNum", "");
             put("AgeVeridation", "");
             put("VoiceActor", VoiceActor);
+            put("Musician", Musician);
+            put("ScreenWriter", ScreenWriter);
             put("Genru", Genru);
             put("BuyingUserViewItems", BuyingUserViewItems);
             put("LookingUserViewItems", LookingUserViewItems);
@@ -329,6 +336,21 @@ public class ScrapingDLSite extends Scraper
         try
         {
 
+            List<WebElement> elements = Driver.findElements(By.xpath("//*[@id='work_outline']/tbody/tr/th[text()= 'シナリオ']/following-sibling::td[1]/a"));
+
+            logger.info("getShopItemInfo show variable [ScreenWriter=%s]",elements.toString());
+            for(WebElement element:elements)
+            {
+                ScreenWriter.add(element.getAttribute("textContent"));
+            }
+            
+        }catch(TimeoutException ex){
+            
+        }
+
+        try
+        {
+
             List<WebElement> elements = Driver.findElements(By.xpath("//*[@id='work_outline']/tbody/tr/th[text()= 'ジャンル']/following-sibling::td[1]/div/a"));
             logger.info("getShopItemInfo show variable [Genru=%s]",elements.toString());
             for(WebElement element:elements)
@@ -339,7 +361,59 @@ public class ScrapingDLSite extends Scraper
         }catch(TimeoutException ex){
             
         }
-        
+        try
+        {
+            data.put("AgeVeridation"
+                ,Wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id='work_outline']/tbody/tr/th[text()= '年齢指定']/following-sibling::td[1]/div/a")))
+                    .getAttribute("textContent")
+            );
+        }catch(TimeoutException ex){
+            
+        }
+        try
+        {
+            data.put("ReleaseDate"
+                ,Wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id='work_outline']/tbody/tr/th[text()= '販売日']/following-sibling::td[1]/a")))
+                    .getAttribute("textContent")
+            );
+        }catch(TimeoutException ex){
+            
+        }
+        // ReleaseDate
+        try
+        {
+
+            List<WebElement> elements = Driver.findElements(By.xpath("//*[@id='work_outline']/tbody/tr/th[text()= '音楽']/following-sibling::td[1]/a"));
+            logger.info("getShopItemInfo show variable [Musician=%s]",elements.toString());
+            for(WebElement element:elements)
+            {
+                Musician.add(element.getAttribute("textContent"));
+            }
+            
+        }catch(TimeoutException ex){
+            
+        }
+
+        try
+        {
+
+            List<WebElement> elements = Driver.findElements(By.xpath("//*[@id='work_outline']/tbody/tr/th[text()= '作品形式']/following-sibling::td[1]/div/a/span"));
+
+            ItemCategory.add(
+                Wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id='work_outline']/tbody/tr/th[text()= '作品形式']/following-sibling::td[1]/div")))
+                    .getAttribute("textContent").replaceAll("^.*/ ","")
+            );
+            
+            logger.info("getShopItemInfo show variable [ItemCategory=%s]",elements.toString());
+            for(WebElement element:elements)
+            {
+                ItemCategory.add(element.getAttribute("textContent"));
+            }
+            
+        }catch(TimeoutException ex){
+            
+        }
+
         logger.info("getShopItemInfo return data=%s", data.toString());
 
         return data;
@@ -424,11 +498,14 @@ public class ScrapingDLSite extends Scraper
             put("UnitsSold", shopItemInfo.get("UnitsSold"));
             put("SalePrice", shopItemInfo.get("SalePrice"));
             put("DiscountRate", shopItemInfo.get("DiscountRate"));
+            put("ReleaseDate", shopItemInfo.get("ReleaseDate"));
             put("UntilHavingSale", shopItemInfo.get("UntilHavingSale"));
             put("NormalPrice", shopItemInfo.get("NormalPrice"));
             put("Assessment", shopItemInfo.get("Assessment"));
             put("AssessmentNum", shopItemInfo.get("AssessmentNum"));
             put("IlustratorName", shopItemInfo.get("IlustratorName"));
+            put("ScreenWriter", shopItemInfo.get("ScreenWriter"));
+            put("Musician", shopItemInfo.get("Musician"));
             put("RerationMatome", shopItemInfo.get("RerationMatome"));
             put("ItemCategory", shopItemInfo.get("ItemCategory"));
             put("FileFormat", shopItemInfo.get("FileFormat"));
