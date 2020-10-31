@@ -40,6 +40,7 @@ import java.util.Date;
 
 import java.util.ArrayList;
 import java.lang.Thread;
+import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 
 import software.amazon.awssdk.core.waiters.WaiterResponse;
 import software.amazon.awssdk.regions.Region;
@@ -56,6 +57,7 @@ import software.amazon.awssdk.services.dynamodb.model.DescribeTableResponse;
 import software.amazon.awssdk.services.dynamodb.model.DynamoDbException;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.waiters.DynamoDbWaiter;
+
 /**
  * 
  */
@@ -228,9 +230,8 @@ public class ScrapingDLSite extends Scraper
         Set<String> VoiceActor = new HashSet<String>();
         Set<String> RerationMatome = new HashSet<String>();
         Set<String> Genru = new HashSet<String>();
-        // new 
-        Set<String> BuyingUserViewItems = new HashSet<String>();
-        Set<String> LookingUserViewItems = new HashSet<String>();
+        Map<String,AttributeValue> BuyingUserViewItems = new HashMap<String,AttributeValue>();
+        Map<String,AttributeValue> LookingUserViewItems = new HashMap<String,AttributeValue>();
         Set<String> FileFormat = new HashSet<String>();
         Set<String> reviews = new HashSet<String>();
         Set<String> ScreenWriter = new HashSet<String>();
@@ -547,7 +548,9 @@ public class ScrapingDLSite extends Scraper
             logger.info("getShopItemInfo show variable [BuyingUserViewItems=%s]",elements.toString());
             for(WebElement element:elements)
             {
-                BuyingUserViewItems.add(element.getAttribute("title"));
+                BuyingUserViewItems.put(element.getAttribute("href")
+                    ,AttributeValue.builder().s(element.getAttribute("title")).build()
+                );
             }
         }catch(TimeoutException ex){
             
@@ -560,7 +563,9 @@ public class ScrapingDLSite extends Scraper
             logger.info("getShopItemInfo show variable [LookingUserViewItems=%s]",elements.toString());
             for(WebElement element:elements)
             {   
-                LookingUserViewItems.add(element.getAttribute("title"));
+                LookingUserViewItems.put(element.getAttribute("href")
+                    ,AttributeValue.builder().s(element.getAttribute("title")).build()
+                );
             }
         }catch(TimeoutException ex){
             

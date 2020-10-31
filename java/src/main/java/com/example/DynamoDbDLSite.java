@@ -255,14 +255,15 @@ public class DynamoDbDLSite extends Model
             );
 
             put("BuyingUserViewItems"
-                , ((Collection<String>) data.get("BuyingUserViewItems")).size() == 0
+                , ((Map<String,AttributeValue>) data.get("BuyingUserViewItems")).size() == 0
                     ? AttributeValue.builder().nul(true).build()
-                    : AttributeValue.builder().ss((Collection<String>) data.get("BuyingUserViewItems")).build()
+                    : AttributeValue.builder().m((Map<String,AttributeValue>) data.get("BuyingUserViewItems")).build()
             );
+
             put("LookingUserViewItems"
-                , ((Collection<String>) data.get("LookingUserViewItems")).size() == 0
+                , ((Map<String,AttributeValue>) data.get("LookingUserViewItems")).size() == 0
                     ? AttributeValue.builder().nul(true).build()
-                    : AttributeValue.builder().ss((Collection<String>) data.get("LookingUserViewItems")).build()
+                    : AttributeValue.builder().m((Map<String,AttributeValue>) data.get("LookingUserViewItems")).build()
             );
 
             put("reviews"
