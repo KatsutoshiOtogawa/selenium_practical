@@ -19,19 +19,19 @@
     </Console>
   </Appenders>
   <Loggers>
-    <Logger name="com.example.ScrapingDLSite" level="info" additivity="false">
+    <Logger name="com.example.ScrapingDLSite" level="trace" additivity="false">
       <AppenderRef ref="Console"/>
     </Logger>
-    <Logger name="com.example.DynamoDbDLSite" level="info" additivity="false">
+    <Logger name="com.example.DynamoDbDLSite" level="trace" additivity="false">
       <AppenderRef ref="Console2"/>
     </Logger>
-    <Logger name="com.example.DynamoDbDLSite" level="info" additivity="false">
+    <Logger name="com.example.DynamoDbDLSite" level="trace" additivity="false">
       <AppenderRef ref="Console3"/>
     </Logger>
-    <Logger name="com.example.ControllerDLSite" level="info" additivity="false">
+    <Logger name="com.example.ControllerDLSite" level="trace" additivity="false">
       <AppenderRef ref="Console4"/>
     </Logger>
-    <Root level="info">
+    <Root level="trace">
       <AppenderRef ref="Console"/>
     </Root>
   </Loggers>

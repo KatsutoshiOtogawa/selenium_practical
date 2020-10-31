@@ -61,9 +61,6 @@ import software.amazon.awssdk.services.dynamodb.model.PutItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.PutItemResponse;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 
-// AwsClientBuilder.EndpointConfiguration
-
-// software.amazon.awssdk.services.apigateway.model;
 /**
  * 
  */
@@ -85,6 +82,7 @@ public class DynamoDbDLSite extends Model
 
     protected DynamoDbClient constructor() throws IllegalArgumentException
     {
+        logger.info("resource opening...");
         // 手動で開放しないといけないリソースはここに書く。
         DynamoDbClient connection = null;
 
@@ -108,15 +106,16 @@ public class DynamoDbDLSite extends Model
                 // overrideConfiguration()
         }
 
-        logger.info("resource open");
+        logger.info("resource opened");
 
         return connection;
     }
 
     public void destructor()
     {
+        logger.info("resource closing...");
         dynamodbClient.close();
-        logger.info("resource close");
+        logger.info("resource closed");
     }
 
     protected PutItemRequest buildPutRequest(Map<String,Object> data)

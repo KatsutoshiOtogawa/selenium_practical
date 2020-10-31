@@ -95,6 +95,7 @@ public class ControllerDLSite extends Controller
     protected Properties openProperties(String path) throws FileNotFoundException,IOException,UnsupportedEncodingException
     {
 
+        logger.info("openProperties start");
         InputStreamReader fp = null;
         
         try
@@ -139,14 +140,16 @@ public class ControllerDLSite extends Controller
             ex.printStackTrace();
             throw ex;
         }
+
+        logger.info("openProperties finish");
         return properties;
     }
 
     protected Map<String,Object> constructor(String path) throws IllegalArgumentException,FileNotFoundException,IOException,UnsupportedEncodingException
     {
-        
+        logger.info("resource opening...");
         Properties properties = openProperties(path);
-
+        logger.info("resource opend");
         return new HashMap<String,Object>(){{
             put("DynamoDbDLSite",new DynamoDbDLSite(properties));
             put("ScrapingDLSite",new ScrapingDLSite(properties));
@@ -155,9 +158,10 @@ public class ControllerDLSite extends Controller
 
     public void destructor()
     {
+        logger.info("resource closing...");
         dynamodbClient.destructor();
         scrapingDLSite.destructor();
-        logger.info("resource close");
+        logger.info("resource closed");
     }
 
     public void setupController() throws TimeoutException,InterruptedException

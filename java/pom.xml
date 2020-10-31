@@ -134,6 +134,7 @@
           </goals>
           <configuration>
             <outputDirectory>${project.build.directory}/classes</outputDirectory>
+            <testOutputDirectory>${project.build.directory}/test-classes</testOutputDirectory>
             <resources>
               <resource>
                 <directory>${basedir}</directory>
@@ -145,8 +146,16 @@
                 <directory>input</directory>
                 <filtering>true</filtering>
               </resource>
-              </resources>
-            </configuration>
+            </resources>
+            <testResources>
+              <testResource>
+                <directory>${basedir}</directory>
+                <includes>
+                  <include>log4j2-test.xml</include>
+                </includes>
+              </testResource>
+            </testResources>
+          </configuration>
           </execution>
           <execution>
           <id>copy-resources2</id>

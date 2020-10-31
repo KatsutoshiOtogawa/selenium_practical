@@ -132,7 +132,7 @@ public class ScrapingDLSite extends Scraper
             .click();
         }catch(TimeoutException ignored)
         {
-            logger.info("age validation isnt shown.");
+            logger.debug("age validation isnt shown.");
         }
         Thread.sleep(TransitionInterval);
     }
@@ -173,7 +173,7 @@ public class ScrapingDLSite extends Scraper
             .click();
         }catch(TimeoutException ignored)
         {
-            logger.info("shownCoupon comment Coupon isnt shown");
+            logger.debug("shownCoupon comment Coupon isnt shown");
         }
         Thread.sleep(TransitionInterval);
 
@@ -414,7 +414,7 @@ public class ScrapingDLSite extends Scraper
 
             List<WebElement> elements = Driver.findElements(By.xpath("//*[@id='work_outline']/tbody/tr/th[text()= '声優']/following-sibling::td[1]/a"));
 
-            logger.info("getShopItemInfo show variable [VoiceActor=%s]",elements.toString());
+            logger.debug("getShopItemInfo show variable [VoiceActor=%s]",elements.toString());
             for(WebElement element:elements)
             {
                 VoiceActor.add(element.getAttribute("textContent"));
@@ -429,7 +429,7 @@ public class ScrapingDLSite extends Scraper
 
             List<WebElement> elements = Driver.findElements(By.xpath("//*[@id='work_outline']/tbody/tr/th[text()= 'イラスト']/following-sibling::td[1]/a"));
 
-            logger.info("getShopItemInfo show variable [IlustratorName=%s]",elements.toString());
+            logger.debug("getShopItemInfo show variable [IlustratorName=%s]",elements.toString());
             for(WebElement element:elements)
             {
                 IlustratorName.add(element.getAttribute("textContent"));
@@ -444,7 +444,7 @@ public class ScrapingDLSite extends Scraper
 
             List<WebElement> elements = Driver.findElements(By.xpath("//*[@id='work_outline']/tbody/tr/th[text()= 'シナリオ']/following-sibling::td[1]/a"));
 
-            logger.info("getShopItemInfo show variable [ScreenWriter=%s]",elements.toString());
+            logger.debug("getShopItemInfo show variable [ScreenWriter=%s]",elements.toString());
             for(WebElement element:elements)
             {
                 ScreenWriter.add(element.getAttribute("textContent"));
@@ -458,7 +458,7 @@ public class ScrapingDLSite extends Scraper
         {
 
             List<WebElement> elements = Driver.findElements(By.xpath("//*[@id='work_outline']/tbody/tr/th[text()= 'ジャンル']/following-sibling::td[1]/div/a"));
-            logger.info("getShopItemInfo show variable [Genru=%s]",elements.toString());
+            logger.debug("getShopItemInfo show variable [Genru=%s]",elements.toString());
             for(WebElement element:elements)
             {
                 Genru.add(element.getAttribute("textContent"));
@@ -511,7 +511,7 @@ public class ScrapingDLSite extends Scraper
         {
 
             List<WebElement> elements = Driver.findElements(By.xpath("//*[@id='work_outline']/tbody/tr/th[text()= '音楽']/following-sibling::td[1]/a"));
-            logger.info("getShopItemInfo show variable [Musician=%s]",elements.toString());
+            logger.debug("getShopItemInfo show variable [Musician=%s]",elements.toString());
             for(WebElement element:elements)
             {
                 Musician.add(element.getAttribute("textContent"));
@@ -531,7 +531,7 @@ public class ScrapingDLSite extends Scraper
                     .getAttribute("textContent").replaceAll("^.*/ ","")
             );
             
-            logger.info("getShopItemInfo show variable [ItemCategory=%s]",elements.toString());
+            logger.debug("getShopItemInfo show variable [ItemCategory=%s]",elements.toString());
             for(WebElement element:elements)
             {
                 ItemCategory.add(element.getAttribute("textContent"));
@@ -550,7 +550,7 @@ public class ScrapingDLSite extends Scraper
                     .getAttribute("textContent").replaceAll("^.*/ ","")
             );
             
-            logger.info("getShopItemInfo show variable [FileFormat=%s]",elements.toString());
+            logger.debug("getShopItemInfo show variable [FileFormat=%s]",elements.toString());
             for(WebElement element:elements)
             {
                 FileFormat.add(element.getAttribute("textContent"));
@@ -563,7 +563,7 @@ public class ScrapingDLSite extends Scraper
         {
             List<WebElement> elements = Driver.findElements(By.xpath("//*[@id='work_left']//div[@class='controller_body']//img"));
             
-            logger.info("getShopItemInfo show variable [Gallery=%s]",elements.toString());
+            logger.debug("getShopItemInfo show variable [Gallery=%s]",elements.toString());
             for(WebElement element:elements)
             {
                 Gallery.add(element.getAttribute("src"));
@@ -576,7 +576,7 @@ public class ScrapingDLSite extends Scraper
         {
             List<WebElement> elements = Driver.findElements(By.xpath("//*[@id='work_review_list']//*[@class='reviewer_descrip']"));
             
-            logger.info("getShopItemInfo show variable [Reviews=%s]",elements.toString());
+            logger.debug("getShopItemInfo show variable [Reviews=%s]",elements.toString());
             for(WebElement element:elements)
             {
                 Reviews.add(element.getAttribute("textContent"));
@@ -590,7 +590,7 @@ public class ScrapingDLSite extends Scraper
         {
             List<WebElement> elements = Driver.findElements(By.xpath("//*[@id='main_inner']//div[@data-type='viewsales2']//div[@class='recommend_work_item']/a[@title]"));
             
-            logger.info("getShopItemInfo show variable [BuyingUserViewItems=%s]",elements.toString());
+            logger.debug("getShopItemInfo show variable [BuyingUserViewItems=%s]",elements.toString());
             for(WebElement element:elements)
             {
                 BuyingUserViewItems.put(element.getAttribute("href")
@@ -605,7 +605,7 @@ public class ScrapingDLSite extends Scraper
         {
             List<WebElement> elements = Driver.findElements(By.xpath("//*[@id='main_inner']//div[@data-type='viewsales']//div[@class='recommend_work_item']/a[@title]"));
             
-            logger.info("getShopItemInfo show variable [LookingUserViewItems=%s]",elements.toString());
+            logger.debug("getShopItemInfo show variable [LookingUserViewItems=%s]",elements.toString());
             for(WebElement element:elements)
             {   
                 LookingUserViewItems.put(element.getAttribute("href")
@@ -620,7 +620,7 @@ public class ScrapingDLSite extends Scraper
         {
             List<WebElement> elements = Driver.findElements(By.xpath("//*[@id='work_review']/table[@class='reviewer_most_genre']//td//a"));
             
-            logger.info("getShopItemInfo show variable [MostProperyGenru=%s]",elements.toString());
+            logger.debug("getShopItemInfo show variable [MostProperyGenru=%s]",elements.toString());
             for(WebElement element:elements)
             {   
 
@@ -641,7 +641,7 @@ public class ScrapingDLSite extends Scraper
         {
             List<WebElement> elements = Driver.findElements(By.xpath("//*[@id='main_inner']//div[@class='matome_container']//*[@class='matome_content_title']/a"));
             
-            logger.info("getShopItemInfo show variable [RerationMatome=%s]",elements.toString());
+            logger.debug("getShopItemInfo show variable [RerationMatome=%s]",elements.toString());
             for(WebElement element:elements)
             {   
                 RerationMatome.put(element.getAttribute("href")
