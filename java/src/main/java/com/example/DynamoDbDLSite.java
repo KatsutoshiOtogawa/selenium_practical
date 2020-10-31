@@ -226,6 +226,11 @@ public class DynamoDbDLSite extends Model
                     ? AttributeValue.builder().nul(true).build()
                     : AttributeValue.builder().n((String) data.get("FileSize")).build()
             );
+            put("FileSizeUnit"
+                , StringUtils.isEmpty((String) data.get("FileSizeUnit"))
+                    ? AttributeValue.builder().nul(true).build()
+                    : AttributeValue.builder().s((String) data.get("FileSizeUnit")).build()
+            );
             put("AgeVeridation"
                 , StringUtils.isEmpty((String) data.get("AgeVeridation"))
                     ? AttributeValue.builder().nul(true).build()
@@ -265,7 +270,11 @@ public class DynamoDbDLSite extends Model
                     ? AttributeValue.builder().nul(true).build()
                     : AttributeValue.builder().ss((Collection<String>) data.get("reviews")).build()
             );
-
+            put("ReviewNum"
+                , StringUtils.isEmpty((String) data.get("ReviewNum"))
+                    ? AttributeValue.builder().nul(true).build()
+                    : AttributeValue.builder().n((String) data.get("ReviewNum")).build()
+            );
             put("Monopoly"
                 , data.get("Monopoly") == null 
                     ? AttributeValue.builder().nul(true).build()

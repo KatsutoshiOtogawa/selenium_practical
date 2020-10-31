@@ -251,6 +251,7 @@ public class ScrapingDLSite extends Scraper
             put("ReleaseDate", "");
             put("FileFormat", "");
             put("FileSize", "");
+            put("FileSizeUnit", "");
             put("StarNum", "");
             put("AgeVeridation", "");
             put("VoiceActor", VoiceActor);
@@ -259,6 +260,7 @@ public class ScrapingDLSite extends Scraper
             put("Genru", Genru);
             put("BuyingUserViewItems", BuyingUserViewItems);
             put("LookingUserViewItems", LookingUserViewItems);
+            put("ReviewNum", "");
             put("reviews", reviews);
             put("Monopoly", false);
         }};
@@ -316,14 +318,24 @@ public class ScrapingDLSite extends Scraper
 
         try
         {
-            data.put("UnitsSold"
-                ,Wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id='work_right']/div[1]/div[2]/dl/dt[text() = '販売数：']/following-sibling::dd[1]"))).getAttribute("textContent")
+            data.put("StarNum"
+                ,Wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id='work_right']//dl/dt[text() = 'お気に入り数：']/following-sibling::dd[1]"))).getAttribute("textContent")
                     .replace(",","")
             );
         }catch(TimeoutException ex){
             
         }
-        
+
+        try
+        {
+            data.put("ReviewNum"
+                ,Wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id='work_right']//dl/dt[text() = 'レビュー数：']/following-sibling::dd[1]/span[1]"))).getAttribute("textContent")
+                    .replace(",","")
+            );
+        }catch(TimeoutException ex){
+            
+        }
+
         try
         {
             data.put("Assessment"
@@ -332,6 +344,8 @@ public class ScrapingDLSite extends Scraper
         }catch(TimeoutException ex){
             
         }
+
+        // AssessmentNum
         try
         {
             data.put("MakerName"
@@ -409,6 +423,27 @@ public class ScrapingDLSite extends Scraper
         }catch(TimeoutException ex){
             
         }
+
+        try
+        {
+
+            String text = Wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id='work_outline']/tbody/tr/th[text()= 'ファイル容量']/following-sibling::td[1]/div")))
+                    .getAttribute("textContent").replaceAll(",","");
+
+            if(text.contains("GB"))
+            {
+                data.put("FileSizeUnit","GB");
+            }else if(text.contains("MB")){
+                data.put("FileSizeUnit","MB");
+            }else if(text.contains("KB")){
+                data.put("FileSizeUnit","KB");
+            }
+            data.put("FileSize",text.replaceAll("[^0-9\\.]",""));
+            // 総計 1.75GB
+        }catch(TimeoutException ex){
+            
+        }
+
         try
         {
             data.put("AgeVeridation"
@@ -557,6 +592,7 @@ public class ScrapingDLSite extends Scraper
             put("ItemCategory", shopItemInfo.get("ItemCategory"));
             put("FileFormat", shopItemInfo.get("FileFormat"));
             put("FileSize", shopItemInfo.get("FileSize"));
+            put("FileSizeUnit", shopItemInfo.get("FileSizeUnit"));
             put("AgeVeridation", shopItemInfo.get("AgeVeridation"));
             put("VoiceActor", shopItemInfo.get("VoiceActor"));
             put("StarNum", shopItemInfo.get("StarNum"));
@@ -564,6 +600,7 @@ public class ScrapingDLSite extends Scraper
             put("BuyingUserViewItems", shopItemInfo.get("BuyingUserViewItems"));
             put("LookingUserViewItems", shopItemInfo.get("LookingUserViewItems"));
             put("reviews", shopItemInfo.get("reviews"));
+            put("ReviewNum", shopItemInfo.get("ReviewNum"));
             put("AffiliateUrl", shopItemAffiriateInfo.get("AffiliateUrl"));
             put("AffiliateBigImageUrl", shopItemAffiriateInfo.get("AffiliateBigImageUrl"));
             put("AffiliateMiddleImageUrl", shopItemAffiriateInfo.get("AffiliateMiddleImageUrl"));
