@@ -205,11 +205,15 @@ public class DynamoDbDLSite extends Model
                     ? AttributeValue.builder().nul(true).build()
                     : AttributeValue.builder().ss((Collection<String>) data.get("Musician")).build()
             );
-            
-            put("RerationMatome"
-                , ((Collection<String>) data.get("RerationMatome")).size() == 0
+            put("MatomeNum"
+                , StringUtils.isEmpty((String) data.get("MatomeNum"))
                     ? AttributeValue.builder().nul(true).build()
-                    : AttributeValue.builder().ss((Collection<String>) data.get("RerationMatome")).build()
+                    : AttributeValue.builder().n((String) data.get("MatomeNum")).build()
+            );
+            put("RerationMatome"
+                , ((Map<String,AttributeValue>) data.get("RerationMatome")).size() == 0
+                    ? AttributeValue.builder().nul(true).build()
+                    : AttributeValue.builder().m((Map<String,AttributeValue>) data.get("RerationMatome")).build()
             );
             put("ItemCategory"
                 , ((Collection<String>) data.get("ItemCategory")).size() == 0
@@ -254,6 +258,11 @@ public class DynamoDbDLSite extends Model
                     : AttributeValue.builder().ss((Collection<String>) data.get("Genru")).build()
             );
 
+            put("MostProperyGenru"
+                , ((Map<String,AttributeValue>) data.get("MostProperyGenru")).size() == 0
+                    ? AttributeValue.builder().nul(true).build()
+                    : AttributeValue.builder().m((Map<String,AttributeValue>) data.get("MostProperyGenru")).build()
+            );
             put("BuyingUserViewItems"
                 , ((Map<String,AttributeValue>) data.get("BuyingUserViewItems")).size() == 0
                     ? AttributeValue.builder().nul(true).build()
@@ -265,11 +274,11 @@ public class DynamoDbDLSite extends Model
                     ? AttributeValue.builder().nul(true).build()
                     : AttributeValue.builder().m((Map<String,AttributeValue>) data.get("LookingUserViewItems")).build()
             );
-
-            put("reviews"
-                , ((Collection<String>) data.get("reviews")).size() == 0
+            
+            put("Reviews"
+                , ((Collection<String>) data.get("Reviews")).size() == 0
                     ? AttributeValue.builder().nul(true).build()
-                    : AttributeValue.builder().ss((Collection<String>) data.get("reviews")).build()
+                    : AttributeValue.builder().ss((Collection<String>) data.get("Reviews")).build()
             );
             put("ReviewNum"
                 , StringUtils.isEmpty((String) data.get("ReviewNum"))

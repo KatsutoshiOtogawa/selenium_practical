@@ -228,15 +228,18 @@ public class ScrapingDLSite extends Scraper
 
         Set<String> IlustratorName = new HashSet<String>();
         Set<String> VoiceActor = new HashSet<String>();
-        Set<String> RerationMatome = new HashSet<String>();
+        // Set<String> RerationMatome = new HashSet<String>();
+        Map<String,AttributeValue> RerationMatome = new HashMap<String,AttributeValue>();
         Set<String> Genru = new HashSet<String>();
+        Map<String,AttributeValue> MostProperyGenru = new HashMap<String,AttributeValue>();
         Map<String,AttributeValue> BuyingUserViewItems = new HashMap<String,AttributeValue>();
         Map<String,AttributeValue> LookingUserViewItems = new HashMap<String,AttributeValue>();
         Set<String> FileFormat = new HashSet<String>();
-        Set<String> reviews = new HashSet<String>();
+        Set<String> Reviews = new HashSet<String>();
         Set<String> ScreenWriter = new HashSet<String>();
         Set<String> ItemCategory = new HashSet<String>();
         Set<String> Musician = new HashSet<String>();
+        Set<String> Gallery = new HashSet<String>();
         
         Map<String,Object> data = new HashMap<String,Object>(){{
             put("ShopArtId", "");
@@ -250,6 +253,7 @@ public class ScrapingDLSite extends Scraper
             put("Assessment", "");
             put("AssessmentNum", "");
             put("IlustratorName", IlustratorName);
+            put("MatomeNum", "");
             put("RerationMatome", RerationMatome);
             put("ItemCategory", ItemCategory);
             put("ReleaseDate", "");
@@ -262,10 +266,12 @@ public class ScrapingDLSite extends Scraper
             put("Musician", Musician);
             put("ScreenWriter", ScreenWriter);
             put("Genru", Genru);
+            put("MostProperyGenru", MostProperyGenru);
+            put("Gallery", Gallery);
             put("BuyingUserViewItems", BuyingUserViewItems);
             put("LookingUserViewItems", LookingUserViewItems);
             put("ReviewNum", "");
-            put("reviews", reviews);
+            put("Reviews", Reviews);
             put("Monopoly", false);
         }};
 
@@ -319,6 +325,18 @@ public class ScrapingDLSite extends Scraper
             }
             
         }
+
+        try
+        {
+            data.put("MatomeNum"
+                ,Wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id='top_wrapper']//a/span[text()='まとめ']/following-sibling::span[1]"))).getAttribute("textContent")
+                    .replace(",","").replace("件","")
+            );
+        }catch(TimeoutException ex){
+            
+        }
+
+        
 
         try
         {
@@ -543,6 +561,33 @@ public class ScrapingDLSite extends Scraper
 
         try
         {
+            List<WebElement> elements = Driver.findElements(By.xpath("//*[@id='work_left']//div[@class='controller_body']//img"));
+            
+            logger.info("getShopItemInfo show variable [Gallery=%s]",elements.toString());
+            for(WebElement element:elements)
+            {
+                Gallery.add(element.getAttribute("src"));
+            }
+        }catch(TimeoutException ex){
+            
+        }
+
+        try
+        {
+            List<WebElement> elements = Driver.findElements(By.xpath("//*[@id='work_review_list']//*[@class='reviewer_descrip']"));
+            
+            logger.info("getShopItemInfo show variable [Reviews=%s]",elements.toString());
+            for(WebElement element:elements)
+            {
+                Reviews.add(element.getAttribute("textContent"));
+            }
+        }catch(TimeoutException ex){
+            
+        }
+
+        
+        try
+        {
             List<WebElement> elements = Driver.findElements(By.xpath("//*[@id='main_inner']//div[@data-type='viewsales2']//div[@class='recommend_work_item']/a[@title]"));
             
             logger.info("getShopItemInfo show variable [BuyingUserViewItems=%s]",elements.toString());
@@ -570,6 +615,42 @@ public class ScrapingDLSite extends Scraper
         }catch(TimeoutException ex){
             
         }
+
+        try
+        {
+            List<WebElement> elements = Driver.findElements(By.xpath("//*[@id='work_review']/table[@class='reviewer_most_genre']//td//a"));
+            
+            logger.info("getShopItemInfo show variable [MostProperyGenru=%s]",elements.toString());
+            for(WebElement element:elements)
+            {   
+
+                String text = element.getAttribute("textContent");
+
+                MostProperyGenru.put(text.replaceAll("\\（.*$","")
+                    ,AttributeValue.builder().n(text.replaceAll("[^0-9]","")).build()
+                );
+                
+                
+            }
+        }catch(TimeoutException ex){
+            
+        }
+        
+        //　レビューおすすめ
+        try
+        {
+            List<WebElement> elements = Driver.findElements(By.xpath("//*[@id='main_inner']//div[@class='matome_container']//*[@class='matome_content_title']/a"));
+            
+            logger.info("getShopItemInfo show variable [RerationMatome=%s]",elements.toString());
+            for(WebElement element:elements)
+            {   
+                RerationMatome.put(element.getAttribute("href")
+                    ,AttributeValue.builder().s(element.getAttribute("textContent")).build()
+                );
+            }
+        }catch(TimeoutException ex){
+            
+        }
         
         logger.info("getShopItemInfo return data=%s", data.toString());
 
@@ -581,14 +662,12 @@ public class ScrapingDLSite extends Scraper
         logger.info("getShopItemAffiriateInfo start");
         
         Set<String> PlayerEmbed = new HashSet<String>();
-        Set<String> Gallery = new HashSet<String>();
         Map<String,Object> data = new HashMap<String,Object>(){{
             put("AffiliateUrl", "");
             put("AffiliateBigImageUrl", "");
             put("AffiliateMiddleImageUrl", "");
             put("AffiliateSmallImageUrl", "");
             put("PlayerEmbed", PlayerEmbed);
-            put("Gallery", Gallery);
         }};
 
         Wait.until(ExpectedConditions.elementToBeClickable(By.linkText("アフィリエイトリンク作成")))
@@ -663,6 +742,7 @@ public class ScrapingDLSite extends Scraper
             put("IlustratorName", shopItemInfo.get("IlustratorName"));
             put("ScreenWriter", shopItemInfo.get("ScreenWriter"));
             put("Musician", shopItemInfo.get("Musician"));
+            put("MatomeNum", shopItemInfo.get("MatomeNum"));
             put("RerationMatome", shopItemInfo.get("RerationMatome"));
             put("ItemCategory", shopItemInfo.get("ItemCategory"));
             put("FileFormat", shopItemInfo.get("FileFormat"));
@@ -672,16 +752,17 @@ public class ScrapingDLSite extends Scraper
             put("VoiceActor", shopItemInfo.get("VoiceActor"));
             put("StarNum", shopItemInfo.get("StarNum"));
             put("Genru", shopItemInfo.get("Genru"));
+            put("MostProperyGenru", shopItemInfo.get("MostProperyGenru"));
+            put("Gallery", shopItemInfo.get("Gallery"));
             put("BuyingUserViewItems", shopItemInfo.get("BuyingUserViewItems"));
             put("LookingUserViewItems", shopItemInfo.get("LookingUserViewItems"));
-            put("reviews", shopItemInfo.get("reviews"));
+            put("Reviews", shopItemInfo.get("Reviews"));
             put("ReviewNum", shopItemInfo.get("ReviewNum"));
             put("AffiliateUrl", shopItemAffiriateInfo.get("AffiliateUrl"));
             put("AffiliateBigImageUrl", shopItemAffiriateInfo.get("AffiliateBigImageUrl"));
             put("AffiliateMiddleImageUrl", shopItemAffiriateInfo.get("AffiliateMiddleImageUrl"));
             put("AffiliateSmallImageUrl", shopItemAffiriateInfo.get("AffiliateSmallImageUrl"));
             put("PlayerEmbed", shopItemAffiriateInfo.get("PlayerEmbed"));
-            put("Gallery", shopItemAffiriateInfo.get("Gallery"));
         }};
 
         logger.info("fetchScraping return data=%s", data.toString());
