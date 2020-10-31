@@ -86,7 +86,7 @@ public class ControllerDLSite extends Controller
 
         this.TableName = "ArtCollection";
         this.ShopName = "DLSite";
-        
+
         // aws credential propertiesよりも環境変数を優先しているので
         // それと同じような作りにするとよいはず。
 
@@ -186,7 +186,7 @@ public class ControllerDLSite extends Controller
     {
 
         logger.info("action start");
-        HashMap<String,Object> data = null;
+        Map<String,Object> data = null;
         try 
         {
             data = scrapingDLSite.fetchScraping(itemName);

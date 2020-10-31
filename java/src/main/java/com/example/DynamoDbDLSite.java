@@ -22,6 +22,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.Properties;
 import java.util.HashMap;
+import java.util.Collection;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -189,30 +190,58 @@ public class DynamoDbDLSite extends Model
                     ? AttributeValue.builder().nul(true).build()
                     : AttributeValue.builder().n((String) data.get("AssessmentNum")).build()
             );
+            // put("IlustratorName"
+            //     , ((ArrayList<String>) data.get("IlustratorName")).size() == 0
+            //         ? AttributeValue.builder().nul(true).build()
+            //         : AttributeValue.builder().ss((ArrayList<String>) data.get("IlustratorName")).build()
+            // );
             put("IlustratorName"
-                , ((ArrayList<String>) data.get("IlustratorName")).size() == 0
+                , ((Collection<String>) data.get("IlustratorName")).size() == 0
                     ? AttributeValue.builder().nul(true).build()
-                    : AttributeValue.builder().ss((ArrayList<String>) data.get("IlustratorName")).build()
+                    : AttributeValue.builder().ss((Collection<String>) data.get("IlustratorName")).build()
             );
+            // put("ScreenWriter"
+            //     , ((ArrayList<String>) data.get("ScreenWriter")).size() == 0
+            //         ? AttributeValue.builder().nul(true).build()
+            //         : AttributeValue.builder().ss((ArrayList<String>) data.get("ScreenWriter")).build()
+            // );
+
             put("ScreenWriter"
-                , ((ArrayList<String>) data.get("ScreenWriter")).size() == 0
+                , ((Collection<String>) data.get("ScreenWriter")).size() == 0
                     ? AttributeValue.builder().nul(true).build()
-                    : AttributeValue.builder().ss((ArrayList<String>) data.get("ScreenWriter")).build()
+                    : AttributeValue.builder().ss((Collection<String>) data.get("ScreenWriter")).build()
             );
+            // put("Musician"
+            //     , ((ArrayList<String>) data.get("Musician")).size() == 0
+            //         ? AttributeValue.builder().nul(true).build()
+            //         : AttributeValue.builder().ss((ArrayList<String>) data.get("Musician")).build()
+            // );
+
             put("Musician"
-                , ((ArrayList<String>) data.get("Musician")).size() == 0
+                , ((Collection<String>) data.get("Musician")).size() == 0
                     ? AttributeValue.builder().nul(true).build()
-                    : AttributeValue.builder().ss((ArrayList<String>) data.get("Musician")).build()
+                    : AttributeValue.builder().ss((Collection<String>) data.get("Musician")).build()
             );
+            // put("RerationMatome"
+            //     , ((ArrayList<String>) data.get("RerationMatome")).size() == 0
+            //         ? AttributeValue.builder().nul(true).build()
+            //         : AttributeValue.builder().ss((ArrayList<String>) data.get("RerationMatome")).build()
+            // );
+
             put("RerationMatome"
-                , ((ArrayList<String>) data.get("RerationMatome")).size() == 0
+                , ((Collection<String>) data.get("RerationMatome")).size() == 0
                     ? AttributeValue.builder().nul(true).build()
-                    : AttributeValue.builder().ss((ArrayList<String>) data.get("RerationMatome")).build()
+                    : AttributeValue.builder().ss((Collection<String>) data.get("RerationMatome")).build()
             );
+            // put("ItemCategory"
+            //     , ((ArrayList<String>) data.get("ItemCategory")).size() == 0
+            //         ? AttributeValue.builder().nul(true).build()
+            //         : AttributeValue.builder().ss((ArrayList<String>) data.get("ItemCategory")).build()
+            // );
             put("ItemCategory"
-                , ((ArrayList<String>) data.get("ItemCategory")).size() == 0
+                , ((Collection<String>) data.get("ItemCategory")).size() == 0
                     ? AttributeValue.builder().nul(true).build()
-                    : AttributeValue.builder().ss((ArrayList<String>) data.get("ItemCategory")).build()
+                    : AttributeValue.builder().ss((Collection<String>) data.get("ItemCategory")).build()
             );
             put("FileFormat"
                 , StringUtils.isEmpty((String) data.get("FileFormat"))
@@ -229,36 +258,68 @@ public class DynamoDbDLSite extends Model
                     ? AttributeValue.builder().nul(true).build()
                     : AttributeValue.builder().s((String) data.get("AgeVeridation")).build()
             );
+            // put("VoiceActor"
+            //     , ((ArrayList<String>) data.get("VoiceActor")).size() == 0
+            //         ? AttributeValue.builder().nul(true).build()
+            //         : AttributeValue.builder().ss((ArrayList<String>) data.get("VoiceActor")).build()
+            // );
+
             put("VoiceActor"
-                , ((ArrayList<String>) data.get("VoiceActor")).size() == 0
+                , ((Collection<String>) data.get("VoiceActor")).size() == 0
                     ? AttributeValue.builder().nul(true).build()
-                    : AttributeValue.builder().ss((ArrayList<String>) data.get("VoiceActor")).build()
+                    : AttributeValue.builder().ss((Collection<String>) data.get("VoiceActor")).build()
             );
             put("StarNum"
                 , StringUtils.isEmpty((String) data.get("StarNum"))
                     ? AttributeValue.builder().nul(true).build()
                     : AttributeValue.builder().n((String) data.get("StarNum")).build()
             );
+            // put("Genru"
+            //     , ((ArrayList<String>) data.get("Genru")).size() == 0
+            //         ? AttributeValue.builder().nul(true).build()
+            //         : AttributeValue.builder().ss((ArrayList<String>) data.get("Genru")).build()
+            // );
+
             put("Genru"
-                , ((ArrayList<String>) data.get("Genru")).size() == 0
+                , ((Collection<String>) data.get("Genru")).size() == 0
                     ? AttributeValue.builder().nul(true).build()
-                    : AttributeValue.builder().ss((ArrayList<String>) data.get("Genru")).build()
+                    : AttributeValue.builder().ss((Collection<String>) data.get("Genru")).build()
             );
+
+            // put("BuyingUserViewItems"
+            //     , ((ArrayList<String>) data.get("BuyingUserViewItems")).size() == 0
+            //         ? AttributeValue.builder().nul(true).build()
+            //         : AttributeValue.builder().ss((ArrayList<String>) data.get("BuyingUserViewItems")).build()
+            // );
+
             put("BuyingUserViewItems"
-                , ((ArrayList<String>) data.get("BuyingUserViewItems")).size() == 0
+                , ((Collection<String>) data.get("BuyingUserViewItems")).size() == 0
                     ? AttributeValue.builder().nul(true).build()
-                    : AttributeValue.builder().ss((ArrayList<String>) data.get("BuyingUserViewItems")).build()
+                    : AttributeValue.builder().ss((Collection<String>) data.get("BuyingUserViewItems")).build()
             );
+            // put("LookingUserViewItems"
+            //     , ((ArrayList<String>) data.get("LookingUserViewItems")).size() == 0
+            //         ? AttributeValue.builder().nul(true).build()
+            //         : AttributeValue.builder().ss((ArrayList<String>) data.get("LookingUserViewItems")).build()
+            // );
+
             put("LookingUserViewItems"
-                , ((ArrayList<String>) data.get("LookingUserViewItems")).size() == 0
+                , ((Collection<String>) data.get("LookingUserViewItems")).size() == 0
                     ? AttributeValue.builder().nul(true).build()
-                    : AttributeValue.builder().ss((ArrayList<String>) data.get("LookingUserViewItems")).build()
+                    : AttributeValue.builder().ss((Collection<String>) data.get("LookingUserViewItems")).build()
             );
+            // put("reviews"
+            //     , ((ArrayList<String>) data.get("reviews")).size() == 0
+            //         ? AttributeValue.builder().nul(true).build()
+            //         : AttributeValue.builder().ss((ArrayList<String>) data.get("reviews")).build()
+            // );
+
             put("reviews"
-                , ((ArrayList<String>) data.get("reviews")).size() == 0
+                , ((Collection<String>) data.get("reviews")).size() == 0
                     ? AttributeValue.builder().nul(true).build()
-                    : AttributeValue.builder().ss((ArrayList<String>) data.get("reviews")).build()
+                    : AttributeValue.builder().ss((Collection<String>) data.get("reviews")).build()
             );
+
             put("Monopoly"
                 , data.get("Monopoly") == null 
                     ? AttributeValue.builder().nul(true).build()
@@ -285,16 +346,27 @@ public class DynamoDbDLSite extends Model
                     ? AttributeValue.builder().nul(true).build()
                     : AttributeValue.builder().s((String) data.get("AffiliateSmallImageUrl")).build()
             );
+            // put("PlayerEmbed"
+            //     , ((ArrayList<String>) data.get("PlayerEmbed")).size() == 0
+            //         ? AttributeValue.builder().nul(true).build()
+            //         : AttributeValue.builder().ss((ArrayList<String>) data.get("PlayerEmbed")).build()
+            // );
+
             put("PlayerEmbed"
-                , ((ArrayList<String>) data.get("PlayerEmbed")).size() == 0
+                , ((Collection<String>) data.get("PlayerEmbed")).size() == 0
                     ? AttributeValue.builder().nul(true).build()
-                    : AttributeValue.builder().ss((ArrayList<String>) data.get("PlayerEmbed")).build()
+                    : AttributeValue.builder().ss((Collection<String>) data.get("PlayerEmbed")).build()
             );
-            put("Gallery"
-                , ((ArrayList<String>) data.get("Gallery")).size() == 0
-                    ? AttributeValue.builder().nul(true).build()
-                    : AttributeValue.builder().ss((ArrayList<String>) data.get("Gallery")).build()
+            // put("Gallery"
+            //     , ((ArrayList<String>) data.get("Gallery")).size() == 0
+            //         ? AttributeValue.builder().nul(true).build()
+            //         : AttributeValue.builder().ss((ArrayList<String>) data.get("Gallery")).build()
                 
+            // );
+            put("Gallery"
+                , ((Collection<String>) data.get("Gallery")).size() == 0
+                    ? AttributeValue.builder().nul(true).build()
+                    : AttributeValue.builder().ss((Collection<String>) data.get("Gallery")).build()
             );
             put("CreatedAt", AttributeValue.builder()
                 .s((String) data.get("CreatedAt"))

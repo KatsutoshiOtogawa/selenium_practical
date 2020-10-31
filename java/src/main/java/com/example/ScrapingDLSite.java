@@ -21,7 +21,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Properties;
+import java.util.Map;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
+
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -66,14 +70,9 @@ public class ScrapingDLSite extends Scraper
         this.Driver = constructor();
         
         this.CreatedAt = (new SimpleDateFormat("yyyy-MM-dd")).format(new Date());
-        this.Wait = new WebDriverWait(Driver, 60);
-        this.TransitionInterval = 10 * 1000;
         this.TableName = "ArtCollection";
         this.ShopName = "DLSite";
-        // this.DynamoDbClient = connection;
         this.properties = properties;
-        // aws credential propertiesよりも環境変数を優先しているので
-        // それと同じような作りにするとよいはず。
 
     }
 
@@ -93,6 +92,13 @@ public class ScrapingDLSite extends Scraper
         logger.info("resource closesing...");
         super.destructor();
         logger.info("resource closed");
+    }
+    @Override
+    protected void setupWebDriver() throws IllegalArgumentException
+    {
+        logger.info("setupWebDriver start");
+        super.setupWebDriver();
+        logger.info("setupWebDriver finish");
     }
 
     @Override
@@ -166,7 +172,6 @@ public class ScrapingDLSite extends Scraper
         }catch(TimeoutException ignored)
         {
             logger.info("shownCoupon comment Coupon isnt shown");
-            // [ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
         }
         Thread.sleep(TransitionInterval);
 
@@ -215,27 +220,32 @@ public class ScrapingDLSite extends Scraper
         logger.info("searchBox finish variable [sentense=%s]",sentense);
     }
 
-    protected HashMap<String,Object> getShopItemInfo(String itemName) throws TimeoutException,InterruptedException
+    protected Map<String,Object> getShopItemInfo(String itemName) throws TimeoutException,InterruptedException
     {
         logger.info("getShopItemInfo start variable [shopItemName=%s]",itemName);
 
-        ArrayList<String> IlustratorName = new ArrayList<String>();
+        // ArrayList<String> IlustratorName = new ArrayList<String>();
+        Set<String> IlustratorName = new HashSet<String>();
+        // ArrayList<String> VoiceActor = new ArrayList<String>();
+        Set<String> VoiceActor = new HashSet<String>();
 
-        ArrayList<String> VoiceActor = new ArrayList<String>();
+        // ArrayList<String> RerationMatome = new ArrayList<String>();
+        Set<String> RerationMatome = new HashSet<String>();
+        // ArrayList<String> Genru = new ArrayList<String>();
+        Set<String> Genru = new HashSet<String>();
+        // ArrayList<String> BuyingUserViewItems = new ArrayList<String>();
+        Set<String> BuyingUserViewItems = new HashSet<String>();
+        // ArrayList<String> LookingUserViewItems = new ArrayList<String>();
+        Set<String> LookingUserViewItems = new HashSet<String>();
+        // ArrayList<String> reviews = new ArrayList<String>();
+        Set<String> reviews = new HashSet<String>();
 
-        ArrayList<String> RerationMatome = new ArrayList<String>();
-
-        ArrayList<String> Genru = new ArrayList<String>();
-        
-        ArrayList<String> BuyingUserViewItems = new ArrayList<String>();
-        ArrayList<String> LookingUserViewItems = new ArrayList<String>();
-        ArrayList<String> reviews = new ArrayList<String>();
-
-        ArrayList<String> ScreenWriter = new ArrayList<String>();
-        
-        ArrayList<String> ItemCategory = new ArrayList<String>();
-        ArrayList<String> Musician = new ArrayList<String>();
-        HashMap<String,Object> data = new HashMap<String,Object>(){{
+        // ArrayList<String> ScreenWriter = new ArrayList<String>();
+        Set<String> ScreenWriter = new HashSet<String>();
+        Set<String> ItemCategory = new HashSet<String>();
+        Set<String> Musician = new HashSet<String>();
+        // ArrayList<String> Musician = new ArrayList<String>();
+        Map<String,Object> data = new HashMap<String,Object>(){{
             put("ShopArtId", "");
             put("MakerName", "");
             put("MakerFollowerNum", "");
@@ -263,6 +273,7 @@ public class ScrapingDLSite extends Scraper
             put("reviews", reviews);
             put("Monopoly", false);
         }};
+
         // url からArtIdを取得。
         // ex) https://www.dlsite.com/pro/work/=/product_id/VJ009935.html -> VJ000935
         data.put("ShopArtId", Driver.getCurrentUrl().replaceAll("^.*/","").replaceAll("\\..*$",""));
@@ -276,6 +287,54 @@ public class ScrapingDLSite extends Scraper
         }catch(TimeoutException ex){
             
         }
+
+        try
+        {
+            data.put("NormalPrice"
+                ,Wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id='work_buy_box_wrapper']//div[@class='work_buy_label' and text()='価格']/following-sibling::div[1]/*[@class='price']")))
+                    .getAttribute("textContent").replace(",","").replace("円","")  
+            );
+        }catch(TimeoutException ex){
+
+            try
+            {
+                data.put("NormalPrice"
+                    ,Wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id='work_price']//div[@class='work_buy_label' and text()='通常価格']/following-sibling::div[1]/*[@class='price strike']")))                                                      
+                        .getAttribute("textContent").replace(",","").replace("円","")  
+                );
+
+                data.put("SalePrice"
+                    ,Wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id='work_price']//div[@class='work_buy_label' and text()='セール特価']/following-sibling::div[1]/*[@class='price']")))
+                        .getAttribute("textContent").replace(",","").replace("円","")  
+                );
+                
+                data.put("DiscountRate"
+                    ,Wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id='work_price']//*[@class='type_sale transition']/a/span")))
+                        .getAttribute("textContent").replaceAll("%.*?$","")
+                );
+
+                data.put("UntilHavingSale"
+                    ,Wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id='work_price']//*[@class='type_sale transition']/a/span/span[@class='period']")))
+                        .getAttribute("textContent")
+                );
+
+            }catch(TimeoutException ex2){
+
+                
+            }
+            
+        }
+
+        try
+        {
+            data.put("UnitsSold"
+                ,Wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id='work_right']/div[1]/div[2]/dl/dt[text() = '販売数：']/following-sibling::dd[1]"))).getAttribute("textContent")
+                    .replace(",","")
+            );
+        }catch(TimeoutException ex){
+            
+        }
+        
         try
         {
             data.put("Assessment"
@@ -379,7 +438,7 @@ public class ScrapingDLSite extends Scraper
         }catch(TimeoutException ex){
             
         }
-        // ReleaseDate
+
         try
         {
 
@@ -409,7 +468,6 @@ public class ScrapingDLSite extends Scraper
             {
                 ItemCategory.add(element.getAttribute("textContent"));
             }
-            
         }catch(TimeoutException ex){
             
         }
@@ -419,19 +477,20 @@ public class ScrapingDLSite extends Scraper
         return data;
     }
 
-    protected HashMap<String,Object> getShopItemAffiriateInfo() throws TimeoutException,InterruptedException,IOException,UnsupportedFlavorException
+    protected Map<String,Object> getShopItemAffiriateInfo() throws TimeoutException,InterruptedException,IOException,UnsupportedFlavorException
     {
         logger.info("getShopItemAffiriateInfo start");
         
-        ArrayList<String> PlayerEmbed = new ArrayList<String>();
-
-        HashMap<String,Object> data = new HashMap<String,Object>(){{
+        // ArrayList<String> PlayerEmbed = new ArrayList<String>();
+        Set<String> PlayerEmbed = new HashSet<String>();
+        Set<String> Gallery = new HashSet<String>();
+        Map<String,Object> data = new HashMap<String,Object>(){{
             put("AffiliateUrl", "");
             put("AffiliateBigImageUrl", "");
             put("AffiliateMiddleImageUrl", "");
             put("AffiliateSmallImageUrl", "");
             put("PlayerEmbed", PlayerEmbed);
-            put("Gallery", new ArrayList<String>());
+            put("Gallery", Gallery);
         }};
 
         Wait.until(ExpectedConditions.elementToBeClickable(By.linkText("アフィリエイトリンク作成")))
@@ -480,17 +539,17 @@ public class ScrapingDLSite extends Scraper
         return data;
     }
 
-    public HashMap<String,Object> fetchScraping(String itemName) throws TimeoutException,InterruptedException,IOException,UnsupportedFlavorException,NotFoundException
+    public Map<String,Object> fetchScraping(String itemName) throws TimeoutException,InterruptedException,IOException,UnsupportedFlavorException,NotFoundException
     {
         logger.info("fetchScraping start");
         // check shopItemName is exist DLSite.
         searchBox(itemName);
 
-        HashMap<String,Object> shopItemInfo = getShopItemInfo(itemName);
+        Map<String,Object> shopItemInfo = getShopItemInfo(itemName);
 
-        HashMap<String,Object> shopItemAffiriateInfo = getShopItemAffiriateInfo();
+        Map<String,Object> shopItemAffiriateInfo = getShopItemAffiriateInfo();
 
-        HashMap<String,Object> data = new HashMap<String,Object>(){{
+        Map<String,Object> data = new HashMap<String,Object>(){{
             put("ShopArtId", shopItemInfo.get("ShopArtId"));
             put("Monopoly", shopItemInfo.get("Monopoly"));
             put("MakerName", shopItemInfo.get("MakerName"));
