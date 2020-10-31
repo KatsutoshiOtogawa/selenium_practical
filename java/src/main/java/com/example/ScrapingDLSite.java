@@ -224,27 +224,16 @@ public class ScrapingDLSite extends Scraper
     {
         logger.info("getShopItemInfo start variable [shopItemName=%s]",itemName);
 
-        // ArrayList<String> IlustratorName = new ArrayList<String>();
         Set<String> IlustratorName = new HashSet<String>();
-        // ArrayList<String> VoiceActor = new ArrayList<String>();
         Set<String> VoiceActor = new HashSet<String>();
-
-        // ArrayList<String> RerationMatome = new ArrayList<String>();
         Set<String> RerationMatome = new HashSet<String>();
-        // ArrayList<String> Genru = new ArrayList<String>();
         Set<String> Genru = new HashSet<String>();
-        // ArrayList<String> BuyingUserViewItems = new ArrayList<String>();
         Set<String> BuyingUserViewItems = new HashSet<String>();
-        // ArrayList<String> LookingUserViewItems = new ArrayList<String>();
         Set<String> LookingUserViewItems = new HashSet<String>();
-        // ArrayList<String> reviews = new ArrayList<String>();
         Set<String> reviews = new HashSet<String>();
-
-        // ArrayList<String> ScreenWriter = new ArrayList<String>();
         Set<String> ScreenWriter = new HashSet<String>();
         Set<String> ItemCategory = new HashSet<String>();
         Set<String> Musician = new HashSet<String>();
-        // ArrayList<String> Musician = new ArrayList<String>();
         Map<String,Object> data = new HashMap<String,Object>(){{
             put("ShopArtId", "");
             put("MakerName", "");
@@ -481,7 +470,6 @@ public class ScrapingDLSite extends Scraper
     {
         logger.info("getShopItemAffiriateInfo start");
         
-        // ArrayList<String> PlayerEmbed = new ArrayList<String>();
         Set<String> PlayerEmbed = new HashSet<String>();
         Set<String> Gallery = new HashSet<String>();
         Map<String,Object> data = new HashMap<String,Object>(){{

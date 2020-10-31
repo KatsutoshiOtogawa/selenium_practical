@@ -190,54 +190,27 @@ public class DynamoDbDLSite extends Model
                     ? AttributeValue.builder().nul(true).build()
                     : AttributeValue.builder().n((String) data.get("AssessmentNum")).build()
             );
-            // put("IlustratorName"
-            //     , ((ArrayList<String>) data.get("IlustratorName")).size() == 0
-            //         ? AttributeValue.builder().nul(true).build()
-            //         : AttributeValue.builder().ss((ArrayList<String>) data.get("IlustratorName")).build()
-            // );
             put("IlustratorName"
                 , ((Collection<String>) data.get("IlustratorName")).size() == 0
                     ? AttributeValue.builder().nul(true).build()
                     : AttributeValue.builder().ss((Collection<String>) data.get("IlustratorName")).build()
             );
-            // put("ScreenWriter"
-            //     , ((ArrayList<String>) data.get("ScreenWriter")).size() == 0
-            //         ? AttributeValue.builder().nul(true).build()
-            //         : AttributeValue.builder().ss((ArrayList<String>) data.get("ScreenWriter")).build()
-            // );
-
             put("ScreenWriter"
                 , ((Collection<String>) data.get("ScreenWriter")).size() == 0
                     ? AttributeValue.builder().nul(true).build()
                     : AttributeValue.builder().ss((Collection<String>) data.get("ScreenWriter")).build()
             );
-            // put("Musician"
-            //     , ((ArrayList<String>) data.get("Musician")).size() == 0
-            //         ? AttributeValue.builder().nul(true).build()
-            //         : AttributeValue.builder().ss((ArrayList<String>) data.get("Musician")).build()
-            // );
-
             put("Musician"
                 , ((Collection<String>) data.get("Musician")).size() == 0
                     ? AttributeValue.builder().nul(true).build()
                     : AttributeValue.builder().ss((Collection<String>) data.get("Musician")).build()
             );
-            // put("RerationMatome"
-            //     , ((ArrayList<String>) data.get("RerationMatome")).size() == 0
-            //         ? AttributeValue.builder().nul(true).build()
-            //         : AttributeValue.builder().ss((ArrayList<String>) data.get("RerationMatome")).build()
-            // );
-
+            
             put("RerationMatome"
                 , ((Collection<String>) data.get("RerationMatome")).size() == 0
                     ? AttributeValue.builder().nul(true).build()
                     : AttributeValue.builder().ss((Collection<String>) data.get("RerationMatome")).build()
             );
-            // put("ItemCategory"
-            //     , ((ArrayList<String>) data.get("ItemCategory")).size() == 0
-            //         ? AttributeValue.builder().nul(true).build()
-            //         : AttributeValue.builder().ss((ArrayList<String>) data.get("ItemCategory")).build()
-            // );
             put("ItemCategory"
                 , ((Collection<String>) data.get("ItemCategory")).size() == 0
                     ? AttributeValue.builder().nul(true).build()
@@ -258,11 +231,6 @@ public class DynamoDbDLSite extends Model
                     ? AttributeValue.builder().nul(true).build()
                     : AttributeValue.builder().s((String) data.get("AgeVeridation")).build()
             );
-            // put("VoiceActor"
-            //     , ((ArrayList<String>) data.get("VoiceActor")).size() == 0
-            //         ? AttributeValue.builder().nul(true).build()
-            //         : AttributeValue.builder().ss((ArrayList<String>) data.get("VoiceActor")).build()
-            // );
 
             put("VoiceActor"
                 , ((Collection<String>) data.get("VoiceActor")).size() == 0
@@ -274,11 +242,6 @@ public class DynamoDbDLSite extends Model
                     ? AttributeValue.builder().nul(true).build()
                     : AttributeValue.builder().n((String) data.get("StarNum")).build()
             );
-            // put("Genru"
-            //     , ((ArrayList<String>) data.get("Genru")).size() == 0
-            //         ? AttributeValue.builder().nul(true).build()
-            //         : AttributeValue.builder().ss((ArrayList<String>) data.get("Genru")).build()
-            // );
 
             put("Genru"
                 , ((Collection<String>) data.get("Genru")).size() == 0
@@ -286,33 +249,16 @@ public class DynamoDbDLSite extends Model
                     : AttributeValue.builder().ss((Collection<String>) data.get("Genru")).build()
             );
 
-            // put("BuyingUserViewItems"
-            //     , ((ArrayList<String>) data.get("BuyingUserViewItems")).size() == 0
-            //         ? AttributeValue.builder().nul(true).build()
-            //         : AttributeValue.builder().ss((ArrayList<String>) data.get("BuyingUserViewItems")).build()
-            // );
-
             put("BuyingUserViewItems"
                 , ((Collection<String>) data.get("BuyingUserViewItems")).size() == 0
                     ? AttributeValue.builder().nul(true).build()
                     : AttributeValue.builder().ss((Collection<String>) data.get("BuyingUserViewItems")).build()
             );
-            // put("LookingUserViewItems"
-            //     , ((ArrayList<String>) data.get("LookingUserViewItems")).size() == 0
-            //         ? AttributeValue.builder().nul(true).build()
-            //         : AttributeValue.builder().ss((ArrayList<String>) data.get("LookingUserViewItems")).build()
-            // );
-
             put("LookingUserViewItems"
                 , ((Collection<String>) data.get("LookingUserViewItems")).size() == 0
                     ? AttributeValue.builder().nul(true).build()
                     : AttributeValue.builder().ss((Collection<String>) data.get("LookingUserViewItems")).build()
             );
-            // put("reviews"
-            //     , ((ArrayList<String>) data.get("reviews")).size() == 0
-            //         ? AttributeValue.builder().nul(true).build()
-            //         : AttributeValue.builder().ss((ArrayList<String>) data.get("reviews")).build()
-            // );
 
             put("reviews"
                 , ((Collection<String>) data.get("reviews")).size() == 0
@@ -346,23 +292,11 @@ public class DynamoDbDLSite extends Model
                     ? AttributeValue.builder().nul(true).build()
                     : AttributeValue.builder().s((String) data.get("AffiliateSmallImageUrl")).build()
             );
-            // put("PlayerEmbed"
-            //     , ((ArrayList<String>) data.get("PlayerEmbed")).size() == 0
-            //         ? AttributeValue.builder().nul(true).build()
-            //         : AttributeValue.builder().ss((ArrayList<String>) data.get("PlayerEmbed")).build()
-            // );
-
             put("PlayerEmbed"
                 , ((Collection<String>) data.get("PlayerEmbed")).size() == 0
                     ? AttributeValue.builder().nul(true).build()
                     : AttributeValue.builder().ss((Collection<String>) data.get("PlayerEmbed")).build()
             );
-            // put("Gallery"
-            //     , ((ArrayList<String>) data.get("Gallery")).size() == 0
-            //         ? AttributeValue.builder().nul(true).build()
-            //         : AttributeValue.builder().ss((ArrayList<String>) data.get("Gallery")).build()
-                
-            // );
             put("Gallery"
                 , ((Collection<String>) data.get("Gallery")).size() == 0
                     ? AttributeValue.builder().nul(true).build()
