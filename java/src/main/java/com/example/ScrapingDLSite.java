@@ -228,12 +228,15 @@ public class ScrapingDLSite extends Scraper
         Set<String> VoiceActor = new HashSet<String>();
         Set<String> RerationMatome = new HashSet<String>();
         Set<String> Genru = new HashSet<String>();
+        // new 
         Set<String> BuyingUserViewItems = new HashSet<String>();
         Set<String> LookingUserViewItems = new HashSet<String>();
+        Set<String> FileFormat = new HashSet<String>();
         Set<String> reviews = new HashSet<String>();
         Set<String> ScreenWriter = new HashSet<String>();
         Set<String> ItemCategory = new HashSet<String>();
         Set<String> Musician = new HashSet<String>();
+        
         Map<String,Object> data = new HashMap<String,Object>(){{
             put("ShopArtId", "");
             put("MakerName", "");
@@ -249,7 +252,7 @@ public class ScrapingDLSite extends Scraper
             put("RerationMatome", RerationMatome);
             put("ItemCategory", ItemCategory);
             put("ReleaseDate", "");
-            put("FileFormat", "");
+            put("FileFormat", FileFormat);
             put("FileSize", "");
             put("FileSizeUnit", "");
             put("StarNum", "");
@@ -318,6 +321,19 @@ public class ScrapingDLSite extends Scraper
 
         try
         {
+            List<WebElement> elements = Driver.findElements(By.xpath("//*[@id='top_wrapper']//span[@title='DLsite専売']"));
+
+            if(elements.size() > 0)
+            {
+                data.put("Monopoly",true);
+            }
+                
+        }catch(TimeoutException ex){
+            
+        }
+
+        try
+        {
             data.put("StarNum"
                 ,Wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id='work_right']//dl/dt[text() = 'お気に入り数：']/following-sibling::dd[1]"))).getAttribute("textContent")
                     .replace(",","")
@@ -345,7 +361,16 @@ public class ScrapingDLSite extends Scraper
             
         }
 
-        // AssessmentNum
+        try
+        {
+            data.put("AssessmentNum"
+                ,Wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id='work_right']//dl/dt[text() = '評価：']/following-sibling::dd[1]/span[@class='count']"))).getAttribute("textContent")
+                    .replace(",","").replaceAll("(\\(|\\))","")
+            );
+        }catch(TimeoutException ex){
+            
+        }
+
         try
         {
             data.put("MakerName"
@@ -439,7 +464,7 @@ public class ScrapingDLSite extends Scraper
                 data.put("FileSizeUnit","KB");
             }
             data.put("FileSize",text.replaceAll("[^0-9\\.]",""));
-            // 総計 1.75GB
+
         }catch(TimeoutException ex){
             
         }
@@ -496,6 +521,51 @@ public class ScrapingDLSite extends Scraper
             
         }
 
+        try
+        {
+
+            List<WebElement> elements = Driver.findElements(By.xpath("//*[@id='work_outline']/tbody/tr/th[text()= 'ファイル形式']/following-sibling::td[1]/div/a/span"));
+
+            FileFormat.add(
+                Wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id='work_outline']/tbody/tr/th[text()= 'ファイル形式']/following-sibling::td[1]/div")))
+                    .getAttribute("textContent").replaceAll("^.*/ ","")
+            );
+            
+            logger.info("getShopItemInfo show variable [FileFormat=%s]",elements.toString());
+            for(WebElement element:elements)
+            {
+                FileFormat.add(element.getAttribute("textContent"));
+            }
+        }catch(TimeoutException ex){
+            
+        }
+
+        try
+        {
+            List<WebElement> elements = Driver.findElements(By.xpath("//*[@id='main_inner']//div[@data-type='viewsales2']//div[@class='recommend_work_item']/a[@title]"));
+            
+            logger.info("getShopItemInfo show variable [BuyingUserViewItems=%s]",elements.toString());
+            for(WebElement element:elements)
+            {
+                BuyingUserViewItems.add(element.getAttribute("title"));
+            }
+        }catch(TimeoutException ex){
+            
+        }
+
+        try
+        {
+            List<WebElement> elements = Driver.findElements(By.xpath("//*[@id='main_inner']//div[@data-type='viewsales']//div[@class='recommend_work_item']/a[@title]"));
+            
+            logger.info("getShopItemInfo show variable [LookingUserViewItems=%s]",elements.toString());
+            for(WebElement element:elements)
+            {   
+                LookingUserViewItems.add(element.getAttribute("title"));
+            }
+        }catch(TimeoutException ex){
+            
+        }
+        
         logger.info("getShopItemInfo return data=%s", data.toString());
 
         return data;

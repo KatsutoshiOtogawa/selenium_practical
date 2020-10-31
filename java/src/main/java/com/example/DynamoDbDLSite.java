@@ -217,9 +217,9 @@ public class DynamoDbDLSite extends Model
                     : AttributeValue.builder().ss((Collection<String>) data.get("ItemCategory")).build()
             );
             put("FileFormat"
-                , StringUtils.isEmpty((String) data.get("FileFormat"))
+                , ((Collection<String>) data.get("FileFormat")).size() == 0
                     ? AttributeValue.builder().nul(true).build()
-                    : AttributeValue.builder().s((String) data.get("FileFormat")).build()
+                    : AttributeValue.builder().ss((Collection<String>) data.get("FileFormat")).build()
             );
             put("FileSize"
                 , StringUtils.isEmpty((String) data.get("FileSize"))
