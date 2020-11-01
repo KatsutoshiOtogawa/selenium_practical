@@ -75,7 +75,7 @@ public class ControllerDLSite extends Controller
     private ScrapingDLSite scrapingDLSite;
     private static final Logger logger = LogManager.getFormatterLogger(ControllerDLSite.class);
     
-    public ControllerDLSite(String path) throws IllegalArgumentException,FileNotFoundException,IOException
+    public ControllerDLSite(String path) throws IllegalArgumentException,IllegalStateException,FileNotFoundException,IOException
     {
         
         this.CreatedAt = (new SimpleDateFormat("yyyy-MM-dd")).format(new Date());
@@ -104,12 +104,10 @@ public class ControllerDLSite extends Controller
         }catch(FileNotFoundException ex)
         {
             logger.error("openProperties message [%s]",ex.getMessage());
-            ex.printStackTrace();
             throw ex;
         }catch(UnsupportedEncodingException ex)
         {
             logger.error("openProperties message [%s]",ex.getMessage());
-            ex.printStackTrace();
             throw ex;
         }
 
@@ -124,11 +122,9 @@ public class ControllerDLSite extends Controller
                 fp.close();
             }catch(IOException ex2){
                 logger.error("openProperties message [%s]",ex.getMessage());
-                ex.printStackTrace();
                 throw ex2;
             }
             logger.error("openProperties message [%s]",ex.getMessage());
-            ex.printStackTrace();
             throw ex;
         }
         
@@ -137,7 +133,6 @@ public class ControllerDLSite extends Controller
             fp.close();
         }catch(IOException ex){
             logger.error("openProperties message [%s]",ex.getMessage());
-            ex.printStackTrace();
             throw ex;
         }
 
@@ -145,15 +140,31 @@ public class ControllerDLSite extends Controller
         return properties;
     }
 
-    protected Map<String,Object> constructor(String path) throws IllegalArgumentException,FileNotFoundException,IOException,UnsupportedEncodingException
+    protected Map<String,Object> constructor(String path) throws IllegalArgumentException,FileNotFoundException,IOException,UnsupportedEncodingException,IllegalStateException
     {
         logger.info("resource opening...");
         Properties properties = openProperties(path);
+
+        Map<String,Object> resources = new HashMap<String,Object>();
+
+        resources.put("DynamoDbDLSite",new DynamoDbDLSite(properties));
+
+        try
+        {
+            resources.put("ScrapingDLSite",new ScrapingDLSite(properties));
+        }catch(Exception ex){
+            ((DynamoDbDLSite)resources.get("DynamoDbDLSite")).destructor();
+            throw ex;
+        }
+
         logger.info("resource opend");
-        return new HashMap<String,Object>(){{
-            put("DynamoDbDLSite",new DynamoDbDLSite(properties));
-            put("ScrapingDLSite",new ScrapingDLSite(properties));
-        }};
+
+        return resources;
+
+        // return new HashMap<String,Object>(){{
+        //     put("DynamoDbDLSite",new DynamoDbDLSite(properties));
+        //     put("ScrapingDLSite",new ScrapingDLSite(properties));
+        // }};
     }
 
     public void destructor()
@@ -172,15 +183,12 @@ public class ControllerDLSite extends Controller
             scrapingDLSite.setupScraping();
         }catch(TimeoutException ex){
             logger.error("main message [%s]",ex.getMessage());
-            ex.printStackTrace();
             throw ex;
         }catch(InterruptedException ex){
             logger.error("main message [%s]",ex.getMessage());
-            ex.printStackTrace();
             throw ex;
         }catch(Exception ex){
             logger.error("main message [%s]",ex.getMessage());
-            ex.printStackTrace();
             throw ex;
         }
         logger.info("setupController finish");

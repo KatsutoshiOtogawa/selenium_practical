@@ -67,7 +67,7 @@ public class ScrapingDLSite extends Scraper
     private final Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
     private static final Logger logger = LogManager.getFormatterLogger(ScrapingDLSite.class);
     
-    public ScrapingDLSite(Properties properties)
+    public ScrapingDLSite(Properties properties) throws IllegalStateException
     {
         this.Driver = constructor();
         
@@ -78,11 +78,20 @@ public class ScrapingDLSite extends Scraper
 
     }
 
-    protected ChromeDriver constructor()
+    protected ChromeDriver constructor() throws IllegalStateException
     {
         logger.info("resource opening...");
+
+        ChromeDriver driver = null;
         // 手動で開放しないといけないリソースはここに書く。
-        ChromeDriver driver = new ChromeDriver();
+        try
+        {
+            driver = new ChromeDriver();
+        }catch(Exception ex)
+        {
+            throw ex;
+        }
+        
         logger.info("resource opened");
 
         return driver;
