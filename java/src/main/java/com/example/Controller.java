@@ -17,7 +17,7 @@ public abstract class Controller {
     protected String CreatedAt;
     protected String TableName;
     protected String ShopName;
-
+    protected Storage storage;
     abstract protected Properties openProperties(String path) throws FileNotFoundException,IOException,UnsupportedEncodingException;
     abstract protected Map<String,Object> constructor(String path) throws IllegalArgumentException,FileNotFoundException,IOException,UnsupportedEncodingException;
     abstract public void destructor();

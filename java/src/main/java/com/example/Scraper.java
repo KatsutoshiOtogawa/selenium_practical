@@ -8,6 +8,8 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.io.FileNotFoundException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import org.openqa.selenium.TimeoutException;
 import software.amazon.awssdk.services.dynamodb.model.PutItemRequest;
@@ -23,6 +25,12 @@ public abstract class Scraper {
     protected String TableName;
     protected String ShopName;
     protected Properties properties;
+
+    public Scraper(Properties properties)
+    {
+        this.CreatedAt = (new SimpleDateFormat("yyyy-MM-dd")).format(new Date());
+        this.properties = properties;
+    }
 
     abstract protected ChromeDriver constructor();
     public void setupScraping() throws TimeoutException,InterruptedException,IllegalArgumentException

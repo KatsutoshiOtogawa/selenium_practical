@@ -2,6 +2,8 @@
 package com.example;
 import java.util.Map;
 import java.util.Properties;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import java.io.IOException;
@@ -18,6 +20,13 @@ public abstract class Model {
     protected String TableName;
     protected String ShopName;
     protected Properties properties;
+    protected Object dbconnection;
+
+    public Model(Properties properties)
+    {
+        this.CreatedAt = (new SimpleDateFormat("yyyy-MM-dd")).format(new Date());
+        this.properties = properties;
+    }
 
     abstract protected Object constructor() throws IllegalArgumentException;
     abstract protected PutItemRequest buildPutRequest(Map<String,Object> data);

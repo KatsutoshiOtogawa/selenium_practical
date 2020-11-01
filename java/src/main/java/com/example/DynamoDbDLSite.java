@@ -33,14 +33,16 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import java.util.ArrayList;
 import java.lang.Thread;
-import java.util.Date;
+
 import org.apache.commons.lang3.StringUtils;
 
 import java.net.URI;
 import java.util.Map;
+import java.util.HashMap;
 import software.amazon.awssdk.core.waiters.WaiterResponse;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.model.CreateTableRequest;
@@ -66,24 +68,20 @@ import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
  */
 public class DynamoDbDLSite extends Model
 {
-    private DynamoDbClient dynamodbClient;
     private static final Logger logger = LogManager.getFormatterLogger(DynamoDbDLSite.class);
     
     public DynamoDbDLSite(Properties properties) throws IllegalArgumentException
     {   
-        this.CreatedAt = (new SimpleDateFormat("yyyy-MM-dd")).format(new Date());
+        super(properties);
         this.TableName = "ArtCollection";
         this.ShopName = "DLSite";
-        this.properties = properties;
-
-        this.dynamodbClient = constructor();
-
+        this.dbconnection = constructor();
     }
 
     protected DynamoDbClient constructor() throws IllegalArgumentException
     {
         logger.info("resource opening...");
-        // 手動で開放しないといけないリソースはここに書く。
+
         DynamoDbClient connection = null;
 
         if(StringUtils.isEmpty(
@@ -102,8 +100,6 @@ public class DynamoDbDLSite extends Model
                 ))
                 .region(Region.AP_NORTHEAST_1)
                 .build();
-
-                // overrideConfiguration()
         }
 
         logger.info("resource opened");
@@ -114,7 +110,7 @@ public class DynamoDbDLSite extends Model
     public void destructor()
     {
         logger.info("resource closing...");
-        dynamodbClient.close();
+        ((DynamoDbClient)dbconnection).close();
         logger.info("resource closed");
     }
 
@@ -339,8 +335,8 @@ public class DynamoDbDLSite extends Model
 
         PutItemRequest putItemRequest = buildPutRequest(data);
 
-        PutItemResponse response = dynamodbClient.putItem(putItemRequest);
-
+        PutItemResponse response = ((DynamoDbClient) dbconnection).putItem(putItemRequest);
+        
         logger.info("putItem finish");
     }
 

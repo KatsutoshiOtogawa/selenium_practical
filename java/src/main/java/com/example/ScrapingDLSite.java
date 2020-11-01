@@ -69,12 +69,10 @@ public class ScrapingDLSite extends Scraper
     
     public ScrapingDLSite(Properties properties) throws IllegalStateException
     {
+        super(properties);
         this.Driver = constructor();
-        
-        this.CreatedAt = (new SimpleDateFormat("yyyy-MM-dd")).format(new Date());
         this.TableName = "ArtCollection";
         this.ShopName = "DLSite";
-        this.properties = properties;
 
     }
 
