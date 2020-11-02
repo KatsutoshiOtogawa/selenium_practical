@@ -233,54 +233,8 @@ public class ScrapingDLSite extends Scraper
     {
         logger.info("getShopItemInfo start variable [shopItemName=%s]",itemName);
 
-        Set<String> IlustratorName = new HashSet<String>();
-        Set<String> VoiceActor = new HashSet<String>();
-        // Set<String> RerationMatome = new HashSet<String>();
-        Map<String,AttributeValue> RerationMatome = new HashMap<String,AttributeValue>();
-        Set<String> Genru = new HashSet<String>();
-        Map<String,AttributeValue> MostProperyGenru = new HashMap<String,AttributeValue>();
-        Map<String,AttributeValue> BuyingUserViewItems = new HashMap<String,AttributeValue>();
-        Map<String,AttributeValue> LookingUserViewItems = new HashMap<String,AttributeValue>();
-        Set<String> FileFormat = new HashSet<String>();
-        Set<String> Reviews = new HashSet<String>();
-        Set<String> ScreenWriter = new HashSet<String>();
-        Set<String> ItemCategory = new HashSet<String>();
-        Set<String> Musician = new HashSet<String>();
-        Set<String> Gallery = new HashSet<String>();
-        
-        Map<String,Object> data = new HashMap<String,Object>(){{
-            put("ShopArtId", "");
-            put("MakerName", "");
-            put("MakerFollowerNum", "");
-            put("UnitsSold", "");
-            put("SalePrice", "");
-            put("DiscountRate", "");
-            put("UntilHavingSale", "");
-            put("NormalPrice", "");
-            put("Assessment", "");
-            put("AssessmentNum", "");
-            put("IlustratorName", IlustratorName);
-            put("MatomeNum", "");
-            put("RerationMatome", RerationMatome);
-            put("ItemCategory", ItemCategory);
-            put("ReleaseDate", "");
-            put("FileFormat", FileFormat);
-            put("FileSize", "");
-            put("FileSizeUnit", "");
-            put("StarNum", "");
-            put("AgeVeridation", "");
-            put("VoiceActor", VoiceActor);
-            put("Musician", Musician);
-            put("ScreenWriter", ScreenWriter);
-            put("Genru", Genru);
-            put("MostProperyGenru", MostProperyGenru);
-            put("Gallery", Gallery);
-            put("BuyingUserViewItems", BuyingUserViewItems);
-            put("LookingUserViewItems", LookingUserViewItems);
-            put("ReviewNum", "");
-            put("Reviews", Reviews);
-            put("Monopoly", false);
-        }};
+        Map<String,Object> data = (new DLSiteModel()).createShopItemInfoModel();
+        // Map<String,Object> data = DLSiteModel.createShopItemAffiliateInfoModel();
 
         // url からArtIdを取得。
         // ex) https://www.dlsite.com/pro/work/=/product_id/VJ009935.html -> VJ000935
@@ -421,6 +375,7 @@ public class ScrapingDLSite extends Scraper
 
             List<WebElement> elements = Driver.findElements(By.xpath("//*[@id='work_outline']/tbody/tr/th[text()= '声優']/following-sibling::td[1]/a"));
 
+            Set<String> VoiceActor = (Set<String>)data.get("VoiceActor");
             logger.debug("getShopItemInfo show variable [VoiceActor=%s]",elements.toString());
             for(WebElement element:elements)
             {
@@ -435,6 +390,7 @@ public class ScrapingDLSite extends Scraper
         {
 
             List<WebElement> elements = Driver.findElements(By.xpath("//*[@id='work_outline']/tbody/tr/th[text()= 'イラスト']/following-sibling::td[1]/a"));
+            Set<String> IlustratorName = (Set<String>) data.get("IlustratorName");
 
             logger.debug("getShopItemInfo show variable [IlustratorName=%s]",elements.toString());
             for(WebElement element:elements)
@@ -450,7 +406,7 @@ public class ScrapingDLSite extends Scraper
         {
 
             List<WebElement> elements = Driver.findElements(By.xpath("//*[@id='work_outline']/tbody/tr/th[text()= 'シナリオ']/following-sibling::td[1]/a"));
-
+            Set<String> ScreenWriter = (Set<String>) data.get("ScreenWriter");
             logger.debug("getShopItemInfo show variable [ScreenWriter=%s]",elements.toString());
             for(WebElement element:elements)
             {
@@ -463,9 +419,10 @@ public class ScrapingDLSite extends Scraper
 
         try
         {
-
+        
             List<WebElement> elements = Driver.findElements(By.xpath("//*[@id='work_outline']/tbody/tr/th[text()= 'ジャンル']/following-sibling::td[1]/div/a"));
             logger.debug("getShopItemInfo show variable [Genru=%s]",elements.toString());
+            Set<String> Genru = (Set<String>) data.get("Genru");
             for(WebElement element:elements)
             {
                 Genru.add(element.getAttribute("textContent"));
@@ -518,6 +475,8 @@ public class ScrapingDLSite extends Scraper
         {
 
             List<WebElement> elements = Driver.findElements(By.xpath("//*[@id='work_outline']/tbody/tr/th[text()= '音楽']/following-sibling::td[1]/a"));
+
+            Set<String> Musician = (Set<String>) data.get("Musician");
             logger.debug("getShopItemInfo show variable [Musician=%s]",elements.toString());
             for(WebElement element:elements)
             {
@@ -532,7 +491,7 @@ public class ScrapingDLSite extends Scraper
         {
 
             List<WebElement> elements = Driver.findElements(By.xpath("//*[@id='work_outline']/tbody/tr/th[text()= '作品形式']/following-sibling::td[1]/div/a/span"));
-
+            Set<String> ItemCategory = (Set<String>) data.get("ItemCategory");
             ItemCategory.add(
                 Wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id='work_outline']/tbody/tr/th[text()= '作品形式']/following-sibling::td[1]/div")))
                     .getAttribute("textContent").replaceAll("^.*/ ","")
@@ -552,6 +511,7 @@ public class ScrapingDLSite extends Scraper
 
             List<WebElement> elements = Driver.findElements(By.xpath("//*[@id='work_outline']/tbody/tr/th[text()= 'ファイル形式']/following-sibling::td[1]/div/a/span"));
 
+            Set<String> FileFormat = (Set<String>) data.get("FileFormat");
             FileFormat.add(
                 Wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id='work_outline']/tbody/tr/th[text()= 'ファイル形式']/following-sibling::td[1]/div")))
                     .getAttribute("textContent").replaceAll("^.*/ ","")
@@ -568,8 +528,9 @@ public class ScrapingDLSite extends Scraper
 
         try
         {
+
             List<WebElement> elements = Driver.findElements(By.xpath("//*[@id='work_left']//div[@class='controller_body']//img"));
-            
+            Set<String> Gallery = (Set<String>) data.get("Gallery");
             logger.debug("getShopItemInfo show variable [Gallery=%s]",elements.toString());
             for(WebElement element:elements)
             {
@@ -582,7 +543,7 @@ public class ScrapingDLSite extends Scraper
         try
         {
             List<WebElement> elements = Driver.findElements(By.xpath("//*[@id='work_review_list']//*[@class='reviewer_descrip']"));
-            
+            Set<String> Reviews = (Set<String>) data.get("Reviews");
             logger.debug("getShopItemInfo show variable [Reviews=%s]",elements.toString());
             for(WebElement element:elements)
             {
@@ -595,8 +556,10 @@ public class ScrapingDLSite extends Scraper
         
         try
         {
+         
+        
             List<WebElement> elements = Driver.findElements(By.xpath("//*[@id='main_inner']//div[@data-type='viewsales2']//div[@class='recommend_work_item']/a[@title]"));
-            
+            Map<String,AttributeValue> BuyingUserViewItems = (Map<String,AttributeValue>) data.get("BuyingUserViewItems");
             logger.debug("getShopItemInfo show variable [BuyingUserViewItems=%s]",elements.toString());
             for(WebElement element:elements)
             {
@@ -610,8 +573,9 @@ public class ScrapingDLSite extends Scraper
 
         try
         {
+
             List<WebElement> elements = Driver.findElements(By.xpath("//*[@id='main_inner']//div[@data-type='viewsales']//div[@class='recommend_work_item']/a[@title]"));
-            
+            Map<String,AttributeValue> LookingUserViewItems = (Map<String,AttributeValue>) data.get("LookingUserViewItems");
             logger.debug("getShopItemInfo show variable [LookingUserViewItems=%s]",elements.toString());
             for(WebElement element:elements)
             {   
@@ -626,7 +590,7 @@ public class ScrapingDLSite extends Scraper
         try
         {
             List<WebElement> elements = Driver.findElements(By.xpath("//*[@id='work_review']/table[@class='reviewer_most_genre']//td//a"));
-            
+            Map<String,AttributeValue> MostProperyGenru = (Map<String,AttributeValue>) data.get("MostProperyGenru");
             logger.debug("getShopItemInfo show variable [MostProperyGenru=%s]",elements.toString());
             for(WebElement element:elements)
             {   
@@ -646,8 +610,9 @@ public class ScrapingDLSite extends Scraper
         //　レビューおすすめ
         try
         {
+
             List<WebElement> elements = Driver.findElements(By.xpath("//*[@id='main_inner']//div[@class='matome_container']//*[@class='matome_content_title']/a"));
-            
+            Map<String,AttributeValue> RerationMatome = (Map<String,AttributeValue>) data.get("RerationMatome");
             logger.debug("getShopItemInfo show variable [RerationMatome=%s]",elements.toString());
             for(WebElement element:elements)
             {   
@@ -667,15 +632,9 @@ public class ScrapingDLSite extends Scraper
     protected Map<String,Object> getShopItemAffiriateInfo() throws TimeoutException,InterruptedException,IOException,UnsupportedFlavorException
     {
         logger.info("getShopItemAffiriateInfo start");
-        
-        Set<String> PlayerEmbed = new HashSet<String>();
-        Map<String,Object> data = new HashMap<String,Object>(){{
-            put("AffiliateUrl", "");
-            put("AffiliateBigImageUrl", "");
-            put("AffiliateMiddleImageUrl", "");
-            put("AffiliateSmallImageUrl", "");
-            put("PlayerEmbed", PlayerEmbed);
-        }};
+
+        Map<String,Object> data = (new DLSiteModel()).createShopItemAffiliateInfoModel();
+        // Map<String,Object> data = DLSiteModel.createShopItemAffiliateInfoModel();
 
         Wait.until(ExpectedConditions.elementToBeClickable(By.linkText("アフィリエイトリンク作成")))
             .click();
@@ -692,7 +651,6 @@ public class ScrapingDLSite extends Scraper
                 ,System.getenv("DLSITE_AFFILIATE_SITE") != null ? System.getenv("DLSITE_AFFILIATE_SITE") : properties.getProperty("DLSITE_AFFILIATE_SITE")
             )
         );
-
         
         data.put("AffiliateUrl"
             , Wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("#preview_wname_sns a"))).getAttribute("href")
@@ -713,7 +671,7 @@ public class ScrapingDLSite extends Scraper
         Wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".main_modify_box button.copy_btn")))
             .click();
 
-
+        Set<String> PlayerEmbed = (Set<String>) data.get("PlayerEmbed");
         PlayerEmbed.add(
             (String)clipboard.getContents(null).getTransferData(DataFlavor.stringFlavor)
         );

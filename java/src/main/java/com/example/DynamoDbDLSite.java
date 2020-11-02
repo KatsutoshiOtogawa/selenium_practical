@@ -66,7 +66,7 @@ import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 /**
  * 
  */
-public class DynamoDbDLSite extends Model
+public class DynamoDbDLSite extends DB
 {
     private static final Logger logger = LogManager.getFormatterLogger(DynamoDbDLSite.class);
     

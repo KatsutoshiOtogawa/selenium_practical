@@ -76,7 +76,7 @@ import software.amazon.awssdk.services.dynamodb.DynamoDbClientBuilder;
  */
 public class ControllerDLSite extends Controller
 {
-    private DynamoDbDLSite dynamodbClient;
+    // private DynamoDbDLSite dynamodbClient;
     private ScrapingDLSite scrapingDLSite;
     private static final Logger logger = LogManager.getFormatterLogger(ControllerDLSite.class);
     
@@ -86,7 +86,8 @@ public class ControllerDLSite extends Controller
         this.CreatedAt = (new SimpleDateFormat("yyyy-MM-dd")).format(new Date());
 
         Map<String,Object> data = constructor(path);
-        this.dynamodbClient = (DynamoDbDLSite) data.get("DynamoDbDLSite");
+        // this.dynamodbClient = (DynamoDbDLSite) data.get("DynamoDbDLSite");
+        this.db = (DB) data.get("DynamoDbDLSite");
         this.scrapingDLSite = (ScrapingDLSite) data.get("ScrapingDLSite");
         this.storage = (Storage) data.get("storage");
         this.TableName = "ArtCollection";
@@ -180,7 +181,8 @@ public class ControllerDLSite extends Controller
     public void destructor()
     {
         logger.info("resource closing...");
-        dynamodbClient.destructor();
+        // dynamodbClient.destructor();
+        db.destructor();
         scrapingDLSite.destructor();
         logger.info("resource closed");
     }
@@ -256,8 +258,20 @@ public class ControllerDLSite extends Controller
 
         logger.info("action variable {data=%s}",data.toString());
 
-        dynamodbClient.putItem(data);
+        // dynamodbClient.putItem(data);
+        db.upsertItem(data);
 
-        // storage.download();
+    }
+
+    public void createUpsertFile(Map<String,Object> data) throws IOException
+    {
+        DLSiteModel model = new DLSiteModel();
+        List <String> downloadList = model.createDowlonadFileModel();
+        for(String val :downloadList)
+        {
+            // data.get(val);
+
+            storage.transport((String)data.get(val));
+        }
     }
 }

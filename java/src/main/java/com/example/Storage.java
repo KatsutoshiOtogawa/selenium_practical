@@ -21,9 +21,8 @@ import java.nio.file.Paths;
 import java.util.Map;
 import java.util.HashMap;
 /**
- * s3,localdisk,googledriveなどのenumを持たせて切り替えの方がよいか。
+ * 
  */
-// public abstract class Storage {
 public class Storage {
     protected String CreatedAt;
     protected Properties properties;
@@ -32,10 +31,7 @@ public class Storage {
     protected static HttpRequestFactory factory;
     
     protected StorageType storageType;
-    // enum StorageType {
-    //     S3
-    //     ,LOCAL_DISK
-    // }
+
     public Storage(Properties properties) throws StorageTypeNotFoundException
     {
         this.CreatedAt = (new SimpleDateFormat("yyyy-MM-dd")).format(new Date());
@@ -45,13 +41,6 @@ public class Storage {
         this.storageType = (StorageType) data.get("USE_STORAGE");
         this.usePath = (String) data.get("USE_PATH");
     }
-    // abstract protected Object constructor() throws IllegalArgumentException;
-
-    // for (StorageType m : StorageType.values()) {
-    //     System.out.println(m.toString());
-    //  StorageType.S3.toString();
-    //  StorageType.LOCAL_DISK.toString();
-    // }
 
     protected Map<String,Object> constructor() throws StorageTypeNotFoundException
     {
@@ -77,11 +66,10 @@ public class Storage {
 
         return data;
     }
-    
-    public void download(URI uri) throws IOException
+
+    public void download(String uri) throws IOException
     {
-        String path = uri.getPath();
-        String name = path.substring(path.lastIndexOf("/") + 1);
+        String name = uri.substring(uri.lastIndexOf("/") + 1);
 
         HttpRequest request = factory.buildGetRequest(new GenericUrl(uri));
 
@@ -92,6 +80,19 @@ public class Storage {
         try(FileOutputStream out = new FileOutputStream(Paths.get(downloadDestination,name).toString())) {
             response.download(out);
         }
+    }
+
+    public void transport(String uri) throws IOException
+    {
+        // data.get(model.);
+        download(uri);
+
+        upload(uri);
+    }
+
+    public void upload(String uri)
+    {
+
     }
 
     public void destructor()
