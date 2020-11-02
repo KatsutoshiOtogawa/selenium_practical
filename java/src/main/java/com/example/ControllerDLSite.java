@@ -88,7 +88,7 @@ public class ControllerDLSite extends Controller
         Map<String,Object> data = constructor(path);
         this.dynamodbClient = (DynamoDbDLSite) data.get("DynamoDbDLSite");
         this.scrapingDLSite = (ScrapingDLSite) data.get("ScrapingDLSite");
-
+        this.storage = (Storage) data.get("storage");
         this.TableName = "ArtCollection";
         this.ShopName = "DLSite";
 
@@ -145,19 +145,28 @@ public class ControllerDLSite extends Controller
         return properties;
     }
 
-    protected Map<String,Object> constructor(String path) throws IllegalArgumentException,FileNotFoundException,IOException,UnsupportedEncodingException,IllegalStateException
+    protected Map<String,Object> constructor(String path) throws IllegalArgumentException,FileNotFoundException,IOException,UnsupportedEncodingException,IllegalStateException,StorageTypeNotFoundException
     {
         logger.info("resource opening...");
         Properties properties = openProperties(path);
 
         Map<String,Object> resources = new HashMap<String,Object>();
 
-        resources.put("DynamoDbDLSite",new DynamoDbDLSite(properties));
+        resources.put("Storage",new Storage(properties));
+
+        try
+        {
+            resources.put("DynamoDbDLSite",new DynamoDbDLSite(properties));
+        }catch(Exception ex){
+            ((Storage)resources.get("Storage")).destructor();
+            throw ex;
+        }
 
         try
         {
             resources.put("ScrapingDLSite",new ScrapingDLSite(properties));
         }catch(Exception ex){
+            ((Storage)resources.get("Storage")).destructor();
             ((DynamoDbDLSite)resources.get("DynamoDbDLSite")).destructor();
             throw ex;
         }
@@ -165,11 +174,7 @@ public class ControllerDLSite extends Controller
         logger.info("resource opend");
 
         return resources;
-
-        // return new HashMap<String,Object>(){{
-        //     put("DynamoDbDLSite",new DynamoDbDLSite(properties));
-        //     put("ScrapingDLSite",new ScrapingDLSite(properties));
-        // }};
+        
     }
 
     public void destructor()
@@ -252,58 +257,7 @@ public class ControllerDLSite extends Controller
         logger.info("action variable {data=%s}",data.toString());
 
         dynamodbClient.putItem(data);
-        
-        // try {
-        //     URL url = new URL("http://localhost/image1.jpg");
-        //     HttpURLConnection conn =
-        //         (HttpURLConnection) url.openConnection();
-        //     conn.setAllowUserInteraction(false);
-        //     conn.setInstanceFollowRedirects(true);
-        //     conn.setRequestMethod("GET");
-        //     conn.connect();
-      
-        //     int httpStatusCode = conn.getResponseCode();
-        //     if (httpStatusCode != HttpURLConnection.HTTP_OK) {
-        //       throw new Exception("HTTP Status " + httpStatusCode);
-        //     }
-      
-        //     String contentType = conn.getContentType();
-        //     System.out.println("Content-Type: " + contentType);
-      
-        //     // Input Stream
-        //     DataInputStream dataInStream
-        //         = new DataInputStream(
-        //         conn.getInputStream());
-      
-        //     // Output Stream
-        //     DataOutputStream dataOutStream
-        //         = new DataOutputStream(
-        //         new BufferedOutputStream(
-        //             new FileOutputStream("/Users/keisukeo/image1.jpg")));
-      
-        //     // Read Data
-        //     byte[] b = new byte[4096];
-        //     int readByte = 0;
-      
-        //     while (-1 != (readByte = dataInStream.read(b))) {
-        //       dataOutStream.write(b, 0, readByte);
-        //     }
-      
-        //     // Close Stream
-        //     dataInStream.close();
-        //     dataOutStream.close();
-      
-        //   } catch (FileNotFoundException e) {
-        //     e.printStackTrace();
-        //   } catch (ProtocolException e) {
-        //     e.printStackTrace();
-        //   } catch (MalformedURLException e) {
-        //     e.printStackTrace();
-        //   } catch (IOException e) {
-        //     e.printStackTrace();
-        //   } catch (Exception e) {
-        //     System.out.println(e.getMessage());
-        //     e.printStackTrace();
-        //   }
+
+        // storage.download();
     }
 }

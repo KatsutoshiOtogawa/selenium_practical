@@ -13,7 +13,7 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import org.openqa.selenium.TimeoutException;
 import software.amazon.awssdk.services.dynamodb.model.PutItemRequest;
 /**
- * 
+ * interfaceに変更。createAffiliateInfo createAffliateという風にする。
  */
 public abstract class Model {
     protected String CreatedAt;
