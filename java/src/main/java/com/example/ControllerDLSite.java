@@ -261,57 +261,5 @@ public class ControllerDLSite extends Controller
 
         db.upsertItem(data);
 
-
-        // createUpsertFile(data);
-
-    }
-
-    @Deprecated
-    @SuppressWarnings("unchecked")
-    public void createUpsertFile(Map<String,Object> data) throws IOException,InterruptedException
-    {
-        
-        logger.info("createUpsertFile start");
-        DLSiteModel model = new DLSiteModel();
-        // List <String> downloadList = model.createDowlonadFileModel();
-        Map<String,String> downloadList = model.createDowlonadFileModel();
-
-
-        for(Map.Entry<String, String> entry : downloadList.entrySet()){
-            logger.info("createUpsertFile inner loop 1");
-            logger.debug("createUpsertFile inner loop 1");
-            if(entry.getValue() == "List")
-            {
-                List<String> list = (List<String>) data.get(entry.getKey());
-
-                for(String row:list)
-                {
-                    logger.info("createUpsertFile inner loop 2");
-                    logger.debug("createUpsertFile inner loop 2");
-                    if(StringUtils.isEmpty(row))
-                    {
-                        continue;
-                    }
-                    storage.transport(row);
-                }
-                
-            }else{
-                logger.info("createUpsertFile inner loop 3 %s",(String) data.get(entry.getKey()));
-                logger.debug("createUpsertFile inner loop 3 %s",(String) data.get(entry.getKey()));
-                if(StringUtils.isEmpty(
-                    (String) data.get(entry.getKey())
-                ))
-                {
-                    continue;
-                }
-
-                storage.transport(
-                    (String) data.get(entry.getKey())
-                );
-                logger.info("createUpsertFile inner loop 3 %s",(String) data.get(entry.getKey()));
-            }
-        }
-
-        logger.info("createUpsertFile finish");
     }
 }

@@ -65,9 +65,9 @@ public abstract class Scraper {
     abstract protected void userLogin() throws TimeoutException,InterruptedException;
     abstract protected void shownCoupon() throws InterruptedException;
     abstract protected void searchBox(String sentense) throws TimeoutException,InterruptedException,NotFoundException;
-    abstract protected Map<String,Object> getShopItemInfo(String itemName) throws TimeoutException,InterruptedException;
-    abstract protected Map<String,Object> getShopItemAffiriateInfo() throws TimeoutException,InterruptedException,IOException,UnsupportedFlavorException;
-    abstract public Map<String,Object> fetchScraping(String itemName) throws TimeoutException,InterruptedException,IOException,UnsupportedFlavorException,NotFoundException;
+    abstract protected Map<String,Object> getShopItemInfo(String itemName,Storage storage) throws TimeoutException,InterruptedException;
+    abstract protected Map<String,Object> getShopItemAffiriateInfo(Storage storage) throws TimeoutException,InterruptedException,IOException,UnsupportedFlavorException;
+    abstract public Map<String,Object> fetchScraping(String itemName,Storage storage) throws TimeoutException,InterruptedException,IOException,UnsupportedFlavorException,NotFoundException;
     public void destructor()
     {
         Driver.close();

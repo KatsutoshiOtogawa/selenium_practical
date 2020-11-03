@@ -21,13 +21,15 @@ import java.nio.file.Paths;
 import java.util.Map;
 import java.util.HashMap;
 import java.lang.Thread;
+import java.io.File;
 /**
  * 
  */
 public class Storage {
+    public String ShopItemId;
+    public String ShopName;
     protected String CreatedAt;
     protected Properties properties;
-    // protected String downloadDestination;
     protected String usePath;
     protected static HttpRequestFactory factory;
     private static final Logger logger = LogManager.getFormatterLogger(Storage.class);
@@ -77,10 +79,9 @@ public class Storage {
 
         HttpResponse response = request.execute();
 
-        // fileOutputStreamにダウンロード先のパスを追加。
-        // try(FileOutputStream out = new FileOutputStream(name)) {
-        // try(FileOutputStream out = new FileOutputStream(Paths.get(downloadDestination,name).toString())) {
-        try(FileOutputStream out = new FileOutputStream(Paths.get(usePath,name).toString())) {
+        // usePath+ShopItemId
+        // try(FileOutputStream out = new FileOutputStream(Paths.get(usePath,name).toString())) {
+        try(FileOutputStream out = new FileOutputStream(Paths.get(usePath,ShopName,ShopItemId,name).toString())) {
             
             response.download(out);
         }
@@ -90,9 +91,17 @@ public class Storage {
         logger.info("download finish");
     }
 
+    public void createShopItemIdPath()
+    {
+        logger.info("createShopItemIdPath start");
+        File file = new File(Paths.get(usePath,ShopName,ShopItemId).toString());
+        file.mkdirs();
+        logger.info("createShopItemIdPath finish");
+    }
+
     public void transport(String uri) throws IOException,InterruptedException
     {
-        // data.get(model.);
+
         download(uri);
 
         if(StorageType.LOCAL_DISK != storageType)
@@ -105,6 +114,8 @@ public class Storage {
     public void upload(String uri)
     {
         logger.info("upload start");
+        /** アップロード処理は別のプロセスとして起動。*/
+        logger.info("upload finish");
     }
 
     public void destructor()
