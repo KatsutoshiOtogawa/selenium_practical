@@ -89,7 +89,7 @@ public class ControllerDLSite extends Controller
         // this.dynamodbClient = (DynamoDbDLSite) data.get("DynamoDbDLSite");
         this.db = (DB) data.get("DynamoDbDLSite");
         this.scrapingDLSite = (ScrapingDLSite) data.get("ScrapingDLSite");
-        this.storage = (Storage) data.get("storage");
+        this.storage = (Storage) data.get("Storage");
         this.TableName = "ArtCollection";
         this.ShopName = "DLSite";
 
@@ -213,7 +213,8 @@ public class ControllerDLSite extends Controller
         Map<String,Object> data = null;
         try 
         {
-            data = scrapingDLSite.fetchScraping(itemName);
+            // data = scrapingDLSite.fetchScraping(itemName);
+            data = scrapingDLSite.fetchScraping(itemName,storage);
 
         } catch(TimeoutException ex){
             logger.warn("main message [%s]",ex.getMessage());
@@ -258,20 +259,59 @@ public class ControllerDLSite extends Controller
 
         logger.info("action variable {data=%s}",data.toString());
 
-        // dynamodbClient.putItem(data);
         db.upsertItem(data);
+
+
+        // createUpsertFile(data);
 
     }
 
-    public void createUpsertFile(Map<String,Object> data) throws IOException
+    @Deprecated
+    @SuppressWarnings("unchecked")
+    public void createUpsertFile(Map<String,Object> data) throws IOException,InterruptedException
     {
+        
+        logger.info("createUpsertFile start");
         DLSiteModel model = new DLSiteModel();
-        List <String> downloadList = model.createDowlonadFileModel();
-        for(String val :downloadList)
-        {
-            // data.get(val);
+        // List <String> downloadList = model.createDowlonadFileModel();
+        Map<String,String> downloadList = model.createDowlonadFileModel();
 
-            storage.transport((String)data.get(val));
+
+        for(Map.Entry<String, String> entry : downloadList.entrySet()){
+            logger.info("createUpsertFile inner loop 1");
+            logger.debug("createUpsertFile inner loop 1");
+            if(entry.getValue() == "List")
+            {
+                List<String> list = (List<String>) data.get(entry.getKey());
+
+                for(String row:list)
+                {
+                    logger.info("createUpsertFile inner loop 2");
+                    logger.debug("createUpsertFile inner loop 2");
+                    if(StringUtils.isEmpty(row))
+                    {
+                        continue;
+                    }
+                    storage.transport(row);
+                }
+                
+            }else{
+                logger.info("createUpsertFile inner loop 3 %s",(String) data.get(entry.getKey()));
+                logger.debug("createUpsertFile inner loop 3 %s",(String) data.get(entry.getKey()));
+                if(StringUtils.isEmpty(
+                    (String) data.get(entry.getKey())
+                ))
+                {
+                    continue;
+                }
+
+                storage.transport(
+                    (String) data.get(entry.getKey())
+                );
+                logger.info("createUpsertFile inner loop 3 %s",(String) data.get(entry.getKey()));
+            }
         }
+
+        logger.info("createUpsertFile finish");
     }
 }

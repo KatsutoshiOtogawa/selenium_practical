@@ -31,7 +31,8 @@ public abstract class Model {
 
     abstract public Map<String,Object> createShopItemInfoModel();
     abstract public Map<String,Object> createShopItemAffiliateInfoModel();
-    abstract public List<String> createDowlonadFileModel();
+    abstract public Map<String,String> createDowlonadFileModel();
+    // abstract public List<String> createDowlonadFileModel();
     // abstract protected Object constructor() throws IllegalArgumentException;
     // abstract protected PutItemRequest buildPutRequest(Map<String,Object> data);
     // abstract protected void putItem(Map<String,Object> data);

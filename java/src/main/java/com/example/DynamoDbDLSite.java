@@ -62,6 +62,7 @@ import software.amazon.awssdk.services.dynamodb.DynamoDbClientBuilder;
 import software.amazon.awssdk.services.dynamodb.model.PutItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.PutItemResponse;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
+import software.amazon.awssdk.services.dynamodb.model.QueryRequest;
 
 /**
  * 
@@ -114,14 +115,15 @@ public class DynamoDbDLSite extends DB
         logger.info("resource closed");
     }
 
+    @SuppressWarnings("unchecked")
     protected PutItemRequest buildPutRequest(Map<String,Object> data)
     {
         logger.info("buildPutRequest start");
         Map<String,AttributeValue> items = new HashMap<String,AttributeValue>(){{
-            put("ShopArtId"
-                , StringUtils.isEmpty((String) data.get("ShopArtId"))
+            put("ShopItemId"
+                , StringUtils.isEmpty((String) data.get("ShopItemId"))
                     ? AttributeValue.builder().nul(true).build()
-                    : AttributeValue.builder().s((String) data.get("ShopArtId")).build()
+                    : AttributeValue.builder().s((String) data.get("ShopItemId")).build()
             );
             put("ShopName", AttributeValue.builder()
                 .s((String)data.get("ShopName"))
@@ -340,6 +342,27 @@ public class DynamoDbDLSite extends DB
         logger.info("putItem finish");
     }
 
+    @Override
+    public void upsertItem(Map<String,Object> data)
+    {
+        logger.info("upsertItem start");
+        super.upsertItem(data);
+        logger.info("upsertItem finish");
+    }
+
+    // public void query(Map<String,Object> data)
+    // {
+        
+    //     QueryRequest.builder()
+    //         .expressionAttributeNames(
+    //             new HashMap<String,String>(){{
+    //                 put("ShopItemName",data.get("ShopItemName"));
+    //             }}
+    //         )
+    //         .
+    //     // QueryRequest
+    // }
+    
     public void setupDB() throws TimeoutException,InterruptedException
     {
 

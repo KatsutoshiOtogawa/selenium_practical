@@ -20,16 +20,17 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
 import java.util.HashMap;
+import java.lang.Thread;
 /**
  * 
  */
 public class Storage {
     protected String CreatedAt;
     protected Properties properties;
-    protected String downloadDestination;
+    // protected String downloadDestination;
     protected String usePath;
     protected static HttpRequestFactory factory;
-    
+    private static final Logger logger = LogManager.getFormatterLogger(Storage.class);
     protected StorageType storageType;
 
     public Storage(Properties properties) throws StorageTypeNotFoundException
@@ -45,7 +46,7 @@ public class Storage {
     protected Map<String,Object> constructor() throws StorageTypeNotFoundException
     {
 
-        Map<String,Object> data = null;
+        Map<String,Object> data = new HashMap<String,Object>();
 
         switch(System.getenv("USE_STORAGE") != null ? System.getenv("USE_STORAGE") : properties.getProperty("USE_STORAGE"))
         {
@@ -67,8 +68,9 @@ public class Storage {
         return data;
     }
 
-    public void download(String uri) throws IOException
+    public void download(String uri) throws IOException,InterruptedException
     {
+        logger.info("download start");
         String name = uri.substring(uri.lastIndexOf("/") + 1);
 
         HttpRequest request = factory.buildGetRequest(new GenericUrl(uri));
@@ -77,22 +79,32 @@ public class Storage {
 
         // fileOutputStreamにダウンロード先のパスを追加。
         // try(FileOutputStream out = new FileOutputStream(name)) {
-        try(FileOutputStream out = new FileOutputStream(Paths.get(downloadDestination,name).toString())) {
+        // try(FileOutputStream out = new FileOutputStream(Paths.get(downloadDestination,name).toString())) {
+        try(FileOutputStream out = new FileOutputStream(Paths.get(usePath,name).toString())) {
+            
             response.download(out);
         }
+
+        Thread.sleep(6);
+
+        logger.info("download finish");
     }
 
-    public void transport(String uri) throws IOException
+    public void transport(String uri) throws IOException,InterruptedException
     {
         // data.get(model.);
         download(uri);
 
-        upload(uri);
+        if(StorageType.LOCAL_DISK != storageType)
+        {
+            upload(uri);
+        }
+        
     }
 
     public void upload(String uri)
     {
-
+        logger.info("upload start");
     }
 
     public void destructor()

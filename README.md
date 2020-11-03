@@ -138,6 +138,9 @@ aws dynamodb create-table --endpoint-url http://localhost:8000 \
 ## aws cli Credential
 
 [aws cli Credential](https://docs.aws.amazon.com/ja_jp/cli/latest/userguide/cli-configure-quickstart.html#cli-configure-quickstart-precedence)
+
+## DynamoDB
+[NoSQL Workbench (GUI tool)](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/workbench.settingup.html)
 ## Java
 
 - [apache log4j](https://logging.apache.org/log4j/2.x/index.html)

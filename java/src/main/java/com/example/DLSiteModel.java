@@ -14,6 +14,12 @@ import java.util.Arrays;
  */
 public class DLSiteModel extends Model {
 
+    public DLSiteModel()
+    {
+        this.TableName = "ArtCollection";
+        this.ShopName = "DLSite";
+    }
+
     public Map<String,Object> createShopItemInfoModel()
     {
         Set<String> IlustratorName = new HashSet<String>();
@@ -31,7 +37,7 @@ public class DLSiteModel extends Model {
         Set<String> Gallery = new HashSet<String>();
         
         return new HashMap<String,Object>(){{
-            put("ShopArtId", "");
+            put("ShopItemId", "");
             put("MakerName", "");
             put("MakerFollowerNum", "");
             put("UnitsSold", "");
@@ -63,6 +69,17 @@ public class DLSiteModel extends Model {
             put("Reviews", Reviews);
             put("Monopoly", false);
         }};
+
+    }
+
+    public Map<String,Object> createShopBasicInfo()
+    {
+        return new HashMap<String,Object>(){{
+            put("CreatedAt", CreatedAt);
+            put("ItemName", "");
+            put("ShopName", ShopName);
+            put("ShopItemName", "");
+        }};
     }
 
     public Map<String,Object> createShopItemAffiliateInfoModel()
@@ -78,14 +95,24 @@ public class DLSiteModel extends Model {
         }};
     }
 
-    public List<String> createDowlonadFileModel()
+    public Map<String,String> createDowlonadFileModel()
     {
 
-        return new ArrayList<String>(
-            Arrays.asList(
-                "Gallery"
-            )
-        );
+        // return new ArrayList<String>(
+        //     Arrays.asList(
+        //         "Gallery"
+        //         ,"AffiliateBigImageUrl"
+        //         ,"AffiliateMiddleImageUrl"
+        //         ,"AffiliateSmallImageUrl"
+        //     )
+        // );
+
+        return new HashMap<String,String>(){{
+            put("Gallery","List");
+            put("AffiliateBigImageUrl","");
+            put("AffiliateMiddleImageUrl","");
+            put("AffiliateSmallImageUrl","");
+        }};
     }
 
     // public Map<String,Object> createFetchScrapingModel()
