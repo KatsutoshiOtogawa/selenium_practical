@@ -98,15 +98,6 @@ public class DLSiteModel extends Model {
     public Map<String,String> createDowlonadFileModel()
     {
 
-        // return new ArrayList<String>(
-        //     Arrays.asList(
-        //         "Gallery"
-        //         ,"AffiliateBigImageUrl"
-        //         ,"AffiliateMiddleImageUrl"
-        //         ,"AffiliateSmallImageUrl"
-        //     )
-        // );
-
         return new HashMap<String,String>(){{
             put("Gallery","List");
             put("AffiliateBigImageUrl","");

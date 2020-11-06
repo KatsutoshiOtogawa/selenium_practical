@@ -40,8 +40,10 @@ import java.util.Date;
 
 import java.util.ArrayList;
 import java.lang.Thread;
-import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 
+import com.amazonaws.services.s3.model.AmazonS3Exception;
+
+import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.core.waiters.WaiterResponse;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.model.CreateTableRequest;
@@ -57,6 +59,7 @@ import software.amazon.awssdk.services.dynamodb.model.DescribeTableResponse;
 import software.amazon.awssdk.services.dynamodb.model.DynamoDbException;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.waiters.DynamoDbWaiter;
+
 
 /**
  * 
@@ -87,6 +90,7 @@ public class ScrapingDLSite extends Scraper
             driver = new ChromeDriver();
         }catch(Exception ex)
         {
+            logger.error("resource opening is faild.");
             throw ex;
         }
         
@@ -247,6 +251,15 @@ public class ScrapingDLSite extends Scraper
             storage.ShopName = ShopName;
             // 画像ダウンロード先を作成。
             storage.createShopItemIdPath();
+            // ストレージにRemoteの物を指定している場合は作成。
+            try
+            {
+                storage.createRemoteStorage();
+            }catch(AmazonS3Exception ignore){
+                // ストレージ作成に失敗した場合はログだけ出力。
+                ignore.printStackTrace();
+            }
+            
         }
         
         try

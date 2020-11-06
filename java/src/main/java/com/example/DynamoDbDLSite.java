@@ -85,22 +85,32 @@ public class DynamoDbDLSite extends DB
 
         DynamoDbClient connection = null;
 
-        if(StringUtils.isEmpty(
-            System.getenv("HOST") != null ? System.getenv("HOST") : properties.getProperty("HOST")
-        ))
+        try
         {
-            connection = DynamoDbClient.create();
-        }else{
-            connection = DynamoDbClient.builder()
-                .endpointOverride(URI.create(
-                    String.format(
-                        "http://%s:%s"
-                        ,System.getenv("HOST") != null ? System.getenv("HOST") : properties.getProperty("HOST")
-                        ,System.getenv("PORT") != null ? System.getenv("PORT") : properties.getProperty("PORT")
-                    )
-                ))
-                .region(Region.AP_NORTHEAST_1)
-                .build();
+            if("AWS".equals(System.getenv("HOST")) || "AWS".equals(properties.getProperty("HOST")))
+            {
+                logger.info("resource opening AWS...");
+                connection = DynamoDbClient.create();
+            }else if("LOCALHOST".equals(System.getenv("HOST")) || "LOCALHOST".equals(properties.getProperty("HOST"))){
+
+                logger.info("resource opening LOCALHOST...");
+                connection = DynamoDbClient.builder()
+                    .endpointOverride(URI.create(
+                        String.format(
+                            "http://%s:%s"
+                            ,System.getenv("HOST") != null ? System.getenv("HOST") : properties.getProperty("HOST")
+                            ,System.getenv("PORT") != null ? System.getenv("PORT") : properties.getProperty("PORT")
+                        )
+                    ))
+                    //overrideConfiguration()
+                    .region(Region.AP_NORTHEAST_1)
+                    .build();
+            }else{
+                throw new IllegalArgumentException();
+            }
+        }catch(Exception ex){
+            logger.error("resource opening is faild.");
+            throw ex;
         }
 
         logger.info("resource opened");

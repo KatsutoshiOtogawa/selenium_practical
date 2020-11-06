@@ -159,6 +159,7 @@ public class ControllerDLSite extends Controller
         {
             resources.put("DynamoDbDLSite",new DynamoDbDLSite(properties));
         }catch(Exception ex){
+            logger.error("resource opening is faild.");
             ((Storage)resources.get("Storage")).destructor();
             throw ex;
         }
@@ -167,6 +168,7 @@ public class ControllerDLSite extends Controller
         {
             resources.put("ScrapingDLSite",new ScrapingDLSite(properties));
         }catch(Exception ex){
+            logger.error("resource opening is faild.");
             ((Storage)resources.get("Storage")).destructor();
             ((DynamoDbDLSite)resources.get("DynamoDbDLSite")).destructor();
             throw ex;

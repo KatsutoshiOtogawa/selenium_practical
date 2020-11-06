@@ -122,67 +122,46 @@ public class ControllerDLSiteTest extends ControllerTest
         logger.debug("controllerDLSiteHavingConstructor was checked.");
         
     }
-    @Test
-    public void testSetupController() throws Exception
-    {
-        logger.debug("testSetupController is being checkd...");
+    // @Test
+    // public void testSetupController() throws Exception
+    // {
+    //     logger.debug("testSetupController is being checkd...");
 
-        Path ref = Paths.get(String.join("/","target","chromedriver"));
-        Path destination = Paths.get(String.join("/",".","chromedriver"));
+    //     Path ref = Paths.get(String.join("/","target","chromedriver"));
+    //     Path destination = Paths.get(String.join("/",".","chromedriver"));
 
-        try
-        {
-            Files.copy(ref, destination);
-        }catch(Exception ex){
-            logger.error("testSetupController message [%s]",ex.getMessage());
-            ex.printStackTrace();
-            throw ex;
-        }
+    //     try
+    //     {
+    //         Files.copy(ref, destination);
+    //     }catch(Exception ex){
+    //         logger.error("testSetupController message [%s]",ex.getMessage());
+    //         ex.printStackTrace();
+    //         throw ex;
+    //     }
         
-        File fp = new File(destination.toString());
+    //     File fp = new File(destination.toString());
 
-        ControllerDLSite controller = null;
+    //     ControllerDLSite controller = null;
 
-        try
-        {
-            controller = new ControllerDLSite(String.join("/","target","resources",".env"));
-        }catch(Exception ex){
-            logger.error("testSetupController message [%s]",ex.getMessage());
-            ex.printStackTrace();
-            if (fp.exists()) {
-                fp.delete();
-            }
-            throw ex;
-        }
+    //     try
+    //     {
+    //         controller = new ControllerDLSite(String.join("/","target","resources",".env"));
+    //     }catch(Exception ex){
+    //         logger.error("testSetupController message [%s]",ex.getMessage());
+    //         ex.printStackTrace();
+    //         if (fp.exists()) {
+    //             fp.delete();
+    //         }
+    //         throw ex;
+    //     }
 
-        // assertAll(
-        //     () -> {
-        //         assertThrows(TimeoutException.class, () -> {
+    //     controller.destructor();
+    //     if (fp.exists()) {
+    //         fp.delete();
+    //     }
 
-        //             logger.debug("checkking TimeoutException is occured");
-        //             controller.setupController();
-        //             controller.destructor();
-        //             throw new Throwable();
-        //         });
-        //     }
-        //     ,() -> {
-        //         assertThrows(InterruptedException.class, () -> {
-
-        //             logger.debug("checkking InterruptedException is occured");
-        //             controller.setupController();
-        //             controller.destructor();
-        //             throw new Throwable();
-        //         });
-        //     }
-        // );
-
-        controller.destructor();
-        if (fp.exists()) {
-            fp.delete();
-        }
-
-        logger.debug("testSetupController was checked.");
-    }
+    //     logger.debug("testSetupController was checked.");
+    // }
 
     // logger.debug("checkking IllegalStateException is occured");
         // ControllerDLSite controller = new ControllerDLSite(String.join("/","target","resources",".env"));
