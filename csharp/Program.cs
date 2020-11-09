@@ -152,11 +152,9 @@ namespace csharp
                 Wait.Until(driver =>driver.FindElement(By.Id("afid")).Enabled);
                 Driver.FindElement(By.Id("afid")).Click();
 
-                // from selenium.webdriver.support.select import Select
                 IWebElement element = Driver.FindElement(By.Id("afid"));
-
-                SelectElement oSelect = new SelectElement(element);
                 
+                var selectObject = new SelectElement(element);
  
                 //selectElement.SelectByText(String.Format("{0} ({1})",Environment.GetEnvironmentVariable("DLSITE_AFFILIATE_ID"),Environment.GetEnvironmentVariable("DLSITE_AFFILIATE_SITE")))
 
