@@ -13,7 +13,7 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import org.openqa.selenium.TimeoutException;
 import software.amazon.awssdk.services.dynamodb.model.PutItemRequest;
 /**
- *
+ * DB<T>Genericx
  */
 public abstract class DB {
     protected String CreatedAt;

@@ -120,6 +120,7 @@ docker run -p 8000:8000 amazon/dynamodb-local:latest -jar DynamoDBLocal.jar -inM
 
 # create table DynamoDBLocal
 
+if you want not to create DynamoDB-Local, omit endpoint-url parameter.
 ```
 aws dynamodb create-table --endpoint-url http://localhost:8000 \
     --table-name ArtCollection \

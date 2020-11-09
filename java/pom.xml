@@ -57,6 +57,13 @@
       <artifactId>dynamodb</artifactId>
       <version>2.15.14</version>
     </dependency>
+    <!-- https://mvnrepository.com/artifact/software.amazon.awssdk/s3 -->
+<dependency>
+    <groupId>software.amazon.awssdk</groupId>
+    <artifactId>s3</artifactId>
+    <version>2.15.23</version>
+</dependency>
+
     <dependency>
       <groupId>org.openjfx</groupId>
       <artifactId>javafx-swing</artifactId>

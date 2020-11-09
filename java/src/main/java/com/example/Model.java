@@ -23,6 +23,10 @@ public abstract class Model {
     protected String CreatedAt;
     protected String TableName;
     protected String ShopName;
+    protected Map<String,String> Items;
+    protected Map<String,List<String>> ListItems;
+    // protected Map<String,T> MultipleItems;
+    // protected add<U>,add<K>で複数関数を作る。
 
     public Model()
     {

@@ -39,14 +39,11 @@ import java.io.File;
 // import com.amazonaws.regions.Regions;
 
 import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.s3.S3client;
-import software.amazon.awssdk.services.s3.S3clientBuilder;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.S3ClientBuilder;
 import software.amazon.awssdk.services.s3.model.CreateBucketRequest;
 import software.amazon.awssdk.services.s3.model.BucketAlreadyExistsException;
 import software.amazon.awssdk.services.s3.model.S3Exception;
-import software.amazon.awssdk.services.transfer.TransferClient;
-import software.amazon.awssdk.services.transfer.TransferClientBuilder;
-import software.amazon.awssdk.services.transfer.model.StartServerRequest;
 import software.amazon.awssdk.services.s3.model.CompleteMultipartUploadRequest;
 import software.amazon.awssdk.services.s3.model.CompletedMultipartUpload;
 import software.amazon.awssdk.services.s3.model.CompletedPart;
@@ -144,7 +141,7 @@ public class Storage {
         logger.info("createShopItemIdPath finish");
     }
 
-    protected void createRemoteStorage() throws AmazonS3Exception
+    protected void createRemoteStorage() throws S3Exception
     {
         logger.info("createRemoteStorage start");
 
@@ -158,7 +155,7 @@ public class Storage {
             // storageClient = AmazonS3ClientBuilder.standard()
             //             .withRegion(Regions.AP_NORTHEAST_1)
             //             .build();
-            storageClient = S3clientBuilder.builder()
+            storageClient = S3Client.builder()
                         .region(Region.AP_NORTHEAST_1)
                         .build();
 
@@ -259,55 +256,57 @@ public class Storage {
                 // XferMgrProgress.showTransferProgress(xfer);
 
                 PutObjectRequest request = PutObjectRequest.builder()
-                            .bucket(bucket)
-                            .key(key)
+                            .bucket(bucketname)
+                            .key(Paths.get(ShopName,ShopItemId,name).toString())
                             .build();
-                storageClient.putObject(request,
-                        RequestBody.fromByteBuffer(getRandomByteBuffer(10_000)));
-
-                System.out.println(xfer.getDescription());
+                
+                ((S3Client)storageClient).putObject(request,
+                        // RequestBody.fromByteBuffer(getRandomByteBuffer(10_000)));
+                        RequestBody.fromFile(f));
+                        // fromFile(File file)
+                // System.out.println(xfer.getDescription());
                 // print an empty progress bar...
-                printProgressBar(0.0);
-                // update the progress bar while the xfer is ongoing.
-                do {
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-                        return;
-                    }
-                    // Note: so_far and total aren't used, they're just for
-                    // documentation purposes.
-                    TransferProgress progress = xfer.getProgress();
-                    long so_far = progress.getBytesTransferred();
-                    long total = progress.getTotalBytesToTransfer();
-                    double pct = progress.getPercentTransferred();
-                    eraseProgressBar();
-                    printProgressBar(pct);
-                } while (xfer.isDone() == false);
-                // print the final state of the transfer.
-                TransferState xfer_state = xfer.getState();
-                System.out.println(": " + xfer_state);
+                // printProgressBar(0.0);
+                // // update the progress bar while the xfer is ongoing.
+                // do {
+                //     try {
+                //         Thread.sleep(100);
+                //     } catch (InterruptedException e) {
+                //         return;
+                //     }
+                //     // Note: so_far and total aren't used, they're just for
+                //     // documentation purposes.
+                //     TransferProgress progress = xfer.getProgress();
+                //     long so_far = progress.getBytesTransferred();
+                //     long total = progress.getTotalBytesToTransfer();
+                //     double pct = progress.getPercentTransferred();
+                //     eraseProgressBar();
+                //     printProgressBar(pct);
+                // } while (xfer.isDone() == false);
+                // // print the final state of the transfer.
+                // TransferState xfer_state = xfer.getState();
+                // System.out.println(": " + xfer_state);
 
-                //  or block with Transfer.waitForCompletion()
-                // XferMgrProgress.waitForCompletion(xfer);
+                // //  or block with Transfer.waitForCompletion()
+                // // XferMgrProgress.waitForCompletion(xfer);
 
-                try {
-                    xfer.waitForCompletion();
-                } catch (AmazonServiceException e) {
-                    System.err.println("Amazon service error: " + e.getMessage());
-                    System.exit(1);
-                } catch (AmazonClientException e) {
-                    System.err.println("Amazon client error: " + e.getMessage());
-                    System.exit(1);
-                } catch (InterruptedException e) {
-                    System.err.println("Transfer interrupted: " + e.getMessage());
-                    System.exit(1);
-                }
+                // try {
+                //     xfer.waitForCompletion();
+                // } catch (AmazonServiceException e) {
+                //     System.err.println("Amazon service error: " + e.getMessage());
+                //     System.exit(1);
+                // } catch (AmazonClientException e) {
+                //     System.err.println("Amazon client error: " + e.getMessage());
+                //     System.exit(1);
+                // } catch (InterruptedException e) {
+                //     System.err.println("Transfer interrupted: " + e.getMessage());
+                //     System.exit(1);
+                // }
 
-            } catch (AmazonServiceException e) {
+            } catch (S3Exception ex) {
                 
             }
-            xfer_mgr.shutdownNow();
+            // xfer_mgr.shutdownNow();
 
 
         }
