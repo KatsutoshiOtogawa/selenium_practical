@@ -10,9 +10,13 @@ import java.io.UnsupportedEncodingException;
 import java.io.FileNotFoundException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import org.openqa.selenium.TimeoutException;
 import software.amazon.awssdk.services.dynamodb.model.PutItemRequest;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 /**
  * 
  */
@@ -25,14 +29,15 @@ public abstract class Scraper {
     protected String TableName;
     protected String ShopName;
     protected Properties properties;
-
+    protected final static Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+    protected Logger logger;
     public Scraper(Properties properties)
     {
         this.CreatedAt = (new SimpleDateFormat("yyyy-MM-dd")).format(new Date());
         this.properties = properties;
     }
 
-    abstract protected ChromeDriver constructor();
+    abstract protected void constructor();
     public void setupScraping() throws TimeoutException,InterruptedException,IllegalArgumentException
     {
         setupWebDriver();

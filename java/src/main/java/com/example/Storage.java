@@ -62,6 +62,7 @@ import software.amazon.awssdk.services.s3.model.UploadPartRequest;
 import software.amazon.awssdk.services.s3.paginators.ListObjectsV2Iterable;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.core.sync.ResponseTransformer;
+import software.amazon.awssdk.services.s3.model.BucketAlreadyOwnedByYouException;
 
 /**
  * 
@@ -78,39 +79,38 @@ public class Storage {
     private static final Logger logger = LogManager.getFormatterLogger(Storage.class);
     protected StorageType storageType;
 
-    public Storage(Properties properties) throws StorageTypeNotFoundException
+    public Storage(Properties properties) throws StorageTypeNotFoundException,S3Exception
     {
         this.CreatedAt = (new SimpleDateFormat("yyyy-MM-dd")).format(new Date());
         this.factory = new NetHttpTransport().createRequestFactory();
         this.properties = properties;
-        Map<String,Object> data = constructor();
-        this.storageType = (StorageType) data.get("USE_STORAGE");
-        this.usePath = (String) data.get("USE_PATH");
+        constructor();
     }
 
-    protected Map<String,Object> constructor() throws StorageTypeNotFoundException
+    protected void constructor() throws StorageTypeNotFoundException,S3Exception
     {
-
-        Map<String,Object> data = new HashMap<String,Object>();
 
         switch(System.getenv("USE_STORAGE") != null ? System.getenv("USE_STORAGE") : properties.getProperty("USE_STORAGE"))
         {
             case "S3":
-                data.put("USE_STORAGE",StorageType.S3);
+
+                this.storageType = StorageType.S3;
                 break;
             case "LOCAL_DISK":
-                data.put("USE_STORAGE",StorageType.LOCAL_DISK);
+                this.storageType = StorageType.LOCAL_DISK;
                 break;
             default:
                 throw new StorageTypeNotFoundException();
         }
 
-        data.put(
-            "USE_PATH"
-            ,System.getenv("USE_PATH") != null ? System.getenv("USE_PATH") : properties.getProperty("USE_PATH")
-        );
 
-        return data;
+        this.usePath = System.getenv("USE_PATH") != null ? System.getenv("USE_PATH") : properties.getProperty("USE_PATH");
+
+        this.bucketname = (System.getenv("BUCKET_NAME") != null ? System.getenv("BUCKET_NAME") : properties.getProperty("BUCKET_NAME")
+                            ).toLowerCase();
+
+        createRemoteStorage();
+        
     }
 
     protected void download(String uri) throws IOException,InterruptedException
@@ -149,23 +149,12 @@ public class Storage {
         {
             logger.info("createRemoteStorage creating...");
 
-            // Bucket name should not contain uppercase characters
-            bucketname = ShopName.toLowerCase();
-            // S3Client
-            // storageClient = AmazonS3ClientBuilder.standard()
-            //             .withRegion(Regions.AP_NORTHEAST_1)
-            //             .build();
             storageClient = S3Client.builder()
                         .region(Region.AP_NORTHEAST_1)
                         .build();
 
-                        
-            // if (((AmazonS3)storageClient).doesBucketExistV2(bucketname)) {
             try 
             {
-                // Bucket bucket = 
-                // ((AmazonS3)storageClient).createBucket(bucketname);
-
                 CreateBucketRequest request = CreateBucketRequest.builder()
                                         .bucket(bucketname)
                                         .build();
@@ -173,6 +162,10 @@ public class Storage {
                 ((S3Client)storageClient).createBucket(request);
             }catch(BucketAlreadyExistsException ignore){
                 logger.info("createRemoteStorage bucket already exists.");
+
+            }catch(BucketAlreadyOwnedByYouException ignore){
+                logger.info("createRemoteStorage bucket already owned.");
+
             } catch (S3Exception ex) {
                 logger.error("createRemoteStorage creating failed.");
                 throw ex;
@@ -181,35 +174,7 @@ public class Storage {
         logger.info("createRemoteStorage finish");
     }
 
-    // public static Bucket getBucket(String bucket_name) {
-    //     final AmazonS3 s3 = AmazonS3ClientBuilder.standard().withRegion(Regions.DEFAULT_REGION).build();
-    //     Bucket named_bucket = null;
-    //     List<Bucket> buckets = s3.listBuckets();
-    //     for (Bucket b : buckets) {
-    //         if (b.getName().equals(bucket_name)) {
-    //             named_bucket = b;
-    //         }
-    //     }
-    //     return named_bucket;
-    // }
-
-    // public static Bucket createBucket(String bucket_name) {
-    //     final AmazonS3 s3 = AmazonS3ClientBuilder.standard().withRegion(Regions.DEFAULT_REGION).build();
-    //     Bucket b = null;
-    //     if (s3.doesBucketExistV2(bucket_name)) {
-    //         System.out.format("Bucket %s already exists.\n", bucket_name);
-    //         b = getBucket(bucket_name);
-    //     } else {
-    //         try {
-    //             b = s3.createBucket(bucket_name);
-    //         } catch (AmazonS3Exception e) {
-    //             System.err.println(e.getErrorMessage());
-    //         }
-    //     }
-    //     return b;
-    // }
-
-    public void transport(String uri) throws IOException,InterruptedException
+    public void transport(String uri) throws IOException,InterruptedException,S3Exception
     {
 
         download(uri);
@@ -222,7 +187,7 @@ public class Storage {
     }
 
     
-    protected void upload(String uri)
+    protected void upload(String uri) throws S3Exception
     {
         logger.info("upload start");
         
@@ -237,33 +202,22 @@ public class Storage {
             String name = uri.substring(uri.lastIndexOf("/") + 1);
             
             File f = new File(Paths.get(usePath,ShopName,ShopItemId,name).toString());
-            // TransferManager xfer_mgr = TransferManagerBuilder.standard()
-            //                         .withRegion(Regions.AP_NORTHEAST_1)
-            //                         .build();
-            // TransferClient xfer_mgr = TransferClient.builder()
-            //             .region(Region.AP_NORTHEAST_1)
-            //             .build();
-                        // .startServer()
-                                    // Put Object
                         
             try {
-                // Upload xfer = xfer_mgr.upload(bucketname, Paths.get(ShopName,ShopItemId,name).toString(), f);
 
-                // StartServerRequest request = StartServerRequest.builder()
-                                        //    .
-                
-                // loop with Transfer.isDone()
-                // XferMgrProgress.showTransferProgress(xfer);
+                logger.info("upload try create request");
 
                 PutObjectRequest request = PutObjectRequest.builder()
                             .bucket(bucketname)
                             .key(Paths.get(ShopName,ShopItemId,name).toString())
                             .build();
-                
+
+                logger.info("upload try putobject");
+
                 ((S3Client)storageClient).putObject(request,
-                        // RequestBody.fromByteBuffer(getRandomByteBuffer(10_000)));
-                        RequestBody.fromFile(f));
-                        // fromFile(File file)
+                        RequestBody.fromFile(f)
+                        );
+
                 // System.out.println(xfer.getDescription());
                 // print an empty progress bar...
                 // printProgressBar(0.0);
@@ -304,7 +258,7 @@ public class Storage {
                 // }
 
             } catch (S3Exception ex) {
-                
+                throw ex;
             }
             // xfer_mgr.shutdownNow();
 

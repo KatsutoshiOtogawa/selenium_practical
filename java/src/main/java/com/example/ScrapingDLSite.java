@@ -66,28 +66,24 @@ import software.amazon.awssdk.services.dynamodb.waiters.DynamoDbWaiter;
  */
 public class ScrapingDLSite extends Scraper
 {
-
-    private final Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-    private static final Logger logger = LogManager.getFormatterLogger(ScrapingDLSite.class);
     
     public ScrapingDLSite(Properties properties) throws IllegalStateException
     {
         super(properties);
-        this.Driver = constructor();
         this.TableName = "ArtCollection";
         this.ShopName = "DLSite";
-
+        this.logger = LogManager.getFormatterLogger(ScrapingDLSite.class);
+        constructor();
     }
 
-    protected ChromeDriver constructor() throws IllegalStateException
+    protected void constructor() throws IllegalStateException
     {
         logger.info("resource opening...");
 
-        ChromeDriver driver = null;
         // 手動で開放しないといけないリソースはここに書く。
         try
         {
-            driver = new ChromeDriver();
+            Driver = new ChromeDriver();
         }catch(Exception ex)
         {
             logger.error("resource opening is faild.");
@@ -96,7 +92,6 @@ public class ScrapingDLSite extends Scraper
         
         logger.info("resource opened");
 
-        return driver;
     }
 
     @Override
@@ -251,14 +246,6 @@ public class ScrapingDLSite extends Scraper
             storage.ShopName = ShopName;
             // 画像ダウンロード先を作成。
             storage.createShopItemIdPath();
-            // ストレージにRemoteの物を指定している場合は作成。
-            try
-            {
-                storage.createRemoteStorage();
-            }catch(AmazonS3Exception ignore){
-                // ストレージ作成に失敗した場合はログだけ出力。
-                ignore.printStackTrace();
-            }
             
         }
         

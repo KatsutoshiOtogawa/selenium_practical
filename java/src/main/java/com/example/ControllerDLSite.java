@@ -67,34 +67,24 @@ import software.amazon.awssdk.services.dynamodb.model.DynamoDbException;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.waiters.DynamoDbWaiter;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClientBuilder;
+import software.amazon.awssdk.services.s3.model.S3Exception;
 
-// AwsClientBuilder.EndpointConfiguration
-
-// software.amazon.awssdk.services.apigateway.model;
 /**
  * 
  */
 public class ControllerDLSite extends Controller
 {
-    // private DynamoDbDLSite dynamodbClient;
-    private ScrapingDLSite scrapingDLSite;
-    private static final Logger logger = LogManager.getFormatterLogger(ControllerDLSite.class);
-    
+       
     public ControllerDLSite(String path) throws IllegalArgumentException,IllegalStateException,FileNotFoundException,IOException
     {
         
         this.CreatedAt = (new SimpleDateFormat("yyyy-MM-dd")).format(new Date());
 
-        Map<String,Object> data = constructor(path);
-        // this.dynamodbClient = (DynamoDbDLSite) data.get("DynamoDbDLSite");
-        this.db = (DB) data.get("DynamoDbDLSite");
-        this.scrapingDLSite = (ScrapingDLSite) data.get("ScrapingDLSite");
-        this.storage = (Storage) data.get("Storage");
+        this.logger = LogManager.getFormatterLogger(ControllerDLSite.class);
+        
         this.TableName = "ArtCollection";
         this.ShopName = "DLSite";
-
-        // aws credential propertiesよりも環境変数を優先しているので
-        // それと同じような作りにするとよいはず。
+        constructor(path);
 
     }
 
@@ -146,37 +136,34 @@ public class ControllerDLSite extends Controller
         return properties;
     }
 
-    protected Map<String,Object> constructor(String path) throws IllegalArgumentException,FileNotFoundException,IOException,UnsupportedEncodingException,IllegalStateException,StorageTypeNotFoundException
+    protected void constructor(String path) throws IllegalArgumentException,S3Exception,FileNotFoundException,IOException,UnsupportedEncodingException,IllegalStateException,StorageTypeNotFoundException
     {
         logger.info("resource opening...");
         Properties properties = openProperties(path);
 
-        Map<String,Object> resources = new HashMap<String,Object>();
-
-        resources.put("Storage",new Storage(properties));
+        storage = new Storage(properties);
 
         try
         {
-            resources.put("DynamoDbDLSite",new DynamoDbDLSite(properties));
+            db = new DynamoDbDLSite(properties);
         }catch(Exception ex){
             logger.error("resource opening is faild.");
-            ((Storage)resources.get("Storage")).destructor();
+            storage.destructor();
             throw ex;
         }
 
         try
         {
-            resources.put("ScrapingDLSite",new ScrapingDLSite(properties));
+            scrapingDLSite = new ScrapingDLSite(properties);
         }catch(Exception ex){
             logger.error("resource opening is faild.");
-            ((Storage)resources.get("Storage")).destructor();
-            ((DynamoDbDLSite)resources.get("DynamoDbDLSite")).destructor();
+            storage.destructor();
+            db.destructor();
+
             throw ex;
         }
 
         logger.info("resource opend");
-
-        return resources;
         
     }
 
