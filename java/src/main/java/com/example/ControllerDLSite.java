@@ -154,7 +154,7 @@ public class ControllerDLSite extends Controller
 
         try
         {
-            scrapingDLSite = new ScrapingDLSite(properties);
+            scraper = new ScrapingDLSite(properties);
         }catch(Exception ex){
             logger.error("resource opening is faild.");
             storage.destructor();
@@ -172,7 +172,7 @@ public class ControllerDLSite extends Controller
         logger.info("resource closing...");
         // dynamodbClient.destructor();
         db.destructor();
-        scrapingDLSite.destructor();
+        scraper.destructor();
         logger.info("resource closed");
     }
 
@@ -181,7 +181,7 @@ public class ControllerDLSite extends Controller
         logger.info("setupController start");
         try
         {
-            scrapingDLSite.setupScraping();
+            scraper.setupScraping();
         }catch(TimeoutException ex){
             logger.error("main message [%s]",ex.getMessage());
             throw ex;
@@ -202,8 +202,7 @@ public class ControllerDLSite extends Controller
         Map<String,Object> data = null;
         try 
         {
-            // data = scrapingDLSite.fetchScraping(itemName);
-            data = scrapingDLSite.fetchScraping(itemName,storage);
+            data = scraper.fetchScraping(itemName,storage);
 
         } catch(TimeoutException ex){
             logger.warn("main message [%s]",ex.getMessage());

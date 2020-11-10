@@ -67,7 +67,7 @@ import software.amazon.awssdk.services.dynamodb.model.QueryRequest;
 /**
  * 
  */
-public class DynamoDbDLSite extends DB
+public class DynamoDbDLSite extends DB<DynamoDbClient>
 {
     private static final Logger logger = LogManager.getFormatterLogger(DynamoDbDLSite.class);
     
@@ -76,12 +76,22 @@ public class DynamoDbDLSite extends DB
         super(properties);
         this.TableName = "ArtCollection";
         this.ShopName = "DLSite";
-        this.dbconnection = constructor();
+        // this.dbconnection = 
+        constructor();
     }
 
-    protected DynamoDbClient constructor() throws IllegalArgumentException
+    @Override
+    protected void constructor() throws IllegalArgumentException
     {
         logger.info("resource opening...");
+        dbconnection = createDBConnection();
+        logger.info("resource opened");
+    }
+
+    @Override
+    protected DynamoDbClient createDBConnection() throws IllegalArgumentException
+    {
+        logger.info("createDBConnection start");
 
         DynamoDbClient connection = null;
 
@@ -89,11 +99,11 @@ public class DynamoDbDLSite extends DB
         {
             if("AWS".equals(System.getenv("HOST")) || "AWS".equals(properties.getProperty("HOST")))
             {
-                logger.info("resource opening AWS...");
+                logger.info("createDBConnection is opening AWS...");
                 connection = DynamoDbClient.create();
             }else if("LOCALHOST".equals(System.getenv("HOST")) || "LOCALHOST".equals(properties.getProperty("HOST"))){
 
-                logger.info("resource opening LOCALHOST...");
+                logger.info("createDBConnection is opening LOCALHOST...");
                 connection = DynamoDbClient.builder()
                     .endpointOverride(URI.create(
                         String.format(
@@ -109,15 +119,16 @@ public class DynamoDbDLSite extends DB
                 throw new IllegalArgumentException();
             }
         }catch(Exception ex){
-            logger.error("resource opening is faild.");
+            logger.info("createDBConnection is failed");
             throw ex;
         }
 
-        logger.info("resource opened");
+        logger.info("createDBConnection finish");
 
         return connection;
     }
 
+    @Override
     public void destructor()
     {
         logger.info("resource closing...");

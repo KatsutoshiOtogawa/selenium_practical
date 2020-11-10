@@ -15,12 +15,12 @@ import software.amazon.awssdk.services.dynamodb.model.PutItemRequest;
 /**
  * DB<T>Genericx
  */
-public abstract class DB {
+public abstract class DB<T> {
     protected String CreatedAt;
     protected String TableName;
     protected String ShopName;
     protected Properties properties;
-    protected Object dbconnection;
+    protected T dbconnection;
     protected DBType dbtype;
 
     public DB(Properties properties)
@@ -29,7 +29,8 @@ public abstract class DB {
         this.properties = properties;
     }
 
-    abstract protected Object constructor() throws IllegalArgumentException;
+    abstract protected void constructor() throws IllegalArgumentException;
+    abstract protected T createDBConnection() throws IllegalArgumentException;
     abstract protected PutItemRequest buildPutRequest(Map<String,Object> data);
     abstract protected void putItem(Map<String,Object> data);
     abstract public void destructor();
