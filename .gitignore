@@ -1,5 +1,6 @@
 .env
 chromedriver
+credentials.json
 
 # These file are used DynamoDBLocal.jar
 DynamoDBLocal_lib
