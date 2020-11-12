@@ -6,29 +6,51 @@ import java.util.HashSet;
 import java.util.Set;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Arrays;
+// import java.util.List;
+// import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 /**
  * interfaceに変更。createAffiliateInfo createAffliateという風にする。
  * Model部分に何をダウンロードするかも決めるdowlonadFileという形で決める。
  */
-public class DLSiteModel extends Model {
+public class DLSiteModel<T> extends Model<T> {
 
     public DLSiteModel()
     {
         this.TableName = "ArtCollection";
         this.ShopName = "DLSite";
+
+        this.Items = new HashMap<String,String>();
+        this.ListItems = new HashMap<String,Set<String>>();
+        this.BoolItems = new HashMap<String,Boolean>();
+        this.DBDependenItems = new HashMap<String,Map<String,T>>();
+
+        constructor();
     }
 
-    public Map<String,Object> createShopItemInfoModel()
+    protected void constructor()
     {
+        createShopItemInfoModel();
+        createShopBasicInfo();
+        createShopItemAffiliateInfoModel();
+    }
+
+    public void clear()
+    {
+        constructor();
+    }
+
+    public void createShopItemInfoModel()
+    {
+
         Set<String> IlustratorName = new HashSet<String>();
         Set<String> VoiceActor = new HashSet<String>();
-        Map<String,AttributeValue> RerationMatome = new HashMap<String,AttributeValue>();
+        Map<String,T> RerationMatome = new HashMap<String,T>();
         Set<String> Genru = new HashSet<String>();
-        Map<String,AttributeValue> MostProperyGenru = new HashMap<String,AttributeValue>();
-        Map<String,AttributeValue> BuyingUserViewItems = new HashMap<String,AttributeValue>();
-        Map<String,AttributeValue> LookingUserViewItems = new HashMap<String,AttributeValue>();
+        Map<String,T> MostProperyGenru = new HashMap<String,T>();
+        Map<String,T> BuyingUserViewItems = new HashMap<String,T>();
+        Map<String,T> LookingUserViewItems = new HashMap<String,T>();
         Set<String> FileFormat = new HashSet<String>();
         Set<String> Reviews = new HashSet<String>();
         Set<String> ScreenWriter = new HashSet<String>();
@@ -36,63 +58,65 @@ public class DLSiteModel extends Model {
         Set<String> Musician = new HashSet<String>();
         Set<String> Gallery = new HashSet<String>();
         
-        return new HashMap<String,Object>(){{
-            put("ShopItemId", "");
-            put("MakerName", "");
-            put("MakerFollowerNum", "");
-            put("UnitsSold", "");
-            put("SalePrice", "");
-            put("DiscountRate", "");
-            put("UntilHavingSale", "");
-            put("NormalPrice", "");
-            put("Assessment", "");
-            put("AssessmentNum", "");
-            put("IlustratorName", IlustratorName);
-            put("MatomeNum", "");
-            put("RerationMatome", RerationMatome);
-            put("ItemCategory", ItemCategory);
-            put("ReleaseDate", "");
-            put("FileFormat", FileFormat);
-            put("FileSize", "");
-            put("FileSizeUnit", "");
-            put("StarNum", "");
-            put("AgeVeridation", "");
-            put("VoiceActor", VoiceActor);
-            put("Musician", Musician);
-            put("ScreenWriter", ScreenWriter);
-            put("Genru", Genru);
-            put("MostProperyGenru", MostProperyGenru);
-            put("Gallery", Gallery);
-            put("BuyingUserViewItems", BuyingUserViewItems);
-            put("LookingUserViewItems", LookingUserViewItems);
-            put("ReviewNum", "");
-            put("Reviews", Reviews);
-            put("Monopoly", false);
-        }};
+        Items.put("ShopItemId", "");
+        Items.put("MakerName", "");
+        Items.put("MakerFollowerNum", "");
+        Items.put("UnitsSold", "");
+        Items.put("SalePrice", "");
+        Items.put("DiscountRate", "");
+        Items.put("UntilHavingSale", "");
+        Items.put("NormalPrice", "");
+        Items.put("Assessment", "");
+        Items.put("AssessmentNum", "");
+        Items.put("MatomeNum", "");
+        Items.put("ReleaseDate", "");
+        Items.put("FileSize", "");
+        Items.put("FileSizeUnit", "");
+        Items.put("StarNum", "");
+        Items.put("AgeVeridation", "");
+        Items.put("ReviewNum", "");
+
+        ListItems.put("IlustratorName", IlustratorName);
+        ListItems.put("ItemCategory", ItemCategory);
+        ListItems.put("FileFormat", FileFormat);
+        ListItems.put("VoiceActor", VoiceActor);
+        ListItems.put("Musician", Musician);
+        ListItems.put("ScreenWriter", ScreenWriter);
+        ListItems.put("Genru", Genru);
+        ListItems.put("Gallery", Gallery);
+        ListItems.put("Reviews", Reviews);
+
+        BoolItems.put("Monopoly", false);
+
+        DBDependenItems.put("RerationMatome", RerationMatome);
+        DBDependenItems.put("MostProperyGenru", MostProperyGenru);
+        DBDependenItems.put("BuyingUserViewItems", BuyingUserViewItems);
+        DBDependenItems.put("LookingUserViewItems", LookingUserViewItems);
+
+    }
+    
+    public void createShopBasicInfo()
+    {
+
+        Items.put("CreatedAt", "");
+        Items.put("ItemName", "");
+        Items.put("ShopName", "");
+        Items.put("ShopItemName", "");
 
     }
 
-    public Map<String,Object> createShopBasicInfo()
+    public void createShopItemAffiliateInfoModel()
     {
-        return new HashMap<String,Object>(){{
-            put("CreatedAt", CreatedAt);
-            put("ItemName", "");
-            put("ShopName", ShopName);
-            put("ShopItemName", "");
-        }};
-    }
 
-    public Map<String,Object> createShopItemAffiliateInfoModel()
-    {
         Set<String> PlayerEmbed = new HashSet<String>();
 
-        return new HashMap<String,Object>(){{
-            put("AffiliateUrl", "");
-            put("AffiliateBigImageUrl", "");
-            put("AffiliateMiddleImageUrl", "");
-            put("AffiliateSmallImageUrl", "");
-            put("PlayerEmbed", PlayerEmbed);
-        }};
+        Items.put("AffiliateUrl", "");
+        Items.put("AffiliateBigImageUrl", "");
+        Items.put("AffiliateMiddleImageUrl", "");
+        Items.put("AffiliateSmallImageUrl", "");
+
+        ListItems.put("PlayerEmbed", PlayerEmbed);
+
     }
 
     public Map<String,String> createDowlonadFileModel()
@@ -105,12 +129,6 @@ public class DLSiteModel extends Model {
             put("AffiliateSmallImageUrl","");
         }};
     }
-
-    // public Map<String,Object> createFetchScrapingModel()
-    // {
-    //     return new HashMap<String,Object>(){{
-    //     }};
-    // }
 
     public void destructor()
     {

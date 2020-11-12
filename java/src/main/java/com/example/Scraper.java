@@ -21,6 +21,7 @@ import org.apache.logging.log4j.Logger;
  * 
  */
 public abstract class Scraper {
+    // public abstract class Scraper<T extends Model> {
 
     protected WebDriver Driver;
     protected int TransitionInterval;
@@ -29,11 +30,13 @@ public abstract class Scraper {
     protected String TableName;
     protected String ShopName;
     protected Properties properties;
+    protected Model model; 
     protected final static Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
     protected Logger logger;
-    public Scraper(Properties properties)
+    public Scraper(Properties properties, Model model)
     {
         this.CreatedAt = (new SimpleDateFormat("yyyy-MM-dd")).format(new Date());
+        this.model = model;
         this.properties = properties;
     }
 
@@ -70,9 +73,16 @@ public abstract class Scraper {
     abstract protected void userLogin() throws TimeoutException,InterruptedException;
     abstract protected void shownCoupon() throws InterruptedException;
     abstract protected void searchBox(String sentense) throws TimeoutException,InterruptedException,NotFoundException;
-    abstract protected Map<String,Object> getShopItemInfo(String itemName,Storage storage) throws TimeoutException,InterruptedException;
-    abstract protected Map<String,Object> getShopItemAffiriateInfo(Storage storage) throws TimeoutException,InterruptedException,IOException,UnsupportedFlavorException;
-    abstract public Map<String,Object> fetchScraping(String itemName,Storage storage) throws TimeoutException,InterruptedException,IOException,UnsupportedFlavorException,NotFoundException;
+    abstract protected void getShopItemInfo(String itemName,Storage storage) throws TimeoutException,InterruptedException;
+    abstract protected void getShopItemAffiriateInfo(Storage storage) throws TimeoutException,InterruptedException,IOException,UnsupportedFlavorException;
+    public void fetchScraping(String itemName,Storage storage) throws TimeoutException,InterruptedException,IOException,UnsupportedFlavorException,NotFoundException
+    {
+        // check shopItemName is exist DLSite.
+        searchBox(itemName);
+        getShopItemInfo(itemName,storage);
+        getShopItemAffiriateInfo(storage);
+    }
+
     public void destructor()
     {
         Driver.close();

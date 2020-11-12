@@ -142,7 +142,7 @@ public class ControllerDLSite extends Controller
         Properties properties = openProperties(path);
 
         storage = new Storage(properties);
-
+        
         try
         {
             db = new DynamoDbDLSite(properties);
@@ -154,7 +154,7 @@ public class ControllerDLSite extends Controller
 
         try
         {
-            scraper = new ScrapingDLSite(properties);
+            scraper = new ScrapingDLSite(properties,db.getModel());
         }catch(Exception ex){
             logger.error("resource opening is faild.");
             storage.destructor();
@@ -163,6 +163,8 @@ public class ControllerDLSite extends Controller
             throw ex;
         }
 
+        model = db.getModel();
+
         logger.info("resource opend");
         
     }
@@ -170,7 +172,6 @@ public class ControllerDLSite extends Controller
     public void destructor()
     {
         logger.info("resource closing...");
-        // dynamodbClient.destructor();
         db.destructor();
         scraper.destructor();
         logger.info("resource closed");
@@ -199,10 +200,12 @@ public class ControllerDLSite extends Controller
     {
 
         logger.info("action start");
-        Map<String,Object> data = null;
+
+        // あとでinitにする。
+        model.clear();
         try 
         {
-            data = scraper.fetchScraping(itemName,storage);
+            scraper.fetchScraping(itemName,storage);
 
         } catch(TimeoutException ex){
             logger.warn("main message [%s]",ex.getMessage());
@@ -230,24 +233,18 @@ public class ControllerDLSite extends Controller
             throw ex;
         }
         
-        data.put("CreatedAt"
-            ,CreatedAt
-        );
+        model.Items.put("CreatedAt",CreatedAt);
 
-        data.put("ItemName"
-            ,itemName
-        );
+        model.Items.put("ItemName",itemName);
 
-        data.put("ShopName"
-            ,ShopName
-        );
-        data.put("ShopItemName"
-            ,ShopName + itemName
-        );
+        model.Items.put("ShopName",ShopName);
 
-        logger.info("action variable {data=%s}",data.toString());
+        model.Items.put("ShopItemName",ShopName + itemName);
 
-        db.upsertItem(data);
+        
+        logger.info("action variable {model=%s}",model.toString());
+
+        db.upsertItem();
 
     }
 }

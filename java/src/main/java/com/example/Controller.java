@@ -22,6 +22,7 @@ public abstract class Controller {
     protected Storage storage;
     protected DB db;
     protected Scraper scraper;
+    protected Model model; 
     protected Logger logger;
     abstract protected Properties openProperties(String path) throws FileNotFoundException,IOException,UnsupportedEncodingException;
     abstract protected void constructor(String path) throws IllegalArgumentException,FileNotFoundException,IOException,UnsupportedEncodingException;

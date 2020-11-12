@@ -67,9 +67,9 @@ import software.amazon.awssdk.services.dynamodb.waiters.DynamoDbWaiter;
 public class ScrapingDLSite extends Scraper
 {
     
-    public ScrapingDLSite(Properties properties) throws IllegalStateException
+    public ScrapingDLSite(Properties properties,Model model) throws IllegalStateException
     {
-        super(properties);
+        super(properties,model);
         this.TableName = "ArtCollection";
         this.ShopName = "DLSite";
         this.logger = LogManager.getFormatterLogger(ScrapingDLSite.class);
@@ -228,20 +228,17 @@ public class ScrapingDLSite extends Scraper
         logger.info("searchBox finish variable [sentense=%s]",sentense);
     }
 
-    @SuppressWarnings("unchecked")
-    protected Map<String,Object> getShopItemInfo(String itemName,Storage storage) throws TimeoutException,InterruptedException
+    protected void getShopItemInfo(String itemName,Storage storage) throws TimeoutException,InterruptedException
     {
         logger.info("getShopItemInfo start variable [shopItemName=%s]",itemName);
-
-        Map<String,Object> data = (new DLSiteModel()).createShopItemInfoModel();
-        // Map<String,Object> data = DLSiteModel.createShopItemAffiliateInfoModel();
 
         // this frase is after functoned.
         {
             // url からArtIdを取得。
             // ex) https://www.dlsite.com/pro/work/=/product_id/VJ009935.html -> VJ000935
             String ShopItemId = Driver.getCurrentUrl().replaceAll("^.*/","").replaceAll("\\..*$","");
-            data.put("ShopItemId", ShopItemId);
+            // data.put("ShopItemId", ShopItemId);
+            model.Items.put("ShopItemId", ShopItemId);
             storage.ShopItemId = ShopItemId;
             storage.ShopName = ShopName;
             // 画像ダウンロード先を作成。
@@ -251,7 +248,7 @@ public class ScrapingDLSite extends Scraper
         
         try
         {
-            data.put("UnitsSold"
+            model.Items.put("UnitsSold"
                 ,Wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id='work_right']/div[1]/div[2]/dl/dt[text() = '販売数：']/following-sibling::dd[1]"))).getAttribute("textContent")
                     .replace(",","")
             );
@@ -261,30 +258,32 @@ public class ScrapingDLSite extends Scraper
 
         try
         {
-            data.put("NormalPrice"
+
+            model.Items.put("NormalPrice"
                 ,Wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id='work_buy_box_wrapper']//div[@class='work_buy_label' and text()='価格']/following-sibling::div[1]/*[@class='price']")))
                     .getAttribute("textContent").replace(",","").replace("円","")  
             );
+
         }catch(TimeoutException ex){
 
             try
             {
-                data.put("NormalPrice"
+                model.Items.put("NormalPrice"
                     ,Wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id='work_price']//div[@class='work_buy_label' and text()='通常価格']/following-sibling::div[1]/*[@class='price strike']")))                                                      
-                        .getAttribute("textContent").replace(",","").replace("円","")  
+                            .getAttribute("textContent").replace(",","").replace("円","")  
                 );
 
-                data.put("SalePrice"
+                model.Items.put("SalePrice"
                     ,Wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id='work_price']//div[@class='work_buy_label' and text()='セール特価']/following-sibling::div[1]/*[@class='price']")))
                         .getAttribute("textContent").replace(",","").replace("円","")  
                 );
                 
-                data.put("DiscountRate"
+                model.Items.put("DiscountRate"
                     ,Wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id='work_price']//*[@class='type_sale transition']/a/span")))
                         .getAttribute("textContent").replaceAll("%.*?$","")
                 );
 
-                data.put("UntilHavingSale"
+                model.Items.put("UntilHavingSale"
                     ,Wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id='work_price']//*[@class='type_sale transition']/a/span/span[@class='period']")))
                         .getAttribute("textContent")
                 );
@@ -298,10 +297,12 @@ public class ScrapingDLSite extends Scraper
 
         try
         {
-            data.put("MatomeNum"
+
+            model.Items.put("MatomeNum"
                 ,Wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id='top_wrapper']//a/span[text()='まとめ']/following-sibling::span[1]"))).getAttribute("textContent")
                     .replace(",","").replace("件","")
             );
+            
         }catch(TimeoutException ex){
             
         }
@@ -314,7 +315,7 @@ public class ScrapingDLSite extends Scraper
 
             if(elements.size() > 0)
             {
-                data.put("Monopoly",true);
+                model.BoolItems.put("Monopoly",true);
             }
                 
         }catch(TimeoutException ex){
@@ -323,58 +324,64 @@ public class ScrapingDLSite extends Scraper
 
         try
         {
-            data.put("StarNum"
+            model.Items.put("StarNum"
                 ,Wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id='work_right']//dl/dt[text() = 'お気に入り数：']/following-sibling::dd[1]"))).getAttribute("textContent")
                     .replace(",","")
             );
+            
         }catch(TimeoutException ex){
             
         }
 
         try
         {
-            data.put("ReviewNum"
+            model.Items.put("ReviewNum"
                 ,Wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id='work_right']//dl/dt[text() = 'レビュー数：']/following-sibling::dd[1]/span[1]"))).getAttribute("textContent")
                     .replace(",","")
             );
+            
         }catch(TimeoutException ex){
             
         }
 
         try
         {
-            data.put("Assessment"
+            model.Items.put("Assessment"
                 ,Wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("#work_right > div.work_right_info > div:nth-child(2) > dl > dd > span.point.average_count"))).getAttribute("textContent")
             );
+            
         }catch(TimeoutException ex){
             
         }
 
         try
         {
-            data.put("AssessmentNum"
+            model.Items.put("AssessmentNum"
                 ,Wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id='work_right']//dl/dt[text() = '評価：']/following-sibling::dd[1]/span[@class='count']"))).getAttribute("textContent")
                     .replace(",","").replaceAll("(\\(|\\))","")
             );
+            
         }catch(TimeoutException ex){
             
         }
 
         try
         {
-            data.put("MakerName"
+            model.Items.put("MakerName"
                 ,Wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("#work_maker span.maker_name > a"))).getAttribute("textContent")
             );
+
         }catch(TimeoutException ex){
             
         }
 
         try
         {
-            data.put("MakerFollowerNum"
+            model.Items.put("MakerFollowerNum"
                 ,Wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("#work_maker span.follow_count"))).getAttribute("textContent")
                     .replace(",","")
             );
+
         }catch(TimeoutException ex){
             
         }
@@ -384,7 +391,7 @@ public class ScrapingDLSite extends Scraper
 
             List<WebElement> elements = Driver.findElements(By.xpath("//*[@id='work_outline']/tbody/tr/th[text()= '声優']/following-sibling::td[1]/a"));
 
-            Set<String> VoiceActor = (Set<String>)data.get("VoiceActor");
+            Set<String> VoiceActor = (Set<String>)model.ListItems.get("VoiceActor");
             logger.debug("getShopItemInfo show variable [VoiceActor=%s]",elements.toString());
             for(WebElement element:elements)
             {
@@ -399,8 +406,7 @@ public class ScrapingDLSite extends Scraper
         {
 
             List<WebElement> elements = Driver.findElements(By.xpath("//*[@id='work_outline']/tbody/tr/th[text()= 'イラスト']/following-sibling::td[1]/a"));
-            Set<String> IlustratorName = (Set<String>) data.get("IlustratorName");
-
+            Set<String> IlustratorName = (Set<String>) model.ListItems.get("IlustratorName");
             logger.debug("getShopItemInfo show variable [IlustratorName=%s]",elements.toString());
             for(WebElement element:elements)
             {
@@ -415,7 +421,7 @@ public class ScrapingDLSite extends Scraper
         {
 
             List<WebElement> elements = Driver.findElements(By.xpath("//*[@id='work_outline']/tbody/tr/th[text()= 'シナリオ']/following-sibling::td[1]/a"));
-            Set<String> ScreenWriter = (Set<String>) data.get("ScreenWriter");
+            Set<String> ScreenWriter = (Set<String>) model.ListItems.get("ScreenWriter");
             logger.debug("getShopItemInfo show variable [ScreenWriter=%s]",elements.toString());
             for(WebElement element:elements)
             {
@@ -431,7 +437,7 @@ public class ScrapingDLSite extends Scraper
         
             List<WebElement> elements = Driver.findElements(By.xpath("//*[@id='work_outline']/tbody/tr/th[text()= 'ジャンル']/following-sibling::td[1]/div/a"));
             logger.debug("getShopItemInfo show variable [Genru=%s]",elements.toString());
-            Set<String> Genru = (Set<String>) data.get("Genru");
+            Set<String> Genru = (Set<String>) model.ListItems.get("Genru");
             for(WebElement element:elements)
             {
                 Genru.add(element.getAttribute("textContent"));
@@ -449,13 +455,13 @@ public class ScrapingDLSite extends Scraper
 
             if(text.contains("GB"))
             {
-                data.put("FileSizeUnit","GB");
+                model.Items.put("FileSizeUnit","GB");
             }else if(text.contains("MB")){
-                data.put("FileSizeUnit","MB");
+                model.Items.put("FileSizeUnit","MB");
             }else if(text.contains("KB")){
-                data.put("FileSizeUnit","KB");
+                model.Items.put("FileSizeUnit","KB");
             }
-            data.put("FileSize",text.replaceAll("[^0-9\\.]",""));
+            model.Items.put("FileSize",text.replaceAll("[^0-9\\.]",""));
 
         }catch(TimeoutException ex){
             
@@ -463,7 +469,7 @@ public class ScrapingDLSite extends Scraper
 
         try
         {
-            data.put("AgeVeridation"
+            model.Items.put("AgeVeridation"
                 ,Wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id='work_outline']/tbody/tr/th[text()= '年齢指定']/following-sibling::td[1]/div/a")))
                     .getAttribute("textContent")
             );
@@ -472,10 +478,11 @@ public class ScrapingDLSite extends Scraper
         }
         try
         {
-            data.put("ReleaseDate"
+            model.Items.put("ReleaseDate"
                 ,Wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id='work_outline']/tbody/tr/th[text()= '販売日']/following-sibling::td[1]/a")))
                     .getAttribute("textContent")
             );
+
         }catch(TimeoutException ex){
             
         }
@@ -485,7 +492,7 @@ public class ScrapingDLSite extends Scraper
 
             List<WebElement> elements = Driver.findElements(By.xpath("//*[@id='work_outline']/tbody/tr/th[text()= '音楽']/following-sibling::td[1]/a"));
 
-            Set<String> Musician = (Set<String>) data.get("Musician");
+            Set<String> Musician = (Set<String>) model.ListItems.get("Musician");
             logger.debug("getShopItemInfo show variable [Musician=%s]",elements.toString());
             for(WebElement element:elements)
             {
@@ -500,7 +507,7 @@ public class ScrapingDLSite extends Scraper
         {
 
             List<WebElement> elements = Driver.findElements(By.xpath("//*[@id='work_outline']/tbody/tr/th[text()= '作品形式']/following-sibling::td[1]/div/a/span"));
-            Set<String> ItemCategory = (Set<String>) data.get("ItemCategory");
+            Set<String> ItemCategory = (Set<String>) model.ListItems.get("ItemCategory");
             ItemCategory.add(
                 Wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id='work_outline']/tbody/tr/th[text()= '作品形式']/following-sibling::td[1]/div")))
                     .getAttribute("textContent").replaceAll("^.*/ ","")
@@ -519,8 +526,7 @@ public class ScrapingDLSite extends Scraper
         {
 
             List<WebElement> elements = Driver.findElements(By.xpath("//*[@id='work_outline']/tbody/tr/th[text()= 'ファイル形式']/following-sibling::td[1]/div/a/span"));
-
-            Set<String> FileFormat = (Set<String>) data.get("FileFormat");
+            Set<String> FileFormat = (Set<String>) model.ListItems.get("FileFormat");
             FileFormat.add(
                 Wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id='work_outline']/tbody/tr/th[text()= 'ファイル形式']/following-sibling::td[1]/div")))
                     .getAttribute("textContent").replaceAll("^.*/ ","")
@@ -539,7 +545,7 @@ public class ScrapingDLSite extends Scraper
         {
 
             List<WebElement> elements = Driver.findElements(By.xpath("//*[@id='work_left']//div[@class='controller_body']//img"));
-            Set<String> Gallery = (Set<String>) data.get("Gallery");
+            Set<String> Gallery = (Set<String>) model.ListItems.get("Gallery");
             logger.debug("getShopItemInfo show variable [Gallery=%s]",elements.toString());
             for(WebElement element:elements)
             {
@@ -562,7 +568,7 @@ public class ScrapingDLSite extends Scraper
         try
         {
             List<WebElement> elements = Driver.findElements(By.xpath("//*[@id='work_review_list']//*[@class='reviewer_descrip']"));
-            Set<String> Reviews = (Set<String>) data.get("Reviews");
+            Set<String> Reviews = (Set<String>) model.ListItems.get("Reviews");
             logger.debug("getShopItemInfo show variable [Reviews=%s]",elements.toString());
             for(WebElement element:elements)
             {
@@ -578,10 +584,15 @@ public class ScrapingDLSite extends Scraper
          
         
             List<WebElement> elements = Driver.findElements(By.xpath("//*[@id='main_inner']//div[@data-type='viewsales2']//div[@class='recommend_work_item']/a[@title]"));
-            Map<String,AttributeValue> BuyingUserViewItems = (Map<String,AttributeValue>) data.get("BuyingUserViewItems");
+
+            // TODO あとでTをするように変更
+            // Map<String,T> BuyingUserViewItems = (Map<String,T>) model.DBDependenItems.get("BuyingUserViewItems");
+
+            Map<String,AttributeValue> BuyingUserViewItems = (Map<String,AttributeValue>) model.DBDependenItems.get("BuyingUserViewItems");
             logger.debug("getShopItemInfo show variable [BuyingUserViewItems=%s]",elements.toString());
             for(WebElement element:elements)
             {
+                // AttributeValue.builder()の内部実装はmodel.function()から呼べるようにする。
                 BuyingUserViewItems.put(element.getAttribute("href")
                     ,AttributeValue.builder().s(element.getAttribute("title")).build()
                 );
@@ -594,10 +605,12 @@ public class ScrapingDLSite extends Scraper
         {
 
             List<WebElement> elements = Driver.findElements(By.xpath("//*[@id='main_inner']//div[@data-type='viewsales']//div[@class='recommend_work_item']/a[@title]"));
-            Map<String,AttributeValue> LookingUserViewItems = (Map<String,AttributeValue>) data.get("LookingUserViewItems");
+            // Map<String,T> LookingUserViewItems = (Map<String,T>) model.DBDependenItems.get("LookingUserViewItems");
+            Map<String,AttributeValue> LookingUserViewItems = (Map<String,AttributeValue>) model.DBDependenItems.get("LookingUserViewItems");
             logger.debug("getShopItemInfo show variable [LookingUserViewItems=%s]",elements.toString());
             for(WebElement element:elements)
             {   
+                // AttributeValue.builder()の内部実装はmodel.function()から呼べるようにする。
                 LookingUserViewItems.put(element.getAttribute("href")
                     ,AttributeValue.builder().s(element.getAttribute("title")).build()
                 );
@@ -609,7 +622,8 @@ public class ScrapingDLSite extends Scraper
         try
         {
             List<WebElement> elements = Driver.findElements(By.xpath("//*[@id='work_review']/table[@class='reviewer_most_genre']//td//a"));
-            Map<String,AttributeValue> MostProperyGenru = (Map<String,AttributeValue>) data.get("MostProperyGenru");
+            // Map<String,T> MostProperyGenru = (Map<String,T>) model.DBDependenItems.get("MostProperyGenru");
+            Map<String,AttributeValue> MostProperyGenru = (Map<String,AttributeValue>) model.DBDependenItems.get("MostProperyGenru");
             logger.debug("getShopItemInfo show variable [MostProperyGenru=%s]",elements.toString());
             for(WebElement element:elements)
             {   
@@ -631,7 +645,8 @@ public class ScrapingDLSite extends Scraper
         {
 
             List<WebElement> elements = Driver.findElements(By.xpath("//*[@id='main_inner']//div[@class='matome_container']//*[@class='matome_content_title']/a"));
-            Map<String,AttributeValue> RerationMatome = (Map<String,AttributeValue>) data.get("RerationMatome");
+            // Map<String,T> RerationMatome = (Map<String,T>) model.DBDependenItems.get("RerationMatome");
+            Map<String,AttributeValue> RerationMatome = (Map<String,AttributeValue>) model.DBDependenItems.get("RerationMatome");
             logger.debug("getShopItemInfo show variable [RerationMatome=%s]",elements.toString());
             for(WebElement element:elements)
             {   
@@ -642,19 +657,14 @@ public class ScrapingDLSite extends Scraper
         }catch(TimeoutException ex){
             
         }
-        
-        logger.info("getShopItemInfo return data=%s", data.toString());
 
-        return data;
+        logger.info("getShopItemInfo return model=%s", model.toString());
+
     }
 
-    @SuppressWarnings("unchecked")
-    protected Map<String,Object> getShopItemAffiriateInfo(Storage storage) throws TimeoutException,InterruptedException,IOException,UnsupportedFlavorException
+    protected void getShopItemAffiriateInfo(Storage storage) throws TimeoutException,InterruptedException,IOException,UnsupportedFlavorException
     {
         logger.info("getShopItemAffiriateInfo start");
-
-        Map<String,Object> data = (new DLSiteModel()).createShopItemAffiliateInfoModel();
-        // Map<String,Object> data = DLSiteModel.createShopItemAffiliateInfoModel();
 
         Wait.until(ExpectedConditions.elementToBeClickable(By.linkText("アフィリエイトリンク作成")))
             .click();
@@ -672,15 +682,14 @@ public class ScrapingDLSite extends Scraper
             )
         );
         
-        data.put("AffiliateUrl"
+        model.Items.put("AffiliateUrl"
             , Wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("#preview_wname_sns a"))).getAttribute("href")
         );
-        
 
         {
             String uri = Wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("#preview_mini img"))).getAttribute("src");
 
-            data.put("AffiliateSmallImageUrl"
+            model.Items.put("AffiliateSmallImageUrl"
                 , uri
             );
 
@@ -696,7 +705,7 @@ public class ScrapingDLSite extends Scraper
         {
             String uri = Wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("#preview_thum img"))).getAttribute("src");
 
-            data.put("AffiliateMiddleImageUrl"
+            model.Items.put("AffiliateMiddleImageUrl"
                 , uri
             );
 
@@ -712,7 +721,7 @@ public class ScrapingDLSite extends Scraper
         {
             String uri = Wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("#preview_main img"))).getAttribute("src");
 
-            data.put("AffiliateBigImageUrl"
+            model.Items.put("AffiliateBigImageUrl"
                 , uri
             );
 
@@ -728,67 +737,21 @@ public class ScrapingDLSite extends Scraper
         Wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".main_modify_box button.copy_btn")))
             .click();
 
-        Set<String> PlayerEmbed = (Set<String>) data.get("PlayerEmbed");
+        Set<String> PlayerEmbed = (Set<String>) model.ListItems.get("PlayerEmbed");
         PlayerEmbed.add(
             (String)clipboard.getContents(null).getTransferData(DataFlavor.stringFlavor)
         );
 
-        logger.info("getShopItemAffiriateInfo return data=%s", data.toString());
+        logger.info("getShopItemAffiriateInfo return model=%s", model.toString());
 
-        return data;
     }
 
-    public Map<String,Object> fetchScraping(String itemName,Storage storage) throws TimeoutException,InterruptedException,IOException,UnsupportedFlavorException,NotFoundException
+    @Override
+    public void fetchScraping(String itemName,Storage storage) throws TimeoutException,InterruptedException,IOException,UnsupportedFlavorException,NotFoundException
     {
         logger.info("fetchScraping start");
-        // check shopItemName is exist DLSite.
-        searchBox(itemName);
+        super.fetchScraping(itemName,storage);
+        logger.info("fetchScraping return model=%s", model.toString());
 
-        Map<String,Object> shopItemInfo = getShopItemInfo(itemName,storage);
-
-        Map<String,Object> shopItemAffiriateInfo = getShopItemAffiriateInfo(storage);
-
-        Map<String,Object> data = new HashMap<String,Object>(){{
-            put("ShopItemId", shopItemInfo.get("ShopItemId"));
-            put("Monopoly", shopItemInfo.get("Monopoly"));
-            put("MakerName", shopItemInfo.get("MakerName"));
-            put("MakerFollowerNum", shopItemInfo.get("MakerFollowerNum"));
-            put("UnitsSold", shopItemInfo.get("UnitsSold"));
-            put("SalePrice", shopItemInfo.get("SalePrice"));
-            put("DiscountRate", shopItemInfo.get("DiscountRate"));
-            put("ReleaseDate", shopItemInfo.get("ReleaseDate"));
-            put("UntilHavingSale", shopItemInfo.get("UntilHavingSale"));
-            put("NormalPrice", shopItemInfo.get("NormalPrice"));
-            put("Assessment", shopItemInfo.get("Assessment"));
-            put("AssessmentNum", shopItemInfo.get("AssessmentNum"));
-            put("IlustratorName", shopItemInfo.get("IlustratorName"));
-            put("ScreenWriter", shopItemInfo.get("ScreenWriter"));
-            put("Musician", shopItemInfo.get("Musician"));
-            put("MatomeNum", shopItemInfo.get("MatomeNum"));
-            put("RerationMatome", shopItemInfo.get("RerationMatome"));
-            put("ItemCategory", shopItemInfo.get("ItemCategory"));
-            put("FileFormat", shopItemInfo.get("FileFormat"));
-            put("FileSize", shopItemInfo.get("FileSize"));
-            put("FileSizeUnit", shopItemInfo.get("FileSizeUnit"));
-            put("AgeVeridation", shopItemInfo.get("AgeVeridation"));
-            put("VoiceActor", shopItemInfo.get("VoiceActor"));
-            put("StarNum", shopItemInfo.get("StarNum"));
-            put("Genru", shopItemInfo.get("Genru"));
-            put("MostProperyGenru", shopItemInfo.get("MostProperyGenru"));
-            put("Gallery", shopItemInfo.get("Gallery"));
-            put("BuyingUserViewItems", shopItemInfo.get("BuyingUserViewItems"));
-            put("LookingUserViewItems", shopItemInfo.get("LookingUserViewItems"));
-            put("Reviews", shopItemInfo.get("Reviews"));
-            put("ReviewNum", shopItemInfo.get("ReviewNum"));
-            put("AffiliateUrl", shopItemAffiriateInfo.get("AffiliateUrl"));
-            put("AffiliateBigImageUrl", shopItemAffiriateInfo.get("AffiliateBigImageUrl"));
-            put("AffiliateMiddleImageUrl", shopItemAffiriateInfo.get("AffiliateMiddleImageUrl"));
-            put("AffiliateSmallImageUrl", shopItemAffiriateInfo.get("AffiliateSmallImageUrl"));
-            put("PlayerEmbed", shopItemAffiriateInfo.get("PlayerEmbed"));
-        }};
-
-        logger.info("fetchScraping return data=%s", data.toString());
-
-        return data;
     }
 }

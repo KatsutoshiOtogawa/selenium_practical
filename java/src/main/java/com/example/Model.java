@@ -15,30 +15,33 @@ import software.amazon.awssdk.services.dynamodb.model.PutItemRequest;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import java.util.Set;
+
 /**
  * interfaceに変更。createAffiliateInfo createAffliateという風にする。
  * Model部分に何をダウンロードするかも決めるdowlonadFileという形で決める。
  */
-public abstract class Model {
+public abstract class Model<T> {
     protected String CreatedAt;
     protected String TableName;
     protected String ShopName;
     protected Map<String,String> Items;
-    protected Map<String,List<String>> ListItems;
-    // protected Map<String,T> MultipleItems;
-    // protected add<U>,add<K>で複数関数を作る。
+    // 型名を入れるならcollectionItemsにすべき。
+    protected Map<String,Set<String>> ListItems;
+    protected Map<String,Boolean> BoolItems;
+    /** DynamoDBのAttributesなどDB独自の実装 */
+    protected Map<String,Map<String,T>> DBDependenItems;
 
     public Model()
     {
         this.CreatedAt = (new SimpleDateFormat("yyyy-MM-dd")).format(new Date());
     }
 
-    abstract public Map<String,Object> createShopItemInfoModel();
-    abstract public Map<String,Object> createShopItemAffiliateInfoModel();
+    abstract public void createShopItemInfoModel();
+    abstract public void createShopItemAffiliateInfoModel();
     abstract public Map<String,String> createDowlonadFileModel();
-    // abstract public List<String> createDowlonadFileModel();
-    // abstract protected Object constructor() throws IllegalArgumentException;
-    // abstract protected PutItemRequest buildPutRequest(Map<String,Object> data);
-    // abstract protected void putItem(Map<String,Object> data);
-    // abstract public void destructor();
+
+    abstract public void clear();
+    
 }

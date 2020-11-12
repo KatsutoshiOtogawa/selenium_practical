@@ -69,14 +69,13 @@ import software.amazon.awssdk.services.dynamodb.model.QueryRequest;
  */
 public class DynamoDbDLSite extends DB<DynamoDbClient>
 {
-    private static final Logger logger = LogManager.getFormatterLogger(DynamoDbDLSite.class);
-    
+
     public DynamoDbDLSite(Properties properties) throws IllegalArgumentException
     {   
         super(properties);
+        logger = LogManager.getFormatterLogger(DynamoDbDLSite.class);
         this.TableName = "ArtCollection";
         this.ShopName = "DLSite";
-        // this.dbconnection = 
         constructor();
     }
 
@@ -85,6 +84,7 @@ public class DynamoDbDLSite extends DB<DynamoDbClient>
     {
         logger.info("resource opening...");
         dbconnection = createDBConnection();
+        model = new DLSiteModel<AttributeValue>();
         logger.info("resource opened");
     }
 
@@ -132,215 +132,215 @@ public class DynamoDbDLSite extends DB<DynamoDbClient>
     public void destructor()
     {
         logger.info("resource closing...");
-        ((DynamoDbClient)dbconnection).close();
+        dbconnection.close();
         logger.info("resource closed");
     }
 
     @SuppressWarnings("unchecked")
-    protected PutItemRequest buildPutRequest(Map<String,Object> data)
+    protected PutItemRequest buildPutRequest()
     {
         logger.info("buildPutRequest start");
         Map<String,AttributeValue> items = new HashMap<String,AttributeValue>(){{
             put("ShopItemId"
-                , StringUtils.isEmpty((String) data.get("ShopItemId"))
+                , StringUtils.isEmpty((String) model.Items.get("ShopItemId"))
                     ? AttributeValue.builder().nul(true).build()
-                    : AttributeValue.builder().s((String) data.get("ShopItemId")).build()
+                    : AttributeValue.builder().s((String) model.Items.get("ShopItemId")).build()
             );
             put("ShopName", AttributeValue.builder()
-                .s((String)data.get("ShopName"))
+                .s((String)model.Items.get("ShopName"))
                 .build()
             );
             put("ItemName", AttributeValue.builder()
-                .s((String)data.get("ItemName"))
+                .s((String)model.Items.get("ItemName"))
                 .build()
             );
             put("ShopItemName", AttributeValue.builder()
-                .s((String)data.get("ShopItemName"))
+                .s((String)model.Items.get("ShopItemName"))
                 .build()
             );
             put("MakerName"
-                , StringUtils.isEmpty((String) data.get("MakerName"))
+                , StringUtils.isEmpty((String) model.Items.get("MakerName"))
                     ? AttributeValue.builder().nul(true).build()
-                    : AttributeValue.builder().s((String) data.get("MakerName")).build()
+                    : AttributeValue.builder().s((String) model.Items.get("MakerName")).build()
             );
             put("ReleaseDate"
-                , StringUtils.isEmpty((String) data.get("ReleaseDate"))
+                , StringUtils.isEmpty((String) model.Items.get("ReleaseDate"))
                     ? AttributeValue.builder().nul(true).build()
-                    : AttributeValue.builder().s((String) data.get("ReleaseDate")).build()
+                    : AttributeValue.builder().s((String) model.Items.get("ReleaseDate")).build()
             );
             put("MakerFollowerNum"
-                , StringUtils.isEmpty((String) data.get("MakerFollowerNum"))
+                , StringUtils.isEmpty((String) model.Items.get("MakerFollowerNum"))
                     ? AttributeValue.builder().nul(true).build()
-                    : AttributeValue.builder().n((String) data.get("MakerFollowerNum")).build()
+                    : AttributeValue.builder().n((String) model.Items.get("MakerFollowerNum")).build()
             );
             put("UnitsSold"
-                , StringUtils.isEmpty((String) data.get("UnitsSold"))
+                , StringUtils.isEmpty((String) model.Items.get("UnitsSold"))
                     ? AttributeValue.builder().nul(true).build()
-                    : AttributeValue.builder().n((String) data.get("UnitsSold")).build()
+                    : AttributeValue.builder().n((String) model.Items.get("UnitsSold")).build()
             );
             put("SalePrice"
-                , StringUtils.isEmpty((String) data.get("SalePrice"))
+                , StringUtils.isEmpty((String) model.Items.get("SalePrice"))
                     ? AttributeValue.builder().nul(true).build()
-                    : AttributeValue.builder().n((String) data.get("SalePrice")).build()
+                    : AttributeValue.builder().n((String) model.Items.get("SalePrice")).build()
             );
             put("DiscountRate"
-                , StringUtils.isEmpty((String) data.get("DiscountRate"))
+                , StringUtils.isEmpty((String) model.Items.get("DiscountRate"))
                     ? AttributeValue.builder().nul(true).build()
-                    : AttributeValue.builder().n((String) data.get("DiscountRate")).build()
+                    : AttributeValue.builder().n((String) model.Items.get("DiscountRate")).build()
             );
             put("UntilHavingSale"
-                , StringUtils.isEmpty((String) data.get("UntilHavingSale"))
+                , StringUtils.isEmpty((String) model.Items.get("UntilHavingSale"))
                     ? AttributeValue.builder().nul(true).build()
-                    : AttributeValue.builder().s((String) data.get("UntilHavingSale")).build()
+                    : AttributeValue.builder().s((String) model.Items.get("UntilHavingSale")).build()
             );
             put("NormalPrice"
-                , StringUtils.isEmpty((String) data.get("NormalPrice"))
+                , StringUtils.isEmpty((String) model.Items.get("NormalPrice"))
                     ? AttributeValue.builder().nul(true).build()
-                    : AttributeValue.builder().n((String) data.get("NormalPrice")).build()
+                    : AttributeValue.builder().n((String) model.Items.get("NormalPrice")).build()
             );
             put("Assessment"
-                , StringUtils.isEmpty((String) data.get("Assessment"))
+                , StringUtils.isEmpty((String) model.Items.get("Assessment"))
                     ? AttributeValue.builder().nul(true).build()
-                    : AttributeValue.builder().n((String) data.get("Assessment")).build()
+                    : AttributeValue.builder().n((String) model.Items.get("Assessment")).build()
             );
             put("AssessmentNum"
-                , StringUtils.isEmpty((String) data.get("AssessmentNum"))
+                , StringUtils.isEmpty((String) model.Items.get("AssessmentNum"))
                     ? AttributeValue.builder().nul(true).build()
-                    : AttributeValue.builder().n((String) data.get("AssessmentNum")).build()
+                    : AttributeValue.builder().n((String) model.Items.get("AssessmentNum")).build()
             );
             put("IlustratorName"
-                , ((Collection<String>) data.get("IlustratorName")).size() == 0
+                , ((Collection<String>) model.ListItems.get("IlustratorName")).size() == 0
                     ? AttributeValue.builder().nul(true).build()
-                    : AttributeValue.builder().ss((Collection<String>) data.get("IlustratorName")).build()
+                    : AttributeValue.builder().ss((Collection<String>) model.ListItems.get("IlustratorName")).build()
             );
             put("ScreenWriter"
-                , ((Collection<String>) data.get("ScreenWriter")).size() == 0
+                , ((Collection<String>) model.ListItems.get("ScreenWriter")).size() == 0
                     ? AttributeValue.builder().nul(true).build()
-                    : AttributeValue.builder().ss((Collection<String>) data.get("ScreenWriter")).build()
+                    : AttributeValue.builder().ss((Collection<String>) model.ListItems.get("ScreenWriter")).build()
             );
             put("Musician"
-                , ((Collection<String>) data.get("Musician")).size() == 0
+                , ((Collection<String>) model.ListItems.get("Musician")).size() == 0
                     ? AttributeValue.builder().nul(true).build()
-                    : AttributeValue.builder().ss((Collection<String>) data.get("Musician")).build()
+                    : AttributeValue.builder().ss((Collection<String>) model.ListItems.get("Musician")).build()
             );
             put("MatomeNum"
-                , StringUtils.isEmpty((String) data.get("MatomeNum"))
+                , StringUtils.isEmpty((String) model.Items.get("MatomeNum"))
                     ? AttributeValue.builder().nul(true).build()
-                    : AttributeValue.builder().n((String) data.get("MatomeNum")).build()
+                    : AttributeValue.builder().n((String) model.Items.get("MatomeNum")).build()
             );
             put("RerationMatome"
-                , ((Map<String,AttributeValue>) data.get("RerationMatome")).size() == 0
+                , ((Map<String,AttributeValue>) model.DBDependenItems.get("RerationMatome")).size() == 0
                     ? AttributeValue.builder().nul(true).build()
-                    : AttributeValue.builder().m((Map<String,AttributeValue>) data.get("RerationMatome")).build()
+                    : AttributeValue.builder().m((Map<String,AttributeValue>) model.DBDependenItems.get("RerationMatome")).build()
             );
             put("ItemCategory"
-                , ((Collection<String>) data.get("ItemCategory")).size() == 0
+                , ((Collection<String>) model.ListItems.get("ItemCategory")).size() == 0
                     ? AttributeValue.builder().nul(true).build()
-                    : AttributeValue.builder().ss((Collection<String>) data.get("ItemCategory")).build()
+                    : AttributeValue.builder().ss((Collection<String>) model.ListItems.get("ItemCategory")).build()
             );
             put("FileFormat"
-                , ((Collection<String>) data.get("FileFormat")).size() == 0
+                , ((Collection<String>) model.ListItems.get("FileFormat")).size() == 0
                     ? AttributeValue.builder().nul(true).build()
-                    : AttributeValue.builder().ss((Collection<String>) data.get("FileFormat")).build()
+                    : AttributeValue.builder().ss((Collection<String>) model.ListItems.get("FileFormat")).build()
             );
             put("FileSize"
-                , StringUtils.isEmpty((String) data.get("FileSize"))
+                , StringUtils.isEmpty((String) model.Items.get("FileSize"))
                     ? AttributeValue.builder().nul(true).build()
-                    : AttributeValue.builder().n((String) data.get("FileSize")).build()
+                    : AttributeValue.builder().n((String) model.Items.get("FileSize")).build()
             );
             put("FileSizeUnit"
-                , StringUtils.isEmpty((String) data.get("FileSizeUnit"))
+                , StringUtils.isEmpty((String) model.Items.get("FileSizeUnit"))
                     ? AttributeValue.builder().nul(true).build()
-                    : AttributeValue.builder().s((String) data.get("FileSizeUnit")).build()
+                    : AttributeValue.builder().s((String) model.Items.get("FileSizeUnit")).build()
             );
             put("AgeVeridation"
-                , StringUtils.isEmpty((String) data.get("AgeVeridation"))
+                , StringUtils.isEmpty((String) model.Items.get("AgeVeridation"))
                     ? AttributeValue.builder().nul(true).build()
-                    : AttributeValue.builder().s((String) data.get("AgeVeridation")).build()
+                    : AttributeValue.builder().s((String) model.Items.get("AgeVeridation")).build()
             );
 
             put("VoiceActor"
-                , ((Collection<String>) data.get("VoiceActor")).size() == 0
+                , ((Collection<String>) model.ListItems.get("VoiceActor")).size() == 0
                     ? AttributeValue.builder().nul(true).build()
-                    : AttributeValue.builder().ss((Collection<String>) data.get("VoiceActor")).build()
+                    : AttributeValue.builder().ss((Collection<String>) model.ListItems.get("VoiceActor")).build()
             );
             put("StarNum"
-                , StringUtils.isEmpty((String) data.get("StarNum"))
+                , StringUtils.isEmpty((String) model.Items.get("StarNum"))
                     ? AttributeValue.builder().nul(true).build()
-                    : AttributeValue.builder().n((String) data.get("StarNum")).build()
+                    : AttributeValue.builder().n((String) model.Items.get("StarNum")).build()
             );
 
             put("Genru"
-                , ((Collection<String>) data.get("Genru")).size() == 0
+                , ((Collection<String>) model.ListItems.get("Genru")).size() == 0
                     ? AttributeValue.builder().nul(true).build()
-                    : AttributeValue.builder().ss((Collection<String>) data.get("Genru")).build()
+                    : AttributeValue.builder().ss((Collection<String>) model.ListItems.get("Genru")).build()
             );
 
             put("MostProperyGenru"
-                , ((Map<String,AttributeValue>) data.get("MostProperyGenru")).size() == 0
+                , ((Map<String,AttributeValue>) model.DBDependenItems.get("MostProperyGenru")).size() == 0
                     ? AttributeValue.builder().nul(true).build()
-                    : AttributeValue.builder().m((Map<String,AttributeValue>) data.get("MostProperyGenru")).build()
+                    : AttributeValue.builder().m((Map<String,AttributeValue>) model.DBDependenItems.get("MostProperyGenru")).build()
             );
             put("BuyingUserViewItems"
-                , ((Map<String,AttributeValue>) data.get("BuyingUserViewItems")).size() == 0
+                , ((Map<String,AttributeValue>) model.DBDependenItems.get("BuyingUserViewItems")).size() == 0
                     ? AttributeValue.builder().nul(true).build()
-                    : AttributeValue.builder().m((Map<String,AttributeValue>) data.get("BuyingUserViewItems")).build()
+                    : AttributeValue.builder().m((Map<String,AttributeValue>) model.DBDependenItems.get("BuyingUserViewItems")).build()
             );
 
             put("LookingUserViewItems"
-                , ((Map<String,AttributeValue>) data.get("LookingUserViewItems")).size() == 0
+                , ((Map<String,AttributeValue>) model.DBDependenItems.get("LookingUserViewItems")).size() == 0
                     ? AttributeValue.builder().nul(true).build()
-                    : AttributeValue.builder().m((Map<String,AttributeValue>) data.get("LookingUserViewItems")).build()
+                    : AttributeValue.builder().m((Map<String,AttributeValue>) model.DBDependenItems.get("LookingUserViewItems")).build()
             );
             
             put("Reviews"
-                , ((Collection<String>) data.get("Reviews")).size() == 0
+                , ((Collection<String>) model.ListItems.get("Reviews")).size() == 0
                     ? AttributeValue.builder().nul(true).build()
-                    : AttributeValue.builder().ss((Collection<String>) data.get("Reviews")).build()
+                    : AttributeValue.builder().ss((Collection<String>) model.ListItems.get("Reviews")).build()
             );
             put("ReviewNum"
-                , StringUtils.isEmpty((String) data.get("ReviewNum"))
+                , StringUtils.isEmpty((String) model.Items.get("ReviewNum"))
                     ? AttributeValue.builder().nul(true).build()
-                    : AttributeValue.builder().n((String) data.get("ReviewNum")).build()
+                    : AttributeValue.builder().n((String) model.Items.get("ReviewNum")).build()
             );
             put("Monopoly"
-                , data.get("Monopoly") == null 
+                , model.BoolItems.get("Monopoly") == null 
                     ? AttributeValue.builder().nul(true).build()
-                    : AttributeValue.builder().bool((Boolean) data.get("Monopoly")).build()
+                    : AttributeValue.builder().bool((Boolean) model.BoolItems.get("Monopoly")).build()
             );
             put("AffiliateUrl"
-                , StringUtils.isEmpty((String) data.get("AffiliateUrl"))
+                , StringUtils.isEmpty((String) model.Items.get("AffiliateUrl"))
                     ? AttributeValue.builder().nul(true).build()
-                    : AttributeValue.builder().s((String) data.get("AffiliateUrl")).build()
+                    : AttributeValue.builder().s((String) model.Items.get("AffiliateUrl")).build()
             );
 
             put("AffiliateBigImageUrl"
-                , StringUtils.isEmpty((String) data.get("AffiliateBigImageUrl"))
+                , StringUtils.isEmpty((String) model.Items.get("AffiliateBigImageUrl"))
                     ? AttributeValue.builder().nul(true).build()
-                    : AttributeValue.builder().s((String) data.get("AffiliateBigImageUrl")).build()
+                    : AttributeValue.builder().s((String) model.Items.get("AffiliateBigImageUrl")).build()
             );
             put("AffiliateMiddleImageUrl"
-                , StringUtils.isEmpty((String) data.get("AffiliateMiddleImageUrl"))
+                , StringUtils.isEmpty((String) model.Items.get("AffiliateMiddleImageUrl"))
                     ? AttributeValue.builder().nul(true).build()
-                    : AttributeValue.builder().s((String) data.get("AffiliateMiddleImageUrl")).build()
+                    : AttributeValue.builder().s((String) model.Items.get("AffiliateMiddleImageUrl")).build()
             );
             put("AffiliateSmallImageUrl"
-                , StringUtils.isEmpty((String) data.get("AffiliateSmallImageUrl"))
+                , StringUtils.isEmpty((String) model.Items.get("AffiliateSmallImageUrl"))
                     ? AttributeValue.builder().nul(true).build()
-                    : AttributeValue.builder().s((String) data.get("AffiliateSmallImageUrl")).build()
+                    : AttributeValue.builder().s((String) model.Items.get("AffiliateSmallImageUrl")).build()
             );
             put("PlayerEmbed"
-                , ((Collection<String>) data.get("PlayerEmbed")).size() == 0
+                , ((Collection<String>) model.ListItems.get("PlayerEmbed")).size() == 0
                     ? AttributeValue.builder().nul(true).build()
-                    : AttributeValue.builder().ss((Collection<String>) data.get("PlayerEmbed")).build()
+                    : AttributeValue.builder().ss((Collection<String>) model.ListItems.get("PlayerEmbed")).build()
             );
             put("Gallery"
-                , ((Collection<String>) data.get("Gallery")).size() == 0
+                , ((Collection<String>) model.ListItems.get("Gallery")).size() == 0
                     ? AttributeValue.builder().nul(true).build()
-                    : AttributeValue.builder().ss((Collection<String>) data.get("Gallery")).build()
+                    : AttributeValue.builder().ss((Collection<String>) model.ListItems.get("Gallery")).build()
             );
             put("CreatedAt", AttributeValue.builder()
-                .s((String) data.get("CreatedAt"))
+                .s((String) model.Items.get("CreatedAt"))
                 .build()
             );
         }};
@@ -351,38 +351,25 @@ public class DynamoDbDLSite extends DB<DynamoDbClient>
                 .item(items)
                 .build();
     }
-    // public void putItem(PutItemRequest request)
-    public void putItem(Map<String,Object> data)
+
+    public void putItem()
     {
         logger.info("putItem start");
 
-        PutItemRequest putItemRequest = buildPutRequest(data);
+        PutItemRequest putItemRequest = buildPutRequest();
 
-        PutItemResponse response = ((DynamoDbClient) dbconnection).putItem(putItemRequest);
+        PutItemResponse response = dbconnection.putItem(putItemRequest);
         
         logger.info("putItem finish");
     }
 
     @Override
-    public void upsertItem(Map<String,Object> data)
+    public void upsertItem()
     {
         logger.info("upsertItem start");
-        super.upsertItem(data);
+        super.upsertItem();
         logger.info("upsertItem finish");
     }
-
-    // public void query(Map<String,Object> data)
-    // {
-        
-    //     QueryRequest.builder()
-    //         .expressionAttributeNames(
-    //             new HashMap<String,String>(){{
-    //                 put("ShopItemName",data.get("ShopItemName"));
-    //             }}
-    //         )
-    //         .
-    //     // QueryRequest
-    // }
     
     public void setupDB() throws TimeoutException,InterruptedException
     {
