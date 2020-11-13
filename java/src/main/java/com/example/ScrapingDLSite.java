@@ -41,8 +41,6 @@ import java.util.Date;
 import java.util.ArrayList;
 import java.lang.Thread;
 
-import com.amazonaws.services.s3.model.AmazonS3Exception;
-
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.core.waiters.WaiterResponse;
 import software.amazon.awssdk.regions.Region;

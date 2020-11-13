@@ -25,7 +25,7 @@ public abstract class Controller {
     protected Model model; 
     protected Logger logger;
     abstract protected Properties openProperties(String path) throws FileNotFoundException,IOException,UnsupportedEncodingException;
-    abstract protected void constructor(String path) throws IllegalArgumentException,FileNotFoundException,IOException,UnsupportedEncodingException;
+    abstract protected void constructor(String path) throws Exception;
     abstract public void destructor();
     abstract public void setupController() throws TimeoutException,InterruptedException;
 }

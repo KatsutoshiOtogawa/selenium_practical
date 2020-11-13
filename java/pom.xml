@@ -45,12 +45,6 @@
       <artifactId>selenium-support</artifactId>
       <version>3.141.59</version>
     </dependency>
-    <!-- https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-s3 -->
-<dependency>
-    <groupId>com.amazonaws</groupId>
-    <artifactId>aws-java-sdk-s3</artifactId>
-    <version>1.11.893</version>
-</dependency>
 
     <dependency>
       <groupId>software.amazon.awssdk</groupId>
@@ -63,6 +57,26 @@
     <artifactId>s3</artifactId>
     <version>2.15.23</version>
 </dependency>
+
+<!-- https://mvnrepository.com/artifact/com.google.api-client/google-api-client -->
+<dependency>
+    <groupId>com.google.api-client</groupId>
+    <artifactId>google-api-client</artifactId>
+    <version>1.31.0</version>
+</dependency>
+<!-- https://mvnrepository.com/artifact/com.google.oauth-client/google-oauth-client-jetty -->
+<dependency>
+    <groupId>com.google.oauth-client</groupId>
+    <artifactId>google-oauth-client-jetty</artifactId>
+    <version>1.31.2</version>
+</dependency>
+<!-- https://mvnrepository.com/artifact/com.google.apis/google-api-services-drive -->
+<dependency>
+    <groupId>com.google.apis</groupId>
+    <artifactId>google-api-services-drive</artifactId>
+    <version>v3-rev197-1.25.0</version>
+</dependency>
+
 
     <dependency>
       <groupId>org.openjfx</groupId>
@@ -135,6 +149,7 @@
                 <includes>
                   <include>ArtName.txt</include>
                   <include>.env</include>
+                  <include>credentials.json</include>
                 </includes>
               </resource>
               <resource>

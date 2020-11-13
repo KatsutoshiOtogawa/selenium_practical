@@ -73,7 +73,7 @@ public class DynamoDbDLSite extends DB<DynamoDbClient>
     public DynamoDbDLSite(Properties properties) throws IllegalArgumentException
     {   
         super(properties);
-        logger = LogManager.getFormatterLogger(DynamoDbDLSite.class);
+        this.logger = LogManager.getFormatterLogger(DynamoDbDLSite.class);
         this.TableName = "ArtCollection";
         this.ShopName = "DLSite";
         constructor();

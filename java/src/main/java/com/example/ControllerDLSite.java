@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
+import java.security.GeneralSecurityException;
 
 import java.util.ArrayList;
 import java.lang.Thread;
@@ -75,7 +76,7 @@ import software.amazon.awssdk.services.s3.model.S3Exception;
 public class ControllerDLSite extends Controller
 {
        
-    public ControllerDLSite(String path) throws IllegalArgumentException,IllegalStateException,FileNotFoundException,IOException
+    public ControllerDLSite(String path) throws IllegalArgumentException,GeneralSecurityException,IllegalStateException,FileNotFoundException,IOException
     {
         
         this.CreatedAt = (new SimpleDateFormat("yyyy-MM-dd")).format(new Date());
@@ -136,13 +137,17 @@ public class ControllerDLSite extends Controller
         return properties;
     }
 
-    protected void constructor(String path) throws IllegalArgumentException,S3Exception,FileNotFoundException,IOException,UnsupportedEncodingException,IllegalStateException,StorageTypeNotFoundException
+    protected void constructor(String path) throws IllegalArgumentException,GeneralSecurityException,S3Exception,FileNotFoundException,IOException,UnsupportedEncodingException,IllegalStateException,StorageTypeNotFoundException
     {
         logger.info("resource opening...");
         Properties properties = openProperties(path);
 
-        storage = new Storage(properties);
-        
+        // storage = new Storage(properties);
+        // AWSなど判断して返す。
+        // DBTypeあたりに入れるべきか。
+        storage = StorageBuilder.build(properties);
+        // storage = new AWSS3(properties);
+
         try
         {
             db = new DynamoDbDLSite(properties);

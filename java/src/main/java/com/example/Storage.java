@@ -22,21 +22,9 @@ import java.util.Map;
 import java.util.HashMap;
 import java.lang.Thread;
 import java.io.File;
-
-// import com.amazonaws.regions.Regions;
-// import com.amazonaws.services.s3.AmazonS3;
-// import com.amazonaws.services.s3.AmazonS3ClientBuilder;
-// import com.amazonaws.services.s3.model.AmazonS3Exception;
-// import com.amazonaws.services.s3.model.Bucket;
-// import com.amazonaws.AmazonServiceException;
-// import com.amazonaws.services.s3.transfer.MultipleFileUpload;
-// import com.amazonaws.services.s3.transfer.TransferProgress;
-// import com.amazonaws.services.s3.transfer.TransferManager;
-// import com.amazonaws.services.s3.transfer.Transfer.TransferState;
-// import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
-// import com.amazonaws.services.s3.transfer.Upload;
-// import com.amazonaws.AmazonClientException;
-// import com.amazonaws.regions.Regions;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.nio.file.Files;
 
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -64,58 +52,65 @@ import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.core.sync.ResponseTransformer;
 import software.amazon.awssdk.services.s3.model.BucketAlreadyOwnedByYouException;
 
+
+
 /**
  * 
  */
-public class Storage {
-    public String ShopItemId;
-    public String ShopName;
+public abstract class Storage<T> implements StorageInterface{
+    protected String ShopItemId;
+    protected String ShopName;
     protected String CreatedAt;
     protected Properties properties;
     protected String usePath;
-    protected static HttpRequestFactory factory;
+    private static HttpRequestFactory factory = new NetHttpTransport().createRequestFactory();;
     protected String bucketname;
-    protected Object storageClient;
-    private static final Logger logger = LogManager.getFormatterLogger(Storage.class);
+    protected T storageClient;
+    protected Logger logger;
     protected StorageType storageType;
 
-    public Storage(Properties properties) throws StorageTypeNotFoundException,S3Exception
-    {
-        this.CreatedAt = (new SimpleDateFormat("yyyy-MM-dd")).format(new Date());
-        this.factory = new NetHttpTransport().createRequestFactory();
-        this.properties = properties;
-        constructor();
-    }
+    // public Storage(Properties properties) throws StorageTypeNotFoundException,S3Exception
+    // {
+    //     this.CreatedAt = (new SimpleDateFormat("yyyy-MM-dd")).format(new Date());
+    //     this.factory = new NetHttpTransport().createRequestFactory();
+    //     this.properties = properties;
+    //     constructor();
+    // }
 
-    protected void constructor() throws StorageTypeNotFoundException,S3Exception
-    {
+    // protected void constructor() throws StorageTypeNotFoundException,S3Exception
+    // {
 
-        switch(System.getenv("USE_STORAGE") != null ? System.getenv("USE_STORAGE") : properties.getProperty("USE_STORAGE"))
-        {
-            case "S3":
+    //     // 与えられた値によって返すインスタンスを変える?
+    //     switch(System.getenv("USE_STORAGE") != null ? System.getenv("USE_STORAGE") : properties.getProperty("USE_STORAGE"))
+    //     {
+    //         case "S3":
 
-                this.storageType = StorageType.S3;
-                break;
-            case "LOCAL_DISK":
-                this.storageType = StorageType.LOCAL_DISK;
-                break;
-            default:
-                throw new StorageTypeNotFoundException();
-        }
+    //             this.storageType = StorageType.S3;
+    //             break;
+    //         case "LOCAL_DISK":
+    //             this.storageType = StorageType.LOCAL_DISK;
+    //             break;
+    //         case "GOOGLE_DRIVE":
+    //             this.storageType = StorageType.GOOGLE_DRIVE;
+    //             break;
+    //         default:
+    //             throw new StorageTypeNotFoundException();
+    //     }
 
 
-        this.usePath = System.getenv("USE_PATH") != null ? System.getenv("USE_PATH") : properties.getProperty("USE_PATH");
+    //     this.usePath = System.getenv("USE_PATH") != null ? System.getenv("USE_PATH") : properties.getProperty("USE_PATH");
 
-        this.bucketname = (System.getenv("BUCKET_NAME") != null ? System.getenv("BUCKET_NAME") : properties.getProperty("BUCKET_NAME")
-                            ).toLowerCase();
+    //     this.bucketname = (System.getenv("BUCKET_NAME") != null ? System.getenv("BUCKET_NAME") : properties.getProperty("BUCKET_NAME")
+    //                         ).toLowerCase();
 
-        createRemoteStorage();
+    //     createRemoteStorage();
         
-    }
+    // }
+
+    protected abstract T createStorageConnection() throws Exception;
 
     protected void download(String uri) throws IOException,InterruptedException
     {
-        logger.info("download start");
         String name = uri.substring(uri.lastIndexOf("/") + 1);
 
         HttpRequest request = factory.buildGetRequest(new GenericUrl(uri));
@@ -129,143 +124,181 @@ public class Storage {
 
         Thread.sleep(6);
 
-        logger.info("download finish");
     }
 
     public void createShopItemIdPath()
     {
-        logger.info("createShopItemIdPath start");
         File file = new File(Paths.get(usePath,ShopName,ShopItemId).toString());
         file.mkdirs();
-
-        logger.info("createShopItemIdPath finish");
     }
 
-    protected void createRemoteStorage() throws S3Exception
+    protected abstract void createRemoteStorage();
+
+    public void transport(String uri) throws IOException,InterruptedException,Exception
     {
-        logger.info("createRemoteStorage start");
-
-        if(StorageType.LOCAL_DISK != storageType)
-        {
-            logger.info("createRemoteStorage creating...");
-
-            storageClient = S3Client.builder()
-                        .region(Region.AP_NORTHEAST_1)
-                        .build();
-
-            try 
-            {
-                CreateBucketRequest request = CreateBucketRequest.builder()
-                                        .bucket(bucketname)
-                                        .build();
-
-                ((S3Client)storageClient).createBucket(request);
-            }catch(BucketAlreadyExistsException ignore){
-                logger.info("createRemoteStorage bucket already exists.");
-
-            }catch(BucketAlreadyOwnedByYouException ignore){
-                logger.info("createRemoteStorage bucket already owned.");
-
-            } catch (S3Exception ex) {
-                logger.error("createRemoteStorage creating failed.");
-                throw ex;
-            }
-        }
-        logger.info("createRemoteStorage finish");
-    }
-
-    public void transport(String uri) throws IOException,InterruptedException,S3Exception
-    {
-
+ // , GeneralSecurityException
         download(uri);
-
-        if(StorageType.LOCAL_DISK != storageType)
-        {
-            upload(uri);
-        }
+        upload(uri);
+        // if(StorageType.LOCAL_DISK != storageType)
+        // {
+        //     upload(uri);
+        // }
         
     }
 
+    protected abstract void upload(String uri) throws IOException,Exception;
     
-    protected void upload(String uri) throws S3Exception
-    {
-        logger.info("upload start");
+    // protected void upload(String uri) throws S3Exception,GeneralSecurityException,IOException
+    // {
+    //     logger.info("upload start");
         
-        // S3
-        if(StorageType.S3 == storageType)
-        {
-            logger.info("upload starting...");
-            // createBucket code.
-            
-            /** アップロード処理は別のプロセスとして起動。*/
+    //     // S3
+    //     if(StorageType.S3 == storageType)
+    //     {
+    //         logger.info("upload starting...");
+    //         // createBucket code.
 
-            String name = uri.substring(uri.lastIndexOf("/") + 1);
+    //         String name = uri.substring(uri.lastIndexOf("/") + 1);
             
-            File f = new File(Paths.get(usePath,ShopName,ShopItemId,name).toString());
+    //         File f = new File(Paths.get(usePath,ShopName,ShopItemId,name).toString());
                         
-            try {
+    //         try {
 
-                logger.info("upload try create request");
+    //             logger.info("upload try create request");
 
-                PutObjectRequest request = PutObjectRequest.builder()
-                            .bucket(bucketname)
-                            .key(Paths.get(ShopName,ShopItemId,name).toString())
-                            .build();
+    //             PutObjectRequest request = PutObjectRequest.builder()
+    //                         .bucket(bucketname)
+    //                         .key(Paths.get(ShopName,ShopItemId,name).toString())
+    //                         .build();
 
-                logger.info("upload try putobject");
+    //             logger.info("upload try putobject");
 
-                ((S3Client)storageClient).putObject(request,
-                        RequestBody.fromFile(f)
-                        );
+    //             ((S3Client)storageClient).putObject(request,
+    //                     RequestBody.fromFile(f)
+    //                     );
 
-                // System.out.println(xfer.getDescription());
-                // print an empty progress bar...
-                // printProgressBar(0.0);
-                // // update the progress bar while the xfer is ongoing.
-                // do {
-                //     try {
-                //         Thread.sleep(100);
-                //     } catch (InterruptedException e) {
-                //         return;
-                //     }
-                //     // Note: so_far and total aren't used, they're just for
-                //     // documentation purposes.
-                //     TransferProgress progress = xfer.getProgress();
-                //     long so_far = progress.getBytesTransferred();
-                //     long total = progress.getTotalBytesToTransfer();
-                //     double pct = progress.getPercentTransferred();
-                //     eraseProgressBar();
-                //     printProgressBar(pct);
-                // } while (xfer.isDone() == false);
-                // // print the final state of the transfer.
-                // TransferState xfer_state = xfer.getState();
-                // System.out.println(": " + xfer_state);
+    //             // System.out.println(xfer.getDescription());
+    //             // print an empty progress bar...
+    //             // printProgressBar(0.0);
+    //             // // update the progress bar while the xfer is ongoing.
+    //             // do {
+    //             //     try {
+    //             //         Thread.sleep(100);
+    //             //     } catch (InterruptedException e) {
+    //             //         return;
+    //             //     }
+    //             //     // Note: so_far and total aren't used, they're just for
+    //             //     // documentation purposes.
+    //             //     TransferProgress progress = xfer.getProgress();
+    //             //     long so_far = progress.getBytesTransferred();
+    //             //     long total = progress.getTotalBytesToTransfer();
+    //             //     double pct = progress.getPercentTransferred();
+    //             //     eraseProgressBar();
+    //             //     printProgressBar(pct);
+    //             // } while (xfer.isDone() == false);
+    //             // // print the final state of the transfer.
+    //             // TransferState xfer_state = xfer.getState();
+    //             // System.out.println(": " + xfer_state);
 
-                // //  or block with Transfer.waitForCompletion()
-                // // XferMgrProgress.waitForCompletion(xfer);
+    //             // //  or block with Transfer.waitForCompletion()
+    //             // // XferMgrProgress.waitForCompletion(xfer);
 
-                // try {
-                //     xfer.waitForCompletion();
-                // } catch (AmazonServiceException e) {
-                //     System.err.println("Amazon service error: " + e.getMessage());
-                //     System.exit(1);
-                // } catch (AmazonClientException e) {
-                //     System.err.println("Amazon client error: " + e.getMessage());
-                //     System.exit(1);
-                // } catch (InterruptedException e) {
-                //     System.err.println("Transfer interrupted: " + e.getMessage());
-                //     System.exit(1);
-                // }
+    //             // try {
+    //             //     xfer.waitForCompletion();
+    //             // } catch (AmazonServiceException e) {
+    //             //     System.err.println("Amazon service error: " + e.getMessage());
+    //             //     System.exit(1);
+    //             // } catch (AmazonClientException e) {
+    //             //     System.err.println("Amazon client error: " + e.getMessage());
+    //             //     System.exit(1);
+    //             // } catch (InterruptedException e) {
+    //             //     System.err.println("Transfer interrupted: " + e.getMessage());
+    //             //     System.exit(1);
+    //             // }
 
-            } catch (S3Exception ex) {
-                throw ex;
-            }
-            // xfer_mgr.shutdownNow();
+    //         } catch (S3Exception ex) {
+    //             throw ex;
+    //         }
+    //         // xfer_mgr.shutdownNow();
 
 
-        }
-        logger.info("upload finish");
-    }
+    //     }
+
+    //     // GOOGLE_DRIVE
+    //     if(StorageType.GOOGLE_DRIVE == storageType)
+    //     {
+
+    //         logger.info("upload try create request");
+    //         Drive service = null;
+    //         try
+    //         {
+    //             // Build a new authorized API client service.
+    //         // あとでconstructorに書く。S3Clientに相当するため。
+    //         final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+    //         service = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
+    //                 .setApplicationName(APPLICATION_NAME)
+    //                 .build();
+
+    //         }catch(GeneralSecurityException ex){
+    //             throw ex;
+    //         }
+
+    //         try{
+    //                 // String folderId, String filePath, String fileName
+
+    //         // String mimeType = Files.probeContentType(Paths.get(usePath,ShopName,ShopItemId,name));
+
+            
+    //         String mimeType = Files.probeContentType(Paths.get("/Volumes/EXTERNAL_HDD/source/selenium_practical/Pipfile"));
+
+    //         com.google.api.services.drive.model.File fileMetadata = new com.google.api.services.drive.model.File();
+    //         // fileMetadata.setName(name);
+    //         fileMetadata.setName(Paths.get(ShopName,ShopItemId,"Pipfile").toString());
+
+    //         // fileMetadata.setName(Paths.get(ShopName,ShopItemId,name).toString());
+    //         // if (Objects.nonNull(folderId)) {
+    //         //     fileMetadata.setParents(Collections.singletonList(folderId));
+    //         // }
+
+    //         // java.io.File localFilePath = 
+    //         // FileContent mediaContent = new FileContent(mimeType, new File(Paths.get(usePath,ShopName,ShopItemId,name)));
+
+    //         FileContent mediaContent = new FileContent(mimeType, new File("/Volumes/EXTERNAL_HDD/source/selenium_practical/Pipfile"));
+
+    //         logger.info("upload try GoogleDrive");
+    //         com.google.api.services.drive.model.File file = service.files()
+    //                 .create(fileMetadata, mediaContent)
+    //                 .setFields("id, name, webContentLink, webViewLink")
+    //                 .execute();
+
+    //         // ret = new HashMap<String,String>();
+    //         // ret.put("id",file.getId());
+    //         // ret.put("name",file.getName());
+    //         // ret.put("webContentLink",file.getWebContentLink());
+    //         // ret.put("webViewLink",file.getWebViewLink());
+
+    //         } catch (IOException ex) {
+    //             throw ex;
+    //         }
+            
+    //         // Print the names and IDs for up to 10 files.
+    //         // FileList result = service.files().list()
+    //         //         .setPageSize(10)
+    //         //         .setFields("nextPageToken, files(id, name)")
+    //         //         .execute();
+    //         // List<File> files = result.getFiles();
+    //         // if (files == null || files.isEmpty()) {
+    //         //     System.out.println("No files found.");
+    //         // } else {
+    //         //     System.out.println("Files:");
+    //         //     for (File file : files) {
+    //         //         System.out.printf("%s (%s)\n", file.getName(), file.getId());
+    //         //     }
+    //         // }
+    //     }
+
+    //     logger.info("upload finish");
+    // }
 
     public static void printProgressBar(double pct) {
         // if bar_size changes, then change erase_bar (in eraseProgressBar) to

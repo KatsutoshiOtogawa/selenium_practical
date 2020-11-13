@@ -5,9 +5,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
-import java.util.ArrayList;
-// import java.util.List;
-// import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 /**
